@@ -204,7 +204,7 @@ def db(request, id):
         elif f_transporte > -1 :
             transporte_ids = tabla.values_list('transporte', flat = True).distinct()
             tabla = ProgramacionGeneral.objects.filter(excel_id = id, transporte = f_transporte).order_by('id')
-
+ 
         elif f_contratista > -1 :
             contratista_ids = tabla.values_list('contratista', flat = True).distinct()
             tabla = ProgramacionGeneral.objects.filter(excel_id = id, contratista = f_contratista).order_by('id')
