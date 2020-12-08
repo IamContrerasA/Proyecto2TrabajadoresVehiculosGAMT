@@ -1,0 +1,120 @@
+<style>
+@page {
+  size: letter landscape;
+  margin: 1cm;
+}
+h1 {
+    text-align:right;
+}
+.styled-table {
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    min-width: 400px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    
+}
+.styled-table thead tr {
+    background-color: #9b7c69;
+    color: #ffffff;
+    text-align: left;
+}
+
+.styled-table tr {
+    padding-bottom: 6px;
+    padding-top: 6px;
+    
+}
+.styled-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+.styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid #009879;
+}
+.styled-table tbody tr.active-row {
+    font-weight: bold;
+    color: #009879;
+}
+#cssTable td{
+    text-align: center; 
+    vertical-align: middle;
+}
+</style>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Reporte Pdf</title>
+</head>
+
+{% block content %}
+<table>
+<tr>
+  {% load static %}  		
+  
+  <td><img src="{{ STATIC_ROOT }}/img/scan-global-logistics.jpg" height='50px'></td>
+  <td><h1>Reporte {{ start_date }} | {{ end_date }}</h1></td>
+</tr>
+</table>
+<hr>
+
+<!--Todas las observaciones-->
+<table class="styled-table" id="cssTable">
+  <thead>
+    <tr>
+      <th>Item</th>	
+			<th>Fecha</th>
+			<th>Lugar</th>
+			<th>Contratista</th>
+			<th>Empresa Transportista</th>
+			<th>Unidad Involucrada</th>
+			<th>Categoría de Evento</th>
+			<th>Descripción</th>
+			<th>Evidencia Fotográfica</th>
+			<th>Plan de Acción</th>	
+			<th>Responsable</th>	
+			<th>Fecha de Levantamiento</th>
+			<th>Evidencia Correctiva</th>
+			<th>Estado</th>      
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for observacion in observaciones %}
+    <tr>
+    
+      <td>{{ observacion.id }}</td>
+      <td>{{ observacion.date }}</td>
+      <td>{{ observacion.lugar.name }}</td>
+      <td>{{ observacion.programacion_general_id.contratista.name }}</td>
+      <td>{{ observacion.programacion_general_id.transporte.name }}</td>
+      <td>{{ observacion.programacion_general_id.conductor_placa.placa1 }}|{{ observacion.programacion_general_id.conductor_placa.placa2 }}</td>
+      <td>{{ observacion.categoria.name }}</td>
+      <td>{{ observacion.descripcion }}</td>
+      <td>        
+        {% if observacion.evidencia_encode != "undefined"  %}        
+          <img src="data:image/png;base64,{{observacion.evidencia_encode|slice:'2:-1'}}" height='200px'>          
+        {% endif %}
+      </td>
+      <td>{{ observacion.accion_plan }}</td>
+      <td>CONTRATISTA</td>
+      <td>{{ observacion.date }}</td>
+      <td>      
+        {% if observacion.evidencia_correctiva_encode != "undefined"  %}
+            <img src="data:image/png;base64,{{observacion.evidencia_correctiva_encode|slice:'2:-1'}}" height='200px'>        
+        {% endif %}
+      </td>
+      <td>{{ observacion.estado.name }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+</html>

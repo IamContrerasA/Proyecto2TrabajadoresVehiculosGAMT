@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+	<h1 class="h2">Reportes</h1>	
+	<div class="btn-toolbar mb-2 mb-md-0">
+		<div class="btn-group mr-2">
+			<a href="/reports/generate_pdf" class="btn btn-primary btn-lg active" role="button" aria-pressed="true" target="_blank">Descargar Reporte</a>
+		</div>
+	</div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+		<div class="form-group row">
+			<label for="Fecha" class="col-sm-2 col-form-label">Contratista</label>
+			<div class="col-sm-10">
+				<select class="form-control" name="contratista" id="id_contratista">
+					<option value="-1"> ninguno </option>
+					{% for contratista in contratistas %}
+							<option value="{{ contratista.id }}"> {{ contratista.name }} </option>
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+		<div class="form-group row">
+			<label for="Fecha" class="col-sm-2 col-form-label">Lugar</label>
+			<div class="col-sm-10">
+				<select class="form-control" name="lugar" id="id_lugar">
+					<option value="-1"> ninguno </option>
+					{% for lugar in lugares %}
+							<option value="{{ lugar.id }}"> {{ lugar.name }} </option>
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+		<div class="form-group row">
+			<label for="Fecha" class="col-sm-2 col-form-label">Categoria</label>
+			<div class="col-sm-10">
+				<select class="form-control" name="categoria" id="id_categoria">
+					<option value="-1"> ninguno </option>
+					{% for categoria in categorias %}
+							<option value="{{ categoria.id }}"> {{ categoria.name }} </option>
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+    <div class="form-group row">
+			<label for="Fecha" class="col-sm-2 col-form-label">Ingrese Fecha</label>
+			<div class="col-sm-10">
+				<input class="form-control" type="text" name="daterange" /><br>
+			</div>
+		</div>
+  </div>
+</div><br>
+
+
+<!--Todas las observaciones-->
+<table class="table " id="id_table">
+	<thead class="thead-dark">
+		<tr>
+			<th scope="col">Item</th>	
+			<th scope="col">Fecha</th>
+			<th scope="col">Lugar</th>
+			<th scope="col">Contratista</th>
+			<th scope="col">Empresa Transportista</th>
+			<th scope="col">Unidad Involucrada</th>
+			<th scope="col">Categoría de Evento</th>
+			<th scope="col">Descripción</th>
+			<th scope="col">Evidencia Fotográfica</th>
+			<th scope="col">Plan de Acción</th>	
+			<th scope="col">Responsable</th>	
+			<th scope="col">Fecha de Levantamiento</th>
+			<th scope="col">Evidencia Correctiva</th>
+			<th scope="col">Estado</th>	
+		</tr>
+	</thead>
+
+	<tbody>		
+	</tbody>
+</table>
+
+<!--Modal para ver imagenes grande-->
+<div class="modal left fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">              
+			<div class="modal-body" >
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<div class="container">					
+						<img src="" class="imagepreview" >
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+	
+	<!--Consulta Ajax-->
+	<script>
+		var token = '{{csrf_token}}';
+		$(function() {
+			$('input[name="daterange"]').daterangepicker({
+				opens: 'left'
+			}, function(start, end, label) {
+				console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+				var t = $('#id_table').DataTable();
+				var contratista = $('#id_contratista')[0].value;
+				var lugar = $('#id_lugar')[0].value;
+				var categoria = $('#id_categoria')[0].value;
+				
+				var fd = new FormData();
+				var start_date = start.format('YYYY-MM-DD');
+				var end_date = end.format('YYYY-MM-DD');
+				fd.append('start_date', start_date);
+				fd.append('end_date', end_date);  
+				fd.append('contratista', contratista);  
+				fd.append('lugar', lugar);  
+				fd.append('categoria', categoria);     
+				
+				// AJAX request
+				$.ajax({
+					headers: { "X-CSRFToken": token },
+					url: '/reports/create',          
+					type: 'POST',
+					data: fd,
+					contentType: false,
+					processData: false,
+					success: function(response){
+						if(response != 0){
+							resultados = response.resultado
+							console.log(resultados);
+							t.clear();
+
+							if (resultados != "vacio"){
+								resultados.forEach(element => {
+									if(element.evidencia_encode != "undefined" && element.evidencia_encode != null){									
+										link_evidencia_encode = "<a href='#' class='pop'><img src='data:image/png;base64,"+ element.evidencia_encode.slice(2, -1) +"' style='width:100px;height:100px;' id='myImg'> </a>";									
+									}else{
+										link_evidencia_encode = "PENDIENTE";
+									}
+									if(element.evidencia_correctiva_encode != "undefined" && element.evidencia_correctiva_encode != null){
+										link_evidencia_correctiva_encode = "<a href='#' class='pop'><img src='data:image/png;base64,"+ element.evidencia_correctiva_encode.slice(2, -1) +"' style='width:100px;height:100px;' id='myImg'> </a>";
+									}else{
+										link_evidencia_correctiva_encode = "PENDIENTE";
+									}				
+									tags = "<h4 class='table-success'>"+element.estado__name+"</h4>"
+									if(element.estado__name == "DESAPROBADO"){
+										tags = "<h4 class='table-danger'>"+element.estado__name+"</h4>"
+									}
+									
+									t.row.add([
+										element.id,
+										element.date,
+										element.lugar__name,
+										element.programacion_general_id__contratista__name,
+										element.programacion_general_id__transporte__name,
+										element.programacion_general_id__conductor_placa__placa1 +" | " + element.programacion_general_id__conductor_placa__placa2,
+										element.categoria__name,
+										element.descripcion,												
+										link_evidencia_encode,
+										element.accion_plan,
+										"CONTRATISTA",
+										element.date,
+										link_evidencia_correctiva_encode,									
+										tags									
+									]).draw( false );	
+								});
+							}else{
+								t.row.add(["","","","","","","","","","","","","",""]).draw( false );	
+							}
+						}
+					}
+				});
+			});
+		
+		});
+	</script>	
+
+	<!--Script para agrandar imagen en modal-->
+	<script>
+		$(function() {			
+			$(document).on('click', '.pop', function() {				
+				$('.imagepreview').attr('src', $(this).find('img').attr('src'));
+				$('#imagemodal').modal('show');   
+			});		
+		});
+	</script>
+{% endblock %}

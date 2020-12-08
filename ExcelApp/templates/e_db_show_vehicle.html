@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Vehiculo: {{vehiculo_archivos.placa.placa1}} | {{vehiculo_archivos.placa.placa1}}</h1>
+</div>
+
+<table class="table">
+  <tbody>
+    <tr>
+      <th scope="row">Fecha</th>
+      <td>{{ vehiculo_archivos.date}}</td>
+    </tr>
+
+    <tr>
+      <th scope="row">ChecList Foto</th>
+      <td>
+        <a href="data:image/png;base64,{{vehiculo_archivos.checklist_file_encode|slice:'2:-1'}}" target="_blank">{{ vehiculo_archivos.checklist_file}}</a>        
+      </td>
+    </tr>
+    {% if vehiculo_archivos.checklist_file_encode %}
+    <tr>
+      <th scope="row"></th>
+      <td>        
+        <img src="data:image/png;base64,{{vehiculo_archivos.checklist_file_encode|slice:'2:-1'}}" style="width:500px;height:600px;">
+      </td>
+    </tr>
+    {% endif %}    
+    
+
+  </tbody>
+</table>
+
+{% endblock %}

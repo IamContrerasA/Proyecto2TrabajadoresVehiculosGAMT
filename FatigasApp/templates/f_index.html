@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+	<h1 class="h2">Lista de Fatiga</h1>
+	<div class="btn-toolbar mb-2 mb-md-0">
+		<div class="btn-group mr-2">
+			<a href="/fatigues/create" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Crear
+				Fatiga</a>
+		</div>
+	</div>
+</div>
+
+
+<table class="table " id="id_table">
+	<thead class="thead-dark">
+		<tr>
+			<th scope="col">Id</th>	
+			<th scope="col">Trabajador</th>
+			<th scope="col">Horas de sueño</th>
+			<th scope="col">Hora que se acostó</th>
+			<th scope="col">Hora que se levantó</th>
+			<th scope="col">Actions</th>	
+		</tr>
+	</thead>
+
+	<tbody>
+		{% for fatigue in fatigues %}
+		<tr>
+			<td>{{ fatigue.id }}</td>
+			<td>{{ fatigue.worker.username }}</td>			
+			<td>{{ fatigue.slept_hours }}</td>
+			<td>{{ fatigue.time_to_bed }}</td>
+			<td>{{ fatigue.time_to_wake }}</td>
+			<td>
+				<a href="/fatigues/show/{{ fatigue.id }}"><span class="glyphicon glyphicon-pencil">Show</span></a>
+				<a href="/fatigues/edit/{{ fatigue.id }}"><span class="glyphicon glyphicon-pencil">Edit</span></a>
+				<a href="/fatigues/delete/{{ fatigue.id }}">Delete</a>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}

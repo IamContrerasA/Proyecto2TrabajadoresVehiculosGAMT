@@ -1,0 +1,598 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+
+{% block content %}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Observaciones</h1>
+</div>
+
+<!--HAY observacioens-->
+{% if existe %}
+  <h1 class="h2">OBSERVACION EN EL VEHICULO {{observaciones.0.programacion_general_id.conductor_placa.placa1}}/{{observaciones.0.programacion_general_id.conductor_placa.placa2}}</h1>
+
+  <!--Datos de programacion general-->
+  <table class="table">
+    <tbody>
+      <tr>
+        <th scope="row">Contratista</th>
+        <td>{{observaciones.0.programacion_general_id.contratista.name}}</td>
+      </tr>
+  
+      <tr>
+        <th scope="row">Empresa Transportista</th>
+        <td>{{observaciones.0.programacion_general_id.transporte.name}}</td>
+      </tr>
+  
+      <tr>
+        <th scope="row">Unidad Involucrada</th>
+        <td>{{observaciones.0.programacion_general_id.conductor_placa.placa1}}/{{observaciones.0.programacion_general_id.conductor_placa.placa2}}</td>
+      </tr>
+  
+      <tr>
+        <th scope="row">Personal Involucrado</th>
+        <td>{{observaciones.0.programacion_general_id.conductor.name}}</td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <!--Todas las observaciones-->
+  <table class="table " id="id_table">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">Id</th>	
+        <th scope="col">Categoría</th>	
+        <th scope="col">Lugar</th>	
+        <th scope="col">Descripción</th>
+        <th scope="col">Evidencia</th>
+        <th scope="col">Plan de Acción</th>	
+        <th scope="col">Evidencia Correctiva</th>
+        <th scope="col">Estado</th>
+        <th scope="col">Editar</th>
+        <th scope="col">Acciones</th>
+      </tr>
+    </thead>
+  
+    <tbody>
+      {% for observacion in observaciones %}
+      {% if observacion.estado.name == "DESAPROBADO" %}
+        <tr class="table-danger">
+      {% else %}
+        <tr class="table-success">
+      {% endif %}
+      
+        <td>{{ observacion.id }}</td>
+        <td>{{ observacion.categoria.name }}</td>
+        <td>{{ observacion.lugar.name }}</td>
+        <td>{{ observacion.descripcion }}</td>
+        <td>         
+          {% if observacion.evidencia_encode != "undefined"  %}
+          <a href="#" class="pop" id="pop{{observacion.id}}_evidencia">
+            <img src="data:image/png;base64,{{observacion.evidencia_encode|slice:'2:-1'}}" style="width:100px;height:100px;" id="evidencia-{{observacion.id}}">
+          </a>          
+          {% endif %}
+        </td>
+        <td>{{ observacion.accion_plan }}</td>        
+        <td>      
+          {% if observacion.evidencia_correctiva_encode != "undefined"  %}
+            <a href="#" class="pop" id="pop{{observacion.id}}_evidencia_correctiva">
+              <img src="data:image/png;base64,{{observacion.evidencia_correctiva_encode|slice:'2:-1'}}" style="width:100px;height:100px;" id="evidencia_correctiva-{{observacion.id}}">              
+            </a>
+          {% endif %}
+        </td>
+        <td>{{ observacion.estado.name }}</td>
+
+        <!--Modal para editar una observacion-->      
+        <td>          
+          <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#uploadModal{{observacion.id}}">Editar</button>            
+          <!-- Modal -->
+          <div id="uploadModal{{observacion.id}}" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">CERRAR</h4>
+                </div>
+                <div class="modal-body">
+                  <!-- Form -->
+                  <form method = "post" action='' enctype="multipart/form-data">
+                    {% csrf_token %} 
+                    
+                    Categoría :    
+                    <select class="form-control" name="categoria" id="categoria_{{observacion.id}}">
+                      {% for categoria in categorias %}
+                        {% if observacion.categoria.id == categoria.id %}
+                          <option selected="selected" value="{{ categoria.id }}"> {{ categoria.name }} </option>
+                        {% else %}
+                          <option value="{{ categoria.id }}"> {{ categoria.name }} </option>
+                        {% endif %}
+                      {% endfor %}
+                    </select><br> 
+                    Lugar :    
+                    <select class="form-control" name="lugar" id="lugar_{{observacion.id}}">
+                      {% for lugar in lugares %}
+                        {% if observacion.lugar.id == lugar.id %}
+                          <option selected="selected" value="{{ lugar.id }}"> {{ lugar.name }} </option>
+                        {% else %}
+                          <option value="{{ lugar.id }}"> {{ lugar.name }} </option>
+                        {% endif %}
+                      {% endfor %}
+                    </select><br>          
+                    Evidencia Fotográfica :<input type='file' name='evidencia' id='id_evidencia_{{observacion.id}}' required class='form-control' value="{{observacion.evidencia}}" ><br>                    
+                    {% if observacion.evidencia != "undefined"  %}
+                      Foto actual  
+                      <a href="#" class="pop">
+                        <img src="data:image/png;base64,{{observacion.evidencia_encode|slice:'2:-1'}}" style="width:100px;height:100px;"><br><br>
+                      </a>
+                    {% endif %}
+                    Descripción: <input type="text"  class="form-control" name="descripcion" id="id_descripcion_{{observacion.id}}" required value="{{observacion.descripcion}}" /><br>
+                    Plan de Acción: <input type="text"  class="form-control" name="plan_accion" id="id_plan_accion_{{observacion.id}}" value="{{observacion.accion_plan}}" /><br>
+                    Evidencia Correctiva :<input type='file' name='levantamiento' id='id_levantamiento_{{observacion.id}}' class='form-control' value=""><br>
+                    {% if observacion.evidencia_correctiva != "undefined"  %}
+                      Foto actual  
+                      <a href="#" class="pop">
+                        <img src="data:image/png;base64,{{observacion.evidencia_correctiva_encode|slice:'2:-1'}}" style="width:100px;height:100px;"><br><br>
+                      </a>
+                    {% endif %}
+                    <input type='button' class='btn btn-info' value='Editar Observacion' id='btn_upload_{{observacion.id}}' name='btn_upload_{{observacion.id}}-{{observacion.programacion_general_id.id}}'>
+                  </form> 
+                  <!-- Preview-->
+                  <div id='preview'></div>
+                </div>          
+              </div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <a href="/excel/db/{{id_file}}/obs_aprove/{{observacion.programacion_general_id.id}}/{{observacion.id}}" class="btn btn-success btn-sm" >Aprobar</a>        
+          <a href="/excel/db/{{id_file}}/obs_disaprove/{{observacion.programacion_general_id.id}}/{{observacion.id}}" class="btn btn-danger btn-sm" >Desaprobar</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  <!--Modal para ver imagenes grande-->
+  <div class="modal left fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">              
+        <div class="modal-body" >
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <!--<img src="" class="imagepreview" id="load">-->
+          <img src="" id="load">
+          <div class="container">
+            <div>
+              <div class="modal-body mi-contenido">
+                <button class="btn btn-danger active mi-boton" id="save" type="button"> Guardar </button> 
+                <a onclick="dibujar()" class="btn btn-primary active mi-boton" id="dibujar_boton" >Dibujar</a>  
+              </div>
+            </div>
+            <div>
+              <canvas class="canvas-content" id="canvas" width="1000" height="500"></canvas>
+            </div>            
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+{% else %}
+
+<!--NO HAY OBSERVACIONES-->
+<h1 class="h2">Ninguna</h1>
+<table class="table">
+  <tbody>
+
+    <tr>
+      <th scope="row">Contratista</th>
+      <td>{{fila_programacion_general.0.contratista.name}}</td>
+    </tr>
+
+    <tr>
+      <th scope="row">Empresa Transportista</th>
+      <td>{{fila_programacion_general.0.transporte.name}}</td>
+    </tr>
+
+    <tr>
+      <th scope="row">Unidad Involucrada</th>
+      <td>{{fila_programacion_general.0.conductor_placa.placa1}}/{{fila_programacion_general.conductor_placa.placa2}}</td>
+    </tr>
+
+    <tr>
+      <th scope="row">Personal Involucrado</th>
+      <td>{{fila_programacion_general.0.conductor.name}}</td>
+    </tr>
+
+  </tbody>
+</table>
+{% endif %}
+
+<!-- Form oculto para subir nueva observacion-->
+<div class="btn-toolbar mb-2 mb-md-0">
+  <div class="btn-group mr-2">
+    <a onclick="myFunction()" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Añadir Observación</a>
+  </div>
+</div>
+
+<div id="myDIV" style="display:none;">
+  <br>
+  <form method="POST" class="post-form" action="/excel/db/{{id_file}}/obs/{{id_registro}}" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">Categoria:</label>
+      <div class="col-sm-4">
+        <select class="form-control" name="categoria">
+          {% for categoria in categorias %}            
+            <option value="{{ categoria.id }}"> {{ categoria.name }} </option>            
+          {% endfor %}
+        </select>                
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">Lugar:</label>
+      <div class="col-sm-4">
+        <select class="form-control" name="lugar">
+          {% for lugar in lugares %}            
+            <option value="{{ lugar.id }}"> {{ lugar.name }} </option>            
+          {% endfor %}
+        </select>                
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">Evidencia Fotográfica : </label>
+      <div class="col-sm-4">
+        <input type='file' name='evidencia' id='id_evidencia' required class='form-control' >
+      </div>
+    </div>  
+
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">Descripción:</label>
+      <div class="col-sm-4">
+        <input type="text"  class="form-control" name="descripcion" id="id_descripcion" required value="" />
+      </div>
+    </div>  
+
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">Plan de Acción:</label>
+      <div class="col-sm-4">
+        <input type="text"  class="form-control" name="plan_accion" id="id_plan_accion" value="" />
+      </div>
+    </div>   
+
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">Evidencia Levantamiento :</label>
+      <div class="col-sm-4">
+        <input type='file' name='levantamiento' id='id_levantamiento' class='form-control' >
+      </div>
+    </div> 
+    <div class="form-group row">
+      <label class="col-sm-1 col-form-label"></label>
+      <div class="col-sm-4">
+        <button type="submit" class="btn btn-success">Crear</button>
+      </div>
+    </div>
+  
+  </form>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<!--Script para mostrar contenido-->
+<script>
+function myFunction() {
+  var x = document.getElementById("myDIV");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+}
+</script>
+
+<!--Script para editar observacion en modal-->
+<script>
+  var token = '{{csrf_token}}';
+  
+  $(document).ready(function(){
+    $('[id^=btn_upload]').click(function(){
+      var $this =  $(this).attr('name');
+      var indice_obs = $this.substring($this.lastIndexOf("_") + 1, $this.lastIndexOf("-"));
+      var indice_pg =  $this.substring($this.lastIndexOf("-") + 1,  $this.length);
+      //console.log("{{id_file}}");      
+      //console.log("{{fila_programacion_general.id}}");
+      //console.log(indice_obs);
+
+      var fd = new FormData();
+      var files = $('#id_evidencia_'+indice_obs)[0].files[0];
+      var id_levantamiento_ = $('#id_levantamiento_'+indice_obs)[0].files[0];
+      var id_mod_des = $('#id_descripcion_'+indice_obs)[0].value;
+      var id_plan_accion = $('#id_plan_accion_'+indice_obs)[0].value;
+      var id_categoria = $('#categoria_'+indice_obs)[0].value;
+      var id_lugar = $('#lugar_'+indice_obs)[0].value;
+      
+      //console.log(files);
+      //console.log(id_mod_des);
+      
+      fd.append('file',files);
+      fd.append('descripcion',id_mod_des);
+      fd.append('plan_accion',id_plan_accion);
+      fd.append('file_id_levantamiento_',id_levantamiento_);
+      fd.append('categoria',id_categoria);
+      fd.append('lugar',id_lugar);
+      
+      // AJAX request
+      $.ajax({
+        headers: { "X-CSRFToken": token },
+        url: '/excel/db/{{id_file}}/obs_update/'+indice_pg+'/'+indice_obs,          
+        type: 'POST',
+        data: fd,
+        contentType: false,
+        processData: false,
+        success: function(response){
+          if(response != 0){
+            resultados = response.resultado
+            console.log(resultados);
+            location.reload()
+            // Show image preview
+            //$('#preview').append("<img src='"+response+"' width='100' height='100' style='display: inline-block;'>");
+          }else{
+            alert('file not uploaded');
+          }
+        }
+      });
+    });
+  });
+
+</script>
+
+<!--Script para agrandar imagen en modal-->
+<script> 
+  var draw;
+  $(function() {
+		$('[id^=pop]').on('click', function() {
+			//$('.imagepreview').attr('src', $(this).find('img').attr('src'));
+			$('#imagemodal').modal('show');  
+      var image_path = $(this).find('img').attr('src');
+      var id_obs = $(this).find('img').attr('id');
+      console.log(id_obs);
+      const canvas = document.getElementById('canvas');
+      const saveButton = document.getElementById('save');
+      const loadInput = document.getElementById('load');
+      draw = new Drawing(canvas, saveButton, loadInput, image_path, id_obs);
+		});		
+  });  
+</script>
+
+<!--Script para habilitar el dibujar-->
+<script>
+  var cont = -1;
+  var puede_dibujar = false;
+  function dibujar() {
+    var boton =  document.getElementById("dibujar_boton");
+    cont++;
+    if(cont %2 == 0){
+      boton.firstChild.data  = "Dibujando";
+      boton.className = "btn btn-warning active mi-boton";
+      puede_dibujar = true;
+      console.log(cont);
+    }else{
+      boton.firstChild.data  = "Dibujar";
+      boton.className = "btn btn-primary active mi-boton";
+      puede_dibujar = false;
+      console.log(cont);
+    }
+  }
+  </script>
+<!--Script para Dibujar-->
+<script>
+  var token = '{{csrf_token}}';
+  var rect, offsetLeft, offsetTop, img;
+  var dragging = false;
+  var lastX;
+  var marginLeft = 0;
+  var control = 0;
+  class Drawing {
+    constructor(canvas, saveButton, loadInput, image_path, id_obs) {       
+      this.isDrawing = false;
+      canvas.addEventListener('mousedown', () => this.startDrawing());
+      canvas.addEventListener('mousemove', (event) => this.draw(event));
+      canvas.addEventListener('mouseup', () => this.stopDrawing());
+      
+      canvas.addEventListener('mousedown', function(e) {
+        if(puede_dibujar == false){
+          var evt = e || event;        
+          dragging = true;
+          lastX = evt.clientX;
+          e.preventDefault();
+        }
+      }, false);
+
+      window.addEventListener('mousemove', function(e) {
+        var evt = e || event;
+        if (dragging) {
+          var delta = evt.clientX - lastX;
+          lastX = evt.clientX;
+          marginLeft += delta;
+          canvas.style.marginLeft = marginLeft + "px";
+        }
+        e.preventDefault();
+      }, false);
+
+      window.addEventListener('mouseup', function() {
+          dragging = false;
+      }, false);
+
+
+      // Set up touch events for mobile, etc
+      canvas.addEventListener("touchstart", function (e) {
+        if(puede_dibujar == true){
+          var evt = e || event;        
+          dragging = true;
+          lastX = evt.clientX;
+          e.preventDefault();
+        
+          var mousePos = getTouchPos(canvas, e);
+          var touch = e.touches[0];
+          var mouseEvent = new MouseEvent("mousedown", { 
+            clientX: touch.clientX, clientY: touch.clientY,        
+            });
+          canvas.dispatchEvent(mouseEvent);
+        }
+      }, false);
+      
+      canvas.addEventListener("touchend", function (e) {
+          var mouseEvent = new MouseEvent("mouseup", {});
+          canvas.dispatchEvent(mouseEvent);
+      }, false);
+
+      canvas.addEventListener("touchmove", function (e) {
+      var touch = e.touches[0];
+      var mouseEvent = new MouseEvent("mousemove", {
+          clientX: touch.clientX,
+          clientY: touch.clientY
+        });      
+      canvas.dispatchEvent(mouseEvent);
+      }, false);
+
+      // Get the position of a touch relative to the canvas
+      function getTouchPos(canvasDom, touchEvent) {
+      var rect = canvasDom.getBoundingClientRect();
+        return {
+            x: touchEvent.touches[0].clientX - rect.left,
+            y: touchEvent.touches[0].clientY - rect.top
+        };
+      }
+
+      var save_fuction = () => this.save(image_path, id_obs);
+      var load_fuction = (event) => this.load(event);
+
+      saveButton.addEventListener('click', save_fuction, true);
+      loadInput.addEventListener('change', load_fuction, true);   
+
+      //si se cierra el modal se liberan los listener
+      $("#imagemodal").on('hidden.bs.modal', function () {
+        $(this).data('bs.modal', null);
+        saveButton.removeEventListener('click', save_fuction,true);
+        loadInput.removeEventListener('change', load_fuction,true);
+        console.log("modal borrado");
+      });
+
+      this.canvas = canvas;
+      this.context = this.canvas.getContext('2d');
+      
+      this.loadTheImage(image_path);      
+      
+    }
+    startDrawing() {
+      this.isDrawing = true;
+    }
+    stopDrawing() {
+      this.isDrawing = false;
+    }
+    draw(event) {
+      this.resize();
+      if(puede_dibujar == true){
+        if (this.isDrawing) {
+
+          this.context.fillStyle = 'red';
+          this.context.fillRect(event.pageX - offsetLeft, event.pageY - offsetTop, 4, 4);
+          
+          //console.log(event.pageX + " " + event.pageY + " " +offsetLeft + " " + offsetTop);
+        }
+      }
+    }
+
+    save(image_path, id_obs) {
+      const data = this.canvas.toDataURL('image/png');
+      
+      var observacion_tipo = id_obs.substring(0, id_obs.lastIndexOf("-"));
+      var observacion_id = id_obs.substring(id_obs.lastIndexOf("-") + 1,  id_obs.length);
+
+      var fd = new FormData();
+      fd.append('imagen', data);
+      fd.append('observacion_tipo', observacion_tipo);
+      fd.append('observacion_id', observacion_id);
+      fd.append('image_path', image_path);  
+
+      // AJAX request
+      $.ajax({
+        headers: { "X-CSRFToken": token },
+        url: '/excel/db/image_editor/'+observacion_id,          
+        type: 'POST',
+        data: fd,
+        contentType: false,
+        processData: false,
+        success: function(response){
+          if(response != 0){
+            console.log(response+ observacion_tipo)           
+            alert("Observacion Actualizada" );
+            location.reload(true);            
+          }else{
+            alert('file not uploaded');
+          }
+        }
+      });    
+    }
+
+    load(event) {
+      const file = [...event.target.files].pop();
+      this.readTheFile(file).then((image) => this.loadTheImage(image))
+    }
+    loadTheImage(image) {
+      img = new Image();
+      const canvas = this.canvas;
+      img.onload = function () {
+        const context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(img, 0, 0);        
+      };
+      img.src = image;
+      this.context.canvas.height = img.height;
+      this.context.canvas.width = img.width;
+      //$('.modal-content').css({width:img.width+100}); 
+      
+          
+    }
+    resize(){  
+
+      /* 
+      if(img.width < $(window).width()){
+        $("#canvas").outerWidth(img.width -200);      
+      }
+      else{
+        $("#canvas").outerWidth($(window).width() -200);      
+      }
+      */
+
+      rect = $("#canvas")[0].getBoundingClientRect();
+      offsetLeft = rect.left ;
+      offsetTop = rect.top ;
+    }  
+    
+    readTheFile(file) {
+      const reader = new FileReader();
+      return new Promise((resolve) => {
+        reader.onload = (event) => {
+          resolve(event.target.result);
+        };
+        reader.readAsDataURL(file);
+      })
+    }
+  }  
+</script>
+<script>
+
+  </script>
+{% endblock %}
+
+
+  

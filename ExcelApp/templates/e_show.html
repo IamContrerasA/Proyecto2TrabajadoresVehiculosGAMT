@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Archivo: {{ file.name }}</h1>
+</div>
+
+<table class="table">
+  <tbody>
+    <tr>
+      <th scope="row">Nombre</th>
+      <td>{{ file.name }}</td>
+    </tr>
+    <tr>
+      <th scope="row">ID</th>
+      <td>{{ file.id }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Fecha de Subida</th>
+      <td>{% load tz %}{{ file.created_at| timezone:'America/Lima' }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Enlace</th>
+      <td>/excel{{ file.file.url }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<table cellspacing="0" width="325%" id="dtHorizontalVerticalExample" style="background-color:#F5F5F5;">
+ 
+  <thead class="thead-dark">
+    <tr>
+      {% for row in rows.0 %}
+      <th scope="col">{{row}}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for i in rows|slice:"1:" %}
+     
+      <tr>
+        {% for row in i %}
+
+        <td>{{ row }}</td>
+
+        {% endfor %}
+      </tr>
+    
+    {% endfor %}
+  </tbody>
+
+</table>
+
+{% endblock %}
+
+
+{% block scripts %}
+  <script src="{% static '/resource_template/bigtable.js' %}"></script>
+  <link rel="stylesheet" type="text/css" src="{% static '/resource_template/bigtable.css' %}"/>
+{% endblock %}

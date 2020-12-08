@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+	<h1 class="h2">Lista de Áreas</h1>
+	<div class="btn-toolbar mb-2 mb-md-0">
+		<div class="btn-group mr-2">
+			<a href="/areas/create" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Crear
+				Área</a>
+		</div>
+	</div>
+</div>
+
+
+<table class="table " id="id_table">
+	<thead class="thead-dark">
+		<tr>
+			<th scope="col">Id</th>	
+			<th scope="col">Nombre</th>	
+			<th scope="col">Actions</th>			
+		</tr>
+	</thead>
+
+	<tbody>
+		{% for area in areas %}
+		<tr>
+			<td>{{ area.id }}</td>
+			<td>{{ area.name }}</td>
+			<td>
+				<a href="/areas/show/{{ area.id }}"><span class="glyphicon glyphicon-pencil">Show</span></a>
+				<a href="/areas/edit/{{ area.id }}"><span class="glyphicon glyphicon-pencil">Edit</span></a>
+				<a href="/areas/delete/{{ area.id }}">Delete</a>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+	<h1 class="h2">Trabajador: {{ worker.username}}</h1>
+	<div class="btn-toolbar mb-2 mb-md-0">
+		<div class="btn-group mr-2">
+			<a href="/workers/{{worker.id}}/results/create" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Añadir
+				Resultado</a>
+		</div>
+	</div>
+</div>
+
+{% if fatigues %}
+<canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
+{% endif %}
+
+<h2>Resultados</h2>
+
+<table class="table " id="id_table">
+	<thead class="thead-dark">
+		<tr>
+			<th scope="col">Id</th>
+			<th scope="col">Horas de sueño</th>
+			<th scope="col">Hora que se acostó</th>
+			<th scope="col">Hora que se levantó</th>
+			<th scope="col">Actions</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		{% for fatigue in fatigues %}
+		<tr>
+			<td>{{ fatigue.id }}</td>
+			<td>{{ fatigue.slept_hours }}</td>
+			<td>{{ fatigue.time_to_bed }}</td>
+			<td>{{ fatigue.time_to_wake }}</td>
+			<td>
+				<a href="/workers/{{ worker.id }}/results/show/{{ fatigue.id }}"><span class="glyphicon glyphicon-pencil">Show</span></a>
+				<a href="/workers/{{ worker.id }}/results/edit/{{ fatigue.id }}"><span class="glyphicon glyphicon-pencil">Edit</span></a>
+				<a href="/workers/{{ worker.id }}/results/delete/{{ fatigue.id }}">Delete</a>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+
+	var token = '{{csrf_token}}';
+
+	$(document).ready(function getCookie() {
+		$.ajax({
+			headers: { "X-CSRFToken": token },
+			type: 'POST',
+			dataType: 'json',
+			url: '/workers/{{worker.id}}/results/index',
+			data: "data",
+			success: function (response) {
+				resultados = response.json_fatigues
+				console.log(resultados);
+
+				//GRAFICA
+				var array_dias = [];
+				var array_horas_dormidas = [];
+
+				resultados.forEach(element => {
+					var aux_dias = element.time_to_wake;	
+					console.log(aux_dias);				
+					array_dias.push(aux_dias.substring(0, element.time_to_wake.indexOf("T")));				
+					array_horas_dormidas.push(element.slept_hours);
+
+				});
+				// Graphs
+				var ctx = document.getElementById('myChart')
+				// eslint-disable-next-line no-unused-vars
+				if (ctx != null) {
+					var myChart = new Chart(ctx, {
+						type: 'line',
+						data: {
+							//Eje X
+							labels: array_dias,
+							datasets: [{
+								//Eje Y
+								label: 'Horas Dormidas',
+								data: array_horas_dormidas,
+								lineTension: 0,
+								backgroundColor: 'transparent',
+								borderColor: '#007bff',
+								borderWidth: 4,
+								pointBackgroundColor: '#007bff'
+							}]
+						},
+						options: {
+							scales: {
+								yAxes: [{
+									ticks: {
+										beginAtZero: false
+									}
+								}]
+							},
+							legend: {
+								display: true
+							}
+						}
+					})
+				}
+
+			}
+		});
+	});
+
+</script>
+
+
+
+{% endblock %}

@@ -1,0 +1,1020 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <!--<h1 class="h2">Base de Datos - Consultas: {{file.name}} --- Enlace: {{file.file}} </h1>-->
+  <h1 class="h2">Consultas: {{file.name}}</h1>
+</div>
+
+<form method="POST" class="post-form" style="font-weight:bold" action="/excel/db/{{file.id}}">
+  {% csrf_token %}  
+ 
+  <label class="col-1 col-form-label">TRANSPORTISTA</label>
+  <div class="col-md mb-2">    
+    <select name="transporte" class="selectpicker form-control" data-live-search="true">
+      <option selected="selected"  value="-1" data-tokens="-1"> ninguno </option>
+      {% for transporte in transportes %}  
+        {% if transporte.id == datos.transporte|add:0 %}       
+          <option selected="selected" selected="selected" value="{{ transporte.id }}" data-tokens="{{ transporte.id }}"> {{ transporte.name }}</option>
+        {% else %}
+          <option value="{{ transporte.id }}" data-tokens="{{ transporte.id }}"> {{ transporte.name }} </option>
+        {% endif %}
+      {% endfor %}
+    </select>
+  </div>
+
+  <label class="col-1 col-form-label">CONTRATISTA</label>
+  <div class="col-md mb-2">    
+    <select name="contratista" class="selectpicker form-control" data-live-search="true">
+      <option selected="selected" value="-1" data-tokens="-1"> ninguno </option>
+      {% for contratista in contratistas %}          
+        {% if contratista.id == datos.contratista|add:0 %}        
+          <option selected="selected" value="{{ contratista.id }}" data-tokens="{{ contratista.id }}"> {{ contratista.name }} </option>
+        {% else %}
+          <option value="{{ contratista.id }}" data-tokens="{{ contratista.id }}"> {{ contratista.name }} </option>
+        {% endif %}
+      {% endfor %}
+    </select>
+  </div>  
+ 
+  <label class="col-1 col-form-label">CONDUCTOR</label>
+  <div class="col-md mb-2">    
+    <select name="conductor" class="selectpicker form-control" data-live-search="true">
+      <option selected="selected" value="-1" data-tokens="-1"> ninguno </option>
+      {% for trabajador in trabajadores %}          
+        {% if trabajador.id == datos.conductor|add:0 %} 
+          <option selected="selected" value="{{ trabajador.id }}" data-tokens="{{ trabajador.id }}"> {{ trabajador.name }} </option>
+        {% elif trabajador.name %}
+          <option value="{{ trabajador.id }}" data-tokens="{{ trabajador.id }}"> {{ trabajador.name }} </option>        
+        {% endif %}
+      {% endfor %}
+    </select>
+  </div>
+
+  <label class="col-1 col-form-label">NÚMERO CONVOY</label>
+  <div class="col-md mb-2">    
+    <select name="num_convoy" class="selectpicker form-control" data-live-search="true">
+      <option selected="selected" value="-1" data-tokens="-1"> ninguno </option>
+      {% for num_convoy in convoys %}          
+        {% if num_convoy.id == datos.num_convoy|add:0 %} 
+          <option selected="selected" value="{{ num_convoy.id }}" data-tokens="{{ num_convoy.id }}"> {{ num_convoy.name }} </option>
+        {% else %}
+          <option value="{{ num_convoy.id }}" data-tokens="{{ num_convoy.id }}"> {{ num_convoy.name }} </option>
+        {% endif %}
+      {% endfor %}
+    </select>
+  </div>
+
+  <label class="col-1 col-form-label">PLACA</label>
+  <div class="col-md mb-2">    
+    <select name="placa" class="selectpicker form-control" data-live-search="true">
+      <option selected="selected" value="-1" data-tokens="-1"> ninguno </option>
+      {% for placa in placas %}          
+        {% if placa.id == datos.placa|add:0 %} 
+          <option selected="selected" value="{{ placa.id }}" data-tokens="{{ placa.id }}"> {{ placa.placa1 }} | {{ placa.placa2 }} </option>          
+        {% elif placa.placa1 %}
+          <option value="{{ placa.id }}" data-tokens="{{ placa.id }}"> {{ placa.placa1 }} | {{ placa.placa2 }} </option>          
+        {% endif %}
+      {% endfor %}
+    </select>
+  </div>
+
+
+  <div class="text-center">
+    <button type="submit" class="btn btn-success">CONSULTAR</button>
+  </div>
+</form>
+<br>
+<form method="GET" class="post-form" action="/excel/db/{{file.id}}">
+  {% csrf_token %}  
+
+  <div class="text-center">
+    <button type="submit" class="btn btn-warning">VER TODO</button>
+  </div>
+</form>
+
+<table cellspacing="0" width="325%" id="dtHorizontalVerticalExample" style="background-color:#F5F5F5;">
+ 
+  <thead class="thead-dark">
+		<tr>
+			<th scope="col">Ea</th>
+			<th scope="col">Contratista</th>
+			<th scope="col">Transportista</th>
+			<th scope="col">Modalidad de Ingreso</th>
+      <th scope="col">Tipo de Vehículo</th>	
+      <th scope="col">Placa 1 | Placa 2</th>	
+      <th scope="col">CHECKLIST</th>	      
+      <th scope="col">Apellidos y Nombres</th>	
+      <th scope="col">Nº Licencia</th>
+      <th scope="col">FATIGA</th>	
+      <th scope="col">DECLARACION JURADA</th>	
+      <th scope="col">IPERC</th>
+      <th scope="col">Apellidos y Nombres Relevo</th>	
+      <th scope="col">Nº Licencia Relevo</th>	
+      <th scope="col">FATIGA RELEVO</th>	
+      <th scope="col">DECLARACION JURADA RELEVO</th>	
+      <th scope="col">IPERC RELEVO</th>
+      <th scope="col">Placa 1 | Placa 2 Relevo</th>	
+      <th scope="col">CHECKLIST RELEVO</th>	
+      <th scope="col">Teléfono Escolta</th>	
+      <th scope="col">Teléfono Satelital</th>	
+      <th scope="col">Pasajeros</th>	
+      <th scope="col">Carga</th>	
+      <th scope="col">Nº Guía</th>	
+      <th scope="col">Descripción</th>	
+      <th scope="col">Desde</th>	
+      <th scope="col">Hacia</th>	
+      <th scope="col">Fecha Llegada a Checkpoint</th>	
+      <th scope="col">Hora Llegada a Checkpoint</th>
+      <th scope="col">Hora de Partida</th>	
+      <th scope="col">Nº Convoy</th>	
+      <th scope="col">ETA SITE</th>	
+      <th scope="col">Estado</th>	
+      <th scope="col">Motivo</th>	
+      <th scope="col">Observaciones</th>	
+
+		</tr>
+	</thead>
+	<tbody>
+    {% for fila in tabla %}
+    {% if fila.estado.name == "DESAPROBADO" %}
+		  <tr class="table-danger">
+    {% else %}
+      <tr >
+    {% endif %}
+
+			<td>{{ fila.ea }}</td>
+			<td>{{ fila.contratista.name }}</td>
+			<td>{{ fila.transporte.name }}</td>
+      <td>{{ fila.modalidad_ingreso.name }}</td>
+      <td>{{ fila.tipo_vehiculo.name }}</td>
+      <td>
+        <a href="/excel/db/{{file.id}}/show_vehicle/{{fila.conductor_placa.id}}"><span class="glyphicon glyphicon-pencil">{{ fila.conductor_placa.placa1 }}  {{ fila.conductor_placa.placa2 }}</span></a>
+      </td> 
+      {% if fila.conductor_placa.placa1 %} 
+        <!--modal checklist-->
+        <td>
+          {% load custom_template_tags %}         
+          {% setvar "true" as action4 %}
+          {% for vehiculo_archivo in vehiculo_archivos %} 
+            
+            {% if fila.conductor_placa.id == vehiculo_archivo.placa_id %}              
+              {% if vehiculo_archivo.checklist_file_encode%}
+                {% setvar "false" as action4 %}
+              {% endif %}                   
+            {% endif %}
+
+            {% if forloop.last %} 
+              {% if action4 == "false" %}
+                <button disabled type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal_cl{{fila.conductor_placa.id}}">CHECKLIST</button>
+              {% else %}
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal_cl{{fila.conductor_placa.id}}">CHECKLIST</button>
+              {% endif %}
+            {% endif %}
+            
+          {% endfor %}    
+
+          {% if not vehiculo_archivos %}
+            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal_cl{{fila.conductor_placa.id}}">CHECKLIST</button>
+          {% endif %}
+          
+          <!-- Modal -->
+          <div id="uploadModal_cl{{fila.conductor_placa.id}}" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">CERRAR</h4>
+                </div>
+                <div class="modal-body">
+                  <!-- Form -->
+                  
+                  <form method = "post" action='' enctype="multipart/form-data">
+                    {% csrf_token %}
+                    Arhivo CheckList : <input type='file' name='file_cl{{fila.conductor_placa.id}}' id='file_cl{{fila.conductor_placa.id}}_{{fila.id}}' class='form-control' ><br>                    
+                    <button type="button" onclick="myFunction()" class="btn btn-danger">Añadir Observacion</button>
+                    <!--Ocultar Observaciones-->
+                    <div id="myDIV4" style="display:none;"><br>
+                      Lugar :
+                      <select class="form-control" name="lugar" id="id_lugar_cl{{fila.conductor_placa.id}}_{{fila.id}}">
+                        {% for lugar in lugares %}
+                            <option value="{{ lugar.id }}"> {{ lugar.name }} </option>
+                        {% endfor %}
+                      </select><br>   
+                      Evidencia Fotográfica : <input type='file' name='file_obs_cl{{fila.conductor_placa.id}}' id='file_obs_cl{{fila.conductor_placa.id}}_{{fila.id}}' class='form-control'><br>
+                      Descripcción: <input type="text"  class="form-control" name="modal_descripcion_cl" id='id_modal_descripcion_cl{{fila.conductor_placa.id}}_{{fila.id}}'/><br>
+                      Plan de accion: <input type="text"  class="form-control" name="modal_plan_accion_cl" id="id_modal_plan_accion_cl{{fila.conductor_placa.id}}_{{fila.id}}"/><br>
+                      Evidencia Levantamiento : <input type='file' name='file_lev_cl{{fila.conductor_placa.id}}' id='file_lev_cl{{fila.conductor_placa.id}}_{{fila.id}}' class='form-control' ><br>
+                    </div>
+                    <input type='button' class='btn btn-info' value='SUBIR CHECKLIST' id='btn_cl{{fila.conductor_placa.id}}_{{fila.id}}' name='{{fila.conductor_placa.id}}'>
+                  </form> 
+                
+                  <!-- Preview-->
+                  <div id='preview'></div>
+                </div>          
+              </div>
+            </div>
+          </div>
+        </td>      
+      {% else %}  
+        <td></td>
+
+
+      {% endif %}
+      <td>
+        <a href="/excel/db/{{file.id}}/show_driver/{{fila.conductor.id}}"><span class="glyphicon glyphicon-pencil">{{ fila.conductor.name }}</span></a>
+      </td>
+      <td>{{ fila.conductor.license }}</td>
+
+      {% if fila.conductor.name %}
+        <!--modal fatiga-->
+        <td>
+          {% load custom_template_tags %}         
+          {% setvar "true" as action1 %}
+          {% for conductor_archivo in conductor_archivos %} 
+            
+            {% if fila.conductor.id == conductor_archivo.conductor_id %}              
+              {% if conductor_archivo.fatiga_file_encode%}
+                {% setvar "false" as action1 %}
+              {% endif %}                   
+            {% endif %}
+
+            {% if forloop.last %} 
+              {% if action1 == "false" %}
+                <button disabled type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal{{fila.conductor.id}}">FATIGA</button>
+              {% else %}
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal{{fila.conductor.id}}">FATIGA</button>
+              {% endif %}
+            {% endif %}
+            
+          {% endfor %}    
+
+          {% if not conductor_archivos %}
+            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal{{fila.conductor.id}}">FATIGA</button>
+          {% endif %}
+          
+          <!-- Modal -->
+          <div id="uploadModal{{fila.conductor.id}}" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">CERRAR</h4>
+                </div>
+                <div class="modal-body">
+                  <!-- Form -->
+                  
+                  <form method = "post" action='' enctype="multipart/form-data">
+                    {% csrf_token %}
+                    Arhivo Fatiga : <input type='file' name='file{{fila.conductor.id}}' id='file{{fila.conductor.id}}_{{fila.id}}' class='form-control' ><br>                    
+                    <button type="button" onclick="myFunction()" class="btn btn-danger">Añadir Observacion</button>
+                    <!--Ocultar Observaciones-->
+                    <div id="myDIV" style="display:none;"><br>
+                      Lugar :
+                      <select class="form-control" name="lugar" id="id_lugar{{fila.conductor.id}}_{{fila.id}}">
+                        {% for lugar in lugares %}                          
+                            <option value="{{ lugar.id }}"> {{ lugar.name }} </option>                          
+                        {% endfor %}
+                      </select><br>
+                      Evidencia Fotográfica : <input type='file' name='file_obs{{fila.conductor.id}}' id='file_obs{{fila.conductor.id}}_{{fila.id}}' class='form-control'><br>
+                      Descripcción: <input type="text"  class="form-control" name="modal_descripcion" id='id_modal_descripcion{{fila.conductor.id}}_{{fila.id}}' /><br>
+                      Plan de accion: <input type="text"  class="form-control" name="modal_plan_accion" id="id_modal_plan_accion{{fila.conductor.id}}_{{fila.id}}" /><br>
+                      Evidencia Levantamiento : <input type='file' name='file_lev{{fila.conductor.id}}' id='file_lev{{fila.conductor.id}}_{{fila.id}}' class='form-control' ><br>
+                    </div>
+                    <input type='button' class='btn btn-info' value='SUBIR FATIGA' id='btn_upload{{fila.conductor.id}}_{{fila.id}}' name='{{fila.conductor.id}}'>
+                  </form> 
+                
+                  <!-- Preview-->
+                  <div id='preview'></div>
+                </div>          
+              </div>
+            </div>
+          </div>
+        </td>
+              
+        <!--modal declaracion jurada-->
+        <td>
+
+          {% setvar "true" as action2 %}
+          {% for conductor_archivo in conductor_archivos %} 
+            
+            {% if fila.conductor.id == conductor_archivo.conductor_id %}              
+              {% if conductor_archivo.declaracion_file_encode%}
+                {% setvar "false" as action2 %}
+              {% endif %}                   
+            {% endif %}
+
+            {% if forloop.last %} 
+              {% if action2 == "false" %}
+                <button disabled type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal_dj{{fila.conductor.id}}">DECLARACION</button>
+              {% else %}
+                <button  type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal_dj{{fila.conductor.id}}">DECLARACION</button>
+              {% endif %}
+            {% endif %}
+            
+          {% endfor %}
+
+          {% if not conductor_archivos %}
+            <button  type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal_dj{{fila.conductor.id}}">DECLARACION</button>
+          {% endif %}
+
+          <!-- Modal -->
+          <div id="uploadModal_dj{{fila.conductor.id}}" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">CERRAR</h4>
+                </div>
+                <div class="modal-body">
+                  <!-- Form -->
+                  <form method = "post" action='' enctype="multipart/form-data">
+                    {% csrf_token %}
+                    Arhivo Declaración Jurada : <input type='file' name='file_dj{{fila.conductor.id}}' id='file_dj{{fila.conductor.id}}_{{fila.id}}' class='form-control' ><br>
+                    <button type="button" onclick="myFunction()" class="btn btn-danger">Añadir Observacion</button>
+                    <!--Ocultar Observaciones-->
+                    <div id="myDIV2" style="display:none;"><br>
+                      Lugar :
+                      <select class="form-control" name="lugar" id="id_lugar_dj{{fila.conductor.id}}_{{fila.id}}">
+                        {% for lugar in lugares %}
+                            <option value="{{ lugar.id }}"> {{ lugar.name }} </option>
+                        {% endfor %}
+                      </select><br>
+                      Evidencia Fotográfica : <input type='file' name='file_obs_dj{{fila.conductor.id}}' id='file_obs_dj{{fila.conductor.id}}_{{fila.id}}' class='form-control'><br>
+                      Descripcción: <input type="text"  class="form-control" name="modal_descripcion" id='id_modal_descripcion_dj{{fila.conductor.id}}_{{fila.id}}' /><br>
+                      Plan de accion: <input type="text"  class="form-control" name="modal_plan_accion" id="id_modal_plan_accion_dj{{fila.conductor.id}}_{{fila.id}}" /><br>
+                      Evidencia Levantamiento : <input type='file' name='file_lev_dj{{fila.conductor.id}}' id='file_lev_dj{{fila.conductor.id}}_{{fila.id}}' class='form-control' ><br>
+                    </div>
+                    <input type='button' class='btn btn-info' value='SUBIR DECLARACION' id='btn_dj{{fila.conductor.id}}_{{fila.id}}' name='{{fila.conductor.id}}'>
+                  </form>                   
+                  <!-- Preview-->
+                  <div id='preview'></div>
+                </div>          
+              </div>
+            </div>
+          </div>
+        </td>
+
+        <!--modal iperc-->
+        <td>
+
+          {% setvar "true" as action3 %}
+          {% for conductor_archivo in conductor_archivos %} 
+            
+            {% if fila.conductor.id == conductor_archivo.conductor_id %}              
+              {% if conductor_archivo.iperc_file_encode%}
+                {% setvar "false" as action3 %}
+              {% endif %}                   
+            {% endif %}
+
+            {% if forloop.last %} 
+              {% if action3 == "false" %}
+                <button disabled type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal_i{{fila.conductor.id}}">IPERC</button>
+              {% else %}
+                <button  type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal_i{{fila.conductor.id}}">IPERC</button>
+              {% endif %}
+            {% endif %}
+            
+          {% endfor %}
+
+          {% if not conductor_archivos %}
+            <button  type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal_i{{fila.conductor.id}}">IPERC</button>
+          {% endif %}
+
+          <!-- Modal -->
+          <div id="uploadModal_i{{fila.conductor.id}}" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">CERRAR</h4>
+                </div>
+                <div class="modal-body">
+                  <!-- Form -->
+                  <form method = "post" action='' enctype="multipart/form-data">
+                    {% csrf_token %}
+                    Archivo Iperc : <input type='file' name='file_i{{fila.conductor.id}}' id='file_i{{fila.conductor.id}}_{{fila.id}}' class='form-control' ><br>
+                    <button type="button" onclick="myFunction()" class="btn btn-danger">Añadir Observacion</button>
+                    <!--Ocultar Observaciones-->
+                    <div id="myDIV3" style="display:none;"><br>
+                      Lugar :
+                      <select class="form-control" name="lugar" id="id_lugar_i{{fila.conductor.id}}_{{fila.id}}">
+                        {% for lugar in lugares %}
+                            <option value="{{ lugar.id }}"> {{ lugar.name }} </option>
+                        {% endfor %}
+                      </select><br>
+                      Evidencia Fotográfica : <input type='file' name='file_obs_i{{fila.conductor.id}}' id='file_obs_i{{fila.conductor.id}}_{{fila.id}}' class='form-control'><br>
+                      Descripcción: <input type="text"  class="form-control" name="modal_descripcion" id='id_modal_descripcion_i{{fila.conductor.id}}_{{fila.id}}' /><br>
+                      Plan de accion: <input type="text"  class="form-control" name="modal_plan_accion" id="id_modal_plan_accion_i{{fila.conductor.id}}_{{fila.id}}" /><br>
+                      Evidencia Levantamiento : <input type='file' name='file_lev_i{{fila.conductor.id}}' id='file_lev_i{{fila.conductor.id}}_{{fila.id}}' class='form-control' ><br>                    
+                    </div>
+                    <input type='button' class='btn btn-info' value='SUBIR IPERC' id='btn_i{{fila.conductor.id}}_{{fila.id}}' name='{{fila.conductor.id}}'>
+                  </form> 
+
+                  <!-- Preview-->
+                  <div id='preview'></div>
+                </div>          
+              </div>
+            </div>
+          </div>
+        </td>
+        
+        {% else %}  
+        <td></td><td></td><td></td>
+      {% endif %}
+      <td>
+        <a href="/excel/db/{{file.id}}/show_driver/{{fila.conductor_relevo.id}}"><span class="glyphicon glyphicon-pencil">{{ fila.conductor_relevo.name }}</span></a>
+      </td>      
+      <td>{{ fila.conductor_relevo.license }}</td>
+
+      {% if fila.conductor_relevo.name %}
+        <!--modal fatiga-->
+        <td>
+          {% load custom_template_tags %}         
+          {% setvar "true" as action1 %}
+          {% for conductor_archivo in conductor_archivos %} 
+            
+            {% if fila.conductor_relevo.id == conductor_archivo.conductor_id %}              
+              {% if conductor_archivo.fatiga_file_encode%}
+                {% setvar "false" as action1 %}
+              {% endif %}                   
+            {% endif %}
+
+            {% if forloop.last %} 
+              {% if action1 == "false" %}
+                <button disabled type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal{{fila.conductor_relevo.id}}">FATIGA</button>
+              {% else %}
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal{{fila.conductor_relevo.id}}">FATIGA</button>
+              {% endif %}
+            {% endif %}
+            
+          {% endfor %}    
+
+          {% if not conductor_archivos %}
+            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal{{fila.conductor_relevo.id}}">FATIGA</button>
+          {% endif %}
+          
+          <!-- Modal -->
+          <div id="uploadModal{{fila.conductor_relevo.id}}" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">CERRAR</h4>
+                </div>
+                <div class="modal-body">
+                  <!-- Form -->
+                  
+                  <form method = "post" action='' enctype="multipart/form-data">
+                    {% csrf_token %}
+                    Arhivo Fatiga : <input type='file' name='file{{fila.conductor_relevo.id}}' id='file{{fila.conductor_relevo.id}}_{{fila.id}}' class='form-control' ><br>                    
+                    <button type="button" onclick="myFunction()" class="btn btn-danger">Añadir Observacion</button>
+                    <!--Ocultar Observaciones-->
+                    <div id="myDIV" style="display:none;"><br>
+                      Lugar :
+                      <select class="form-control" name="lugar" id="id_lugar{{fila.conductor_relevo.id}}_{{fila.id}}">
+                        {% for lugar in lugares %}
+                            <option value="{{ lugar.id }}"> {{ lugar.name }} </option>
+                        {% endfor %}
+                      </select><br>
+                      Evidencia Fotográfica : <input type='file' name='file_obs{{fila.conductor_relevo.id}}' id='file_obs{{fila.conductor_relevo.id}}_{{fila.id}}' class='form-control'><br>
+                      Descripcción: <input type="text"  class="form-control" name="modal_descripcion" id='id_modal_descripcion{{fila.conductor_relevo.id}}_{{fila.id}}' /><br>
+                      Plan de accion: <input type="text"  class="form-control" name="modal_plan_accion" id="id_modal_plan_accion{{fila.conductor_relevo.id}}_{{fila.id}}" /><br>
+                      Evidencia Levantamiento : <input type='file' name='file_lev{{fila.conductor_relevo.id}}' id='file_lev{{fila.conductor_relevo.id}}_{{fila.id}}' class='form-control' ><br>
+                    </div>
+                    <input type='button' class='btn btn-info' value='SUBIR FATIGA' id='btn_upload{{fila.conductor_relevo.id}}_{{fila.id}}' name='{{fila.conductor_relevo.id}}'>
+                  </form> 
+                
+                  <!-- Preview-->
+                  <div id='preview'></div>
+                </div>          
+              </div>
+            </div>
+          </div>
+        </td>
+              
+        <!--modal declaracion jurada-->
+        <td>
+
+          {% setvar "true" as action2 %}
+          {% for conductor_archivo in conductor_archivos %} 
+            
+            {% if fila.conductor_relevo.id == conductor_archivo.conductor_id %}              
+              {% if conductor_archivo.declaracion_file_encode%}
+                {% setvar "false" as action2 %}
+              {% endif %}                   
+            {% endif %}
+
+            {% if forloop.last %} 
+              {% if action2 == "false" %}
+                <button disabled type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal_dj{{fila.conductor_relevo.id}}">DECLARACION</button>
+              {% else %}
+                <button  type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal_dj{{fila.conductor_relevo.id}}">DECLARACION</button>
+              {% endif %}
+            {% endif %}
+            
+          {% endfor %}
+
+          {% if not conductor_archivos %}
+            <button  type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal_dj{{fila.conductor_relevo.id}}">DECLARACION</button>
+          {% endif %}
+
+          <!-- Modal -->
+          <div id="uploadModal_dj{{fila.conductor_relevo.id}}" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">CERRAR</h4>
+                </div>
+                <div class="modal-body">
+                  <!-- Form -->
+                  <form method = "post" action='' enctype="multipart/form-data">
+                    {% csrf_token %}
+                    Arhivo Declaración Jurada : <input type='file' name='file_dj{{fila.conductor_relevo.id}}' id='file_dj{{fila.conductor_relevo.id}}_{{fila.id}}' class='form-control' ><br>
+                    <button type="button" onclick="myFunction()" class="btn btn-danger">Añadir Observacion</button>
+                    <!--Ocultar Observaciones-->
+                    <div id="myDIV2" style="display:none;"><br>
+                      Lugar :
+                      <select class="form-control" name="lugar" id="id_lugar_dj{{fila.conductor_relevo.id}}_{{fila.id}}">
+                        {% for lugar in lugares %}
+                            <option value="{{ lugar.id }}"> {{ lugar.name }} </option>
+                        {% endfor %}
+                      </select><br>
+                      Evidencia Fotográfica : <input type='file' name='file_obs_dj{{fila.conductor_relevo.id}}' id='file_obs_dj{{fila.conductor_relevo.id}}_{{fila.id}}' class='form-control'><br>
+                      Descripcción: <input type="text"  class="form-control" name="modal_descripcion" id='id_modal_descripcion_dj{{fila.conductor_relevo.id}}_{{fila.id}}' /><br>
+                      Plan de accion: <input type="text"  class="form-control" name="modal_plan_accion" id="id_modal_plan_accion_dj{{fila.conductor_relevo.id}}_{{fila.id}}" /><br>
+                      Evidencia Levantamiento : <input type='file' name='file_lev_dj{{fila.conductor_relevo.id}}' id='file_lev_dj{{fila.conductor_relevo.id}}_{{fila.id}}' class='form-control' ><br>
+                    </div>
+                    <input type='button' class='btn btn-info' value='SUBIR DECLARACION' id='btn_dj{{fila.conductor_relevo.id}}_{{fila.id}}' name='{{fila.conductor_relevo.id}}'>
+                  </form>                   
+                  <!-- Preview-->
+                  <div id='preview'></div>
+                </div>          
+              </div>
+            </div>
+          </div>
+        </td>
+
+        <!--modal iperc-->
+        <td>
+
+          {% setvar "true" as action3 %}
+          {% for conductor_archivo in conductor_archivos %} 
+            
+            {% if fila.conductor_relevo.id == conductor_archivo.conductor_id %}              
+              {% if conductor_archivo.iperc_file_encode%}
+                {% setvar "false" as action3 %}
+              {% endif %}                   
+            {% endif %}
+
+            {% if forloop.last %} 
+              {% if action3 == "false" %}
+                <button disabled type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal_i{{fila.conductor_relevo.id}}">IPERC</button>
+              {% else %}
+                <button  type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal_i{{fila.conductor_relevo.id}}">IPERC</button>
+              {% endif %}
+            {% endif %}
+            
+          {% endfor %}
+
+          {% if not conductor_archivos %}
+            <button  type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal_i{{fila.conductor_relevo.id}}">IPERC</button>
+          {% endif %}
+
+          <!-- Modal -->
+          <div id="uploadModal_i{{fila.conductor_relevo.id}}" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">CERRAR</h4>
+                </div>
+                <div class="modal-body">
+                  <!-- Form -->
+                  <form method = "post" action='' enctype="multipart/form-data">
+                    {% csrf_token %}
+                    Archivo Iperc : <input type='file' name='file_i{{fila.conductor_relevo.id}}' id='file_i{{fila.conductor_relevo.id}}_{{fila.id}}' class='form-control' ><br>
+                    <button type="button" onclick="myFunction()" class="btn btn-danger">Añadir Observacion</button>
+                    <!--Ocultar Observaciones-->
+                    <div id="myDIV3" style="display:none;"><br>
+                      Lugar :
+                      <select class="form-control" name="lugar" id="id_lugar_i{{fila.conductor_relevo.id}}_{{fila.id}}">
+                        {% for lugar in lugares %}
+                            <option value="{{ lugar.id }}"> {{ lugar.name }} </option>
+                        {% endfor %}
+                      </select><br>
+                      Evidencia Fotográfica : <input type='file' name='file_obs_i{{fila.conductor_relevo.id}}' id='file_obs_i{{fila.conductor_relevo.id}}_{{fila.id}}' class='form-control'><br>
+                      Descripcción: <input type="text"  class="form-control" name="modal_descripcion" id='id_modal_descripcion_i{{fila.conductor_relevo.id}}_{{fila.id}}' /><br>
+                      Plan de accion: <input type="text"  class="form-control" name="modal_plan_accion" id="id_modal_plan_accion_i{{fila.conductor_relevo.id}}_{{fila.id}}" /><br>
+                      Evidencia Levantamiento : <input type='file' name='file_lev_i{{fila.conductor_relevo.id}}' id='file_lev_i{{fila.conductor_relevo.id}}_{{fila.id}}' class='form-control' ><br>                    
+                    </div>
+                    <input type='button' class='btn btn-info' value='SUBIR IPERC' id='btn_i{{fila.conductor_relevo.id}}_{{fila.id}}' name='{{fila.conductor_relevo.id}}'>
+                  </form> 
+
+                  <!-- Preview-->
+                  <div id='preview'></div>
+                </div>          
+              </div>
+            </div>
+          </div>
+        </td>
+
+        
+        {% else %}  
+        <td></td><td></td><td></td>
+      {% endif %}
+      
+      <td>
+        <a href="/excel/db/{{file.id}}/show_vehicle/{{fila.conductor_relevo_placa.id}}"><span class="glyphicon glyphicon-pencil">{{ fila.conductor_relevo_placa.placa1 }}  {{ fila.conductor_relevo_placa.placa2 }}</span></a>
+      </td> 
+      {% if fila.conductor_relevo_placa.placa1 %} 
+        <!--modal checklist-->
+        <td>
+          {% load custom_template_tags %}         
+          {% setvar "true" as action4 %}
+          {% for vehiculo_archivo in vehiculo_archivos %} 
+            
+            {% if fila.conductor_relevo_placa.id == vehiculo_archivo.placa_id %}              
+              {% if vehiculo_archivo.checklist_file_encode%}
+                {% setvar "false" as action4 %}
+              {% endif %}                   
+            {% endif %}
+
+            {% if forloop.last %} 
+              {% if action4 == "false" %}
+                <button disabled type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal_cl{{fila.conductor_relevo_placa.id}}">CHECKLIST</button>
+              {% else %}
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal_cl{{fila.conductor_relevo_placa.id}}">CHECKLIST</button>
+              {% endif %}
+            {% endif %}
+            
+          {% endfor %}    
+
+          {% if not vehiculo_archivos %}
+            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal_cl{{fila.conductor_relevo_placa.id}}">CHECKLIST</button>
+          {% endif %}
+          
+          <!-- Modal -->
+          <div id="uploadModal_cl{{fila.conductor_relevo_placa.id}}" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">CERRAR</h4>
+                </div>
+                <div class="modal-body">
+                  <!-- Form -->
+                  
+                  <form method = "post" action='' enctype="multipart/form-data">
+                    {% csrf_token %}
+                    Arhivo CheckList : <input type='file' name='file_cl{{fila.conductor_relevo_placa.id}}' id='file_cl{{fila.conductor_relevo_placa.id}}_{{fila.id}}' class='form-control' ><br>                    
+                    <button type="button" onclick="myFunction()" class="btn btn-danger">Añadir Observacion</button>
+                    <!--Ocultar Observaciones-->
+                    <div id="myDIV4" style="display:none;"><br>
+                      Lugar :
+                      <select class="form-control" name="lugar" id="id_lugar_cl{{fila.conductor_relevo_placa.id}}_{{fila.id}}">
+                        {% for lugar in lugares %}
+                            <option value="{{ lugar.id }}"> {{ lugar.name }} </option>
+                        {% endfor %}
+                      </select><br>
+                      Evidencia Fotográfica : <input type='file' name='file_obs_cl{{fila.conductor_relevo_placa.id}}' id='file_obs_cl{{fila.conductor_relevo_placa.id}}_{{fila.id}}' class='form-control'><br>
+                      Descripcción: <input type="text"  class="form-control" name="modal_descripcion_cl" id='id_modal_descripcion_cl{{fila.conductor_relevo_placa.id}}_{{fila.id}}'/><br>
+                      Plan de accion: <input type="text"  class="form-control" name="modal_plan_accion_cl" id="id_modal_plan_accion_cl{{fila.conductor_relevo_placa.id}}_{{fila.id}}"/><br>
+                      Evidencia Levantamiento : <input type='file' name='file_lev_cl{{fila.conductor_relevo_placa.id}}' id='file_lev_cl{{fila.conductor_relevo_placa.id}}_{{fila.id}}' class='form-control' ><br>
+                    </div>
+                    <input type='button' class='btn btn-info' value='SUBIR CHECKLIST' id='btn_cl{{fila.conductor_relevo_placa.id}}_{{fila.id}}' name='{{fila.conductor_relevo_placa.id}}'>
+                  </form> 
+                
+                  <!-- Preview-->
+                  <div id='preview'></div>
+                </div>          
+              </div>
+            </div>
+          </div>
+        </td>   
+      {% else %}  
+        <td></td>
+      {% endif %}
+
+      <td>{{ fila.telefono_escolta }}</td>
+      <td>{{ fila.telefono_satelital }}</td>
+      <td>{{ fila.pasajeros }}</td>
+      <td>{{ fila.carga.name }}</td>
+      <td>{{ fila.num_guia }}</td>
+      <td>{{ fila.descripcion }}</td>
+      <td>{{ fila.desde.name }}</td>
+      <td>{{ fila.hacia.name }}</td>
+      <td>{{ fila.fecha_llegada }}</td>
+      <td>{{ fila.hora_llegada }}</td>
+      <td>{{ fila.hora_partida }}</td>
+      <td>{{ fila.num_convoy.name }}</td>
+      <td>{{ fila.eta_site }}</td>
+      <td>{{ fila.estado.name }}</td>
+      <td>{{ fila.motivo.name }}</td>
+      <td>         
+        <a href="/excel/db/{{file.id}}/obs/{{fila.id}}"><span class="glyphicon glyphicon-pencil">Obervaciones</span></a>
+      </td>
+			
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+</br>
+<!-- Paginacion -->
+<div class="float-right">
+  {% if tabla.has_previous %}
+    <a class="btn btn-outline-info mb-4" href="?page={{ tabla.previous_page_number }}">« Página Anterior</a>
+    {% if tabla.number > 3 %}
+      <a class="btn btn-outline-info mb-4" href="?page=1">1</a>
+      {% if tabla.number > 4 %}
+        <button class="btn btn-outline-info mb-4" disabled="">...</button>
+      {% endif %}
+    {% endif %}
+  {% endif %}
+
+  {% for num in tabla.paginator.page_range %}
+    {% if tabla.number == num %}
+      <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+    {% elif num > tabla.number|add:'-3' and num < tabla.number|add:'3' %}
+      <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+    {% endif %}
+  {% endfor %}
+
+  {% if tabla.has_next %}
+    {% if tabla.number < tabla.paginator.num_pages|add:'-3' %}
+      <button class="btn btn-outline-info mb-4" disabled="">...</button>
+      <a class="btn btn-outline-info mb-4" href="?page={{ tabla.paginator.num_pages }}">{{ tabla.paginator.num_pages }}</a>
+    {% elif tabla.number < tabla.paginator.num_pages|add:'-2' %}
+      <a class="btn btn-outline-info mb-4" href="?page={{ tabla.paginator.num_pages }}">{{ tabla.paginator.num_pages }}</a>
+    {% endif %}
+    <a class="btn btn-outline-info mb-4" href="?page={{ tabla.next_page_number }}">Página Siguiente »</a>
+  {% endif %}
+</div>
+
+
+
+
+
+
+
+
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static '/resource_template/bigtable.js' %}"></script>
+  <link rel="stylesheet" type="text/css" src="{% static '/resource_template/bigtable.css' %}"/>
+
+  <!--Script para mostrar contenido-->
+  <script>
+  function myFunction() {
+    //var x = document.getElementById("myDIV");
+    polls = document.querySelectorAll('[id ^= "myDIV"]');
+    Array.prototype.forEach.call(polls, callback);
+
+    function callback(element, iterator) {
+      //console.log(iterator, element.id);
+      if (element.style.display === "none") {
+        element.style.display = "block";
+      } else {
+        element.style.display = "none";
+      }
+    }
+   
+  }
+  </script>
+
+  <!--Script para fatiga-->
+  <script>
+    var token = '{{csrf_token}}';
+    
+    $(document).ready(function(){
+      $('[id^=btn_upload]').click(function(){
+        var $this =  $(this).attr('name');
+        var indice = $this;
+        var indice_fila = $(this).attr('id');
+        //console.log(indice);
+
+        indice_fila = indice_fila.substring(indice_fila.lastIndexOf("_")+1, indice_fila.length);
+        //console.log(indice_fila);
+        
+
+        var fd = new FormData();
+        var files = $('#file'+indice+'_'+indice_fila)[0].files[0];
+        var file_obs = $('#file_obs'+indice+'_'+indice_fila)[0].files[0];
+        var id_mod_des = $('#id_modal_descripcion'+indice+'_'+indice_fila)[0].value;
+        var id_plan_accion = $('#id_modal_plan_accion'+indice+'_'+indice_fila)[0].value;
+        var file_lev = $('#file_lev'+indice+'_'+indice_fila)[0].files[0]; 
+        var id_lugar = $('#id_lugar'+indice+'_'+indice_fila)[0].value;       
+
+        //console.log(files);
+        //console.log(id_mod_des);
+        fd.append('file',files);
+        fd.append('file_obs',file_obs);
+        fd.append('id_mod_des',id_mod_des);
+        fd.append('id_plan_accion',id_plan_accion);
+        fd.append('file_lev',file_lev);        
+        fd.append('fecha',"{{file.created_at|date:'c'}}");
+        fd.append('lugar',id_lugar);
+        // AJAX request
+        $.ajax({
+          headers: { "X-CSRFToken": token },
+          url: '/excel/db/'+indice+'/fatiga_modal/'+indice_fila,          
+          type: 'POST',
+          data: fd,
+          contentType: false,
+          processData: false,
+          success: function(response){
+            if(response != 0){
+              resultados = response.resultado
+              console.log(resultados);
+              location.reload()
+              // Show image preview
+              //$('#preview').append("<img src='"+response+"' width='100' height='100' style='display: inline-block;'>");
+            }else{
+              alert('file not uploaded');
+            }
+          }
+        });
+      });
+    });
+
+  </script>
+  
+  <!--Script para declaracion jurada-->
+  <script>
+    var token = '{{csrf_token}}';
+    
+    $(document).ready(function(){
+      $('[id^=btn_dj]').click(function(){
+        var $this =  $(this).attr('name');
+        var indice = $this;
+        var indice_fila = $(this).attr('id');  
+
+        indice_fila = indice_fila.substring(indice_fila.lastIndexOf("_")+1, indice_fila.length);      
+
+        var fd = new FormData();        
+        var files = $('#file_dj'+indice+'_'+indice_fila)[0].files[0];
+        var file_obs = $('#file_obs_dj'+indice+'_'+indice_fila)[0].files[0];
+        var id_mod_des = $('#id_modal_descripcion_dj'+indice+'_'+indice_fila)[0].value;
+        var id_plan_accion = $('#id_modal_plan_accion_dj'+indice+'_'+indice_fila)[0].value;
+        var file_lev = $('#file_lev_dj'+indice+'_'+indice_fila)[0].files[0]; 
+        var id_lugar = $('#id_lugar_dj'+indice+'_'+indice_fila)[0].value;       
+
+        fd.append('file',files);
+        fd.append('file_obs',file_obs);
+        fd.append('id_mod_des',id_mod_des);
+        fd.append('id_plan_accion',id_plan_accion);
+        fd.append('file_lev',file_lev); 
+        fd.append('fecha',"{{file.created_at|date:'c'}}");
+        fd.append('lugar',id_lugar);
+        // AJAX request
+        $.ajax({
+          headers: { "X-CSRFToken": token },
+          url: '/excel/db/'+indice+'/declaracion_modal/'+indice_fila,     
+          type: 'POST',
+          data: fd,
+          contentType: false,
+          processData: false,
+          success: function(response){
+            if(response != 0){
+              resultados = response.resultado
+              console.log(resultados);
+              location.reload()
+              // Show image preview
+              //$('#preview').append("<img src='"+response+"' width='100' height='100' style='display: inline-block;'>");
+            }else{
+              alert('file not uploaded');
+            }
+          }
+        });
+      });
+    });
+
+  </script>
+
+  <!--Script para iperce-->
+  <script>
+    var token = '{{csrf_token}}';
+    
+    $(document).ready(function(){
+      $('[id^=btn_i]').click(function(){
+        var $this =  $(this).attr('name');
+        var indice = $this;
+        var indice_fila = $(this).attr('id');  
+
+        indice_fila = indice_fila.substring(indice_fila.lastIndexOf("_")+1, indice_fila.length);   
+
+        var fd = new FormData();
+        var files = $('#file_i'+indice+'_'+indice_fila)[0].files[0];
+        var file_obs = $('#file_obs_i'+indice+'_'+indice_fila)[0].files[0];
+        var id_mod_des = $('#id_modal_descripcion_i'+indice+'_'+indice_fila)[0].value;
+        var id_plan_accion = $('#id_modal_plan_accion_i'+indice+'_'+indice_fila)[0].value;
+        var file_lev = $('#file_lev_i'+indice+'_'+indice_fila)[0].files[0]; 
+        var id_lugar = $('#id_lugar_i'+indice+'_'+indice_fila)[0].value;       
+
+        fd.append('file',files);
+        fd.append('file_obs',file_obs);
+        fd.append('id_mod_des',id_mod_des);
+        fd.append('id_plan_accion',id_plan_accion);
+        fd.append('file_lev',file_lev); 
+        fd.append('fecha',"{{file.created_at|date:'c'}}");
+        fd.append('lugar',id_lugar);
+        // AJAX request
+        $.ajax({
+          headers: { "X-CSRFToken": token },
+          url: '/excel/db/'+indice+'/iperc_modal/'+indice_fila,          
+          type: 'POST',
+          data: fd,
+          contentType: false,
+          processData: false,
+          success: function(response){
+            if(response != 0){
+              resultados = response.resultado
+              console.log(resultados);
+              location.reload()
+              // Show image preview
+              //$('#preview').append("<img src='"+response+"' width='100' height='100' style='display: inline-block;'>");
+            }else{
+              alert('file not uploaded');
+            }
+          }
+        });
+      });
+    });
+
+  </script>
+
+  <!--Script para CheckList-->
+  <script>
+    var token = '{{csrf_token}}';
+    
+    $(document).ready(function(){
+      $('[id^=btn_cl]').click(function(){
+        var $this =  $(this).attr('name');
+        var indice = $this;
+        var indice_fila = $(this).attr('id');  
+
+        indice_fila = indice_fila.substring(indice_fila.lastIndexOf("_")+1, indice_fila.length);   
+        
+        var fd = new FormData();
+        var files = $('#file_cl'+indice+'_'+indice_fila)[0].files[0];
+        var file_obs = $('#file_obs_cl'+indice+'_'+indice_fila)[0].files[0];
+        var id_mod_des = $('#id_modal_descripcion_cl'+indice+'_'+indice_fila)[0].value;
+        var id_plan_accion = $('#id_modal_plan_accion_cl'+indice+'_'+indice_fila)[0].value;
+        var file_lev = $('#file_lev_cl'+indice+'_'+indice_fila)[0].files[0];        
+        var id_lugar = $('#id_lugar_cl'+indice+'_'+indice_fila)[0].value;
+
+        fd.append('file',files);
+        fd.append('file_obs',file_obs);
+        fd.append('id_mod_des',id_mod_des);
+        fd.append('id_plan_accion',id_plan_accion);
+        fd.append('file_lev',file_lev); 
+        fd.append('fecha',"{{file.created_at|date:'c'}}");
+        fd.append('lugar',id_lugar);
+        // AJAX request
+        $.ajax({
+          headers: { "X-CSRFToken": token },
+          url: '/excel/db/'+indice+'/checklist_modal/'+indice_fila,          
+          type: 'POST',
+          data: fd,
+          contentType: false,
+          processData: false,
+          success: function(response){
+            if(response != 0){
+              resultados = response.resultado
+              console.log(resultados);
+              location.reload()
+              // Show image preview
+              //$('#preview').append("<img src='"+response+"' width='100' height='100' style='display: inline-block;'>");
+            }else{
+              alert('file not uploaded');
+            }
+          }
+        });
+      });
+    });
+
+  </script>
+
+{% endblock %}

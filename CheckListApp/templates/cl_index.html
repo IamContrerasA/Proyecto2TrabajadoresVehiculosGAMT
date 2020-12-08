@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+	<h1 class="h2">Lista de Check List</h1>
+	<div class="btn-toolbar mb-2 mb-md-0">
+		<div class="btn-group mr-2">
+			<a href="/check_lists/create" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Crear
+				Check List</a>
+		</div>
+	</div>
+</div>
+
+
+<table class="table " id="id_table">
+	<thead class="thead-dark">
+		<tr>
+			<th scope="col">Id</th>	
+			<th scope="col">Nombre del Trabajador</th>	
+			<th scope="col">Placa del Vehículo</th>	
+			<th scope="col">Detalles</th>	
+			<th scope="col">Actions</th>			
+		</tr>
+	</thead>
+
+	<tbody>
+		{% for check_list in check_lists %}
+		<tr>
+			<td>{{ check_list.id }}</td>
+			<td>{{ check_list.worker.username }}</td>
+			<td>{{ check_list.vehicle.plate_number }}</td>
+			<td>detalles</td>
+			<td>
+				<a href="/check_lists/show/{{ check_list.id }}"><span class="glyphicon glyphicon-pencil">Show</span></a>
+				<a href="/check_lists/edit/{{ check_list.id }}"><span class="glyphicon glyphicon-pencil">Edit</span></a>
+				<a href="/check_lists/delete/{{ check_list.id }}">Delete</a>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}

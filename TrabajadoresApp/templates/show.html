@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Trabajador: {{ worker.ename }}</h1>
+</div>
+
+<table class="table">
+  <tbody>
+    <tr>
+      <th scope="row">Id</th>
+      <td>{{ worker.dni }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Nombre</th>
+      <td> {{ worker.username }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Area</th>
+      <td> {{ worker.area.name }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Email</th>
+      <td> {{ worker.email }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Contact</th>
+      <td> {{ worker.slept_hours }}</td>
+    </tr>
+
+  </tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Editar Área</h1>
+</div>
+
+<form method="POST" class="post-form" action="/check_lists/update/{{check_list.id}}">
+  {% csrf_token %}  
+    
+  <div class="form-group row">
+    <label class="col-sm-2 col-form-label">Nombre del Trabajador:</label>
+    <div class="col-sm-4">
+      <select class="form-control" name="worker">
+        {% for worker in workers %}
+          {% if check_list.worker.id == worker.id %}
+            <option selected="selected" value="{{ worker.id }}"> {{ worker.username }} </option>
+          {% else %}
+            <option value="{{ worker.id }}"> {{ worker.username }} </option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-sm-2 col-form-label">Placa del vehículo:</label>
+    <div class="col-sm-4">
+      <select class="form-control" name="vehicle">
+        {% for vehicle in vehicles %}
+          {% if check_list.vehicle.id == vehicle.id %}
+            <option selected="selected" value="{{ vehicle.id }}"> {{ vehicle.plate_number }} </option>
+          {% else %}
+            <option value="{{ vehicle.id }}"> {{ vehicle.plate_number }} </option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+  </div>  
+    <div class="form-group row">
+      <label class="col-sm-1 col-form-label"></label>
+      <div class="col-sm-4">
+        <button type="submit" class="btn btn-success">Update</button>
+      </div>
+    </div>
+  
+</form>
+{% endblock %}

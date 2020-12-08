@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Editar Usuario</h1>
+</div>
+
+<form method="POST" class="post-form" action="/users/update/{{user.id}}">
+  {% csrf_token %}  
+    
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">Nombre:</label>
+      <div class="col-sm-4">
+        <input type="text"  class="form-control" name="username" id="id_username" required maxlength=20 value="{{ user.username }}" />
+      </div>
+    </div>   
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">DNI:</label>
+      <div class="col-sm-4">
+        <input type="text"  class="form-control" name="dni" id="id_dni" required maxlength=8 value="{{ user.dni }}" />
+      </div>
+    </div>   
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">Rol:</label>
+      <div class="col-sm-4">
+        <select class="form-control" name="role">
+          {% for role in roles %}
+            {% if user.role.id == role.id %}
+              <option selected="selected" value="{{ role.id }}"> {{ role.name }} </option>
+            {% else %}
+              <option value="{{ role.id }}"> {{ role.name }} </option>
+            {% endif %}
+          {% endfor %}
+        </select>                
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-1 col-form-label"></label>
+      <div class="col-sm-4">
+        <button type="submit" class="btn btn-success">Update</button>
+      </div>
+    </div>
+  
+</form>
+{% endblock %}

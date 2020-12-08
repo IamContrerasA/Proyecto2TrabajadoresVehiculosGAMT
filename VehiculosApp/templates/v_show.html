@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Vehículo: {{ vehicle.unit_code }}</h1>
+</div>
+
+<table class="table">
+  <tbody>
+    <tr>
+      <th scope="row">Código de Unidad</th>
+      <td>{{ vehicle.unit_code }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Placa</th>
+      <td> {{ vehicle.plate_number }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Año</th>
+      <td> {{ vehicle.year }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Marca</th>
+      <td> {{ vehicle.brand }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Color</th>
+      <td> {{ vehicle.color }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Modelo</th>
+      <td> {{ vehicle.model }}</td>
+    </tr>   
+  </tbody>
+</table>
+
+{% endblock %}

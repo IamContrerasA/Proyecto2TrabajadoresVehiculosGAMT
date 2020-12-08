@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Fatiga: {{ fatigue.id }}</h1>
+</div>
+
+<table class="table">
+  <tbody>
+    <tr>
+      <th scope="row">Trabajador</th>
+      <td>{{ fatigue.worker.username }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Horas de Sueño</th>
+      <td>{{ fatigue.slept_hours }}</td>
+    </tr>    
+    <tr>
+      <th scope="row">Hora que se acostó</th>
+      <td>{{ fatigue.time_to_bed }}</td>
+    </tr>    
+    <tr>
+      <th scope="row">Hora que se Levantó</th>
+      <td>{{ fatigue.time_to_wake }}</td>
+    </tr>    
+  </tbody>
+</table>
+
+{% endblock %}

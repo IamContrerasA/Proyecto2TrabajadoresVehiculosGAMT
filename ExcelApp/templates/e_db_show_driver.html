@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Conductor: {{ conductor_archivos.conductor.name }}</h1>
+</div>
+
+<table class="table">
+  <tbody>
+    <tr>
+      <th scope="row">Fecha</th>
+      <td>{{ conductor_archivos.date}}</td>
+    </tr>
+
+    <tr>
+      <th scope="row">Iperc Foto</th>
+      <td>
+        <a href="data:image/png;base64,{{conductor_archivos.iperc_file_encode|slice:'2:-1'}}" target="_blank">{{ conductor_archivos.iperc_file}}</a>        
+      </td>
+    </tr>
+    {% if conductor_archivos.iperc_file_encode %}
+    <tr>
+      <th scope="row"></th>
+      <td>        
+        <img src="data:image/png;base64,{{conductor_archivos.iperc_file_encode|slice:'2:-1'}}" style="width:500px;height:600px;">
+      </td>
+    </tr>
+    {% endif %}
+    
+    <tr>
+      <th scope="row">Declaración Foto</th>
+      <td>
+        <a href="data:image/png;base64,{{conductor_archivos.declaracion_file_encode|slice:'2:-1'}}" target="_blank">{{ conductor_archivos.declaracion_file}}</a>        
+      </td>
+    </tr>
+    {% if conductor_archivos.declaracion_file_encode %}
+      <tr>
+        <th scope="row"></th>
+        <td>        
+          <img src="data:image/png;base64,{{conductor_archivos.declaracion_file_encode|slice:'2:-1'}}" style="width:500px;height:600px;">
+        </td>
+      </tr>
+    {% endif %}
+
+    <tr>
+      <th scope="row">Fatiga Foto</th>
+      <td>
+        <a href="data:image/png;base64,{{conductor_archivos.fatiga_file_encode|slice:'2:-1'}}" target="_blank">{{ conductor_archivos.fatiga_file}}</a>        
+      </td>
+    </tr>
+    {% if conductor_archivos.fatiga_file_encode %}
+      <tr>
+        <th scope="row"></th>
+        <td>        
+          <img src="data:image/png;base64,{{conductor_archivos.fatiga_file_encode|slice:'2:-1'}}" style="width:500px;height:600px;">
+        </td>
+      </tr>
+    {% endif %}
+
+  </tbody>
+</table>
+
+{% endblock %}

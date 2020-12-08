@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+	<h1 class="h2">Matriz</h1>
+	<div class="btn-toolbar mb-2 mb-md-0">
+		<div class="btn-group mr-2">
+			<a href="/excel/create" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Subir Archivo</a>
+		</div>
+	</div>
+</div>
+
+<table class="table " id="id_table">
+	<thead class="thead-dark">
+		<tr>
+			<th scope="col">Id</th>	
+			<th scope="col">Nombre</th>	
+			<th scope="col">Fecha de Subida</th>	
+			<th scope="col">Detalles</th>	
+			<!--
+			<th scope="col">Excel</th>	
+			<th scope="col">Descargar</th>			
+			-->
+		</tr>
+	</thead>
+
+	<tbody>
+		{% for file in files %}
+		<tr>
+			<td>{{ file.id }}</td>
+			<td>{{ file.name }}</td>
+			<td>{% load tz %}{{ file.created_at| timezone:'America/Lima' }}</td>
+			<td>
+				<a href="/excel/db/{{ file.id }}" class="btn btn-primary btn-sm" >CONSULTAS</a>					
+			</td>
+
+			<!--
+			<td>
+				<a href="/excel/process_excel/{{ file.id }}" >CARGAR DATOS EXCEL</a>				
+			</td>			
+			
+			<td>
+				<a href="/excel{{ file.file.url }}" class="btn btn-primary btn-sm" target="_blank">Descargar</a>				
+			</td>
+			-->
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}

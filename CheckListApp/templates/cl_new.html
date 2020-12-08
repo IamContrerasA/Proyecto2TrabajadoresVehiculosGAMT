@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Crear Registro de checkList</h1>
+</div>
+
+<form method="POST" class="post-form" action="/check_lists/create">
+  {% csrf_token %}
+
+  <div class="form-row">
+
+    <label class="col-1 col-form-label">EMPRESA</label>
+    <div class="col-md mb-2">
+      <select name="company" class="selectpicker form-control" data-live-search="true">
+        {% for company in companies %}
+        <option value="{{ company.id }}" data-tokens="{{ company.id }}"> {{ company.name }} </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <label class="col-1 col-form-label">FECHA</label>
+    <div class="col-md mb-2">
+      <input type="text" class="form-control" id="validationDefault023" placeholder="Last name" value="DAte" required>
+    </div>
+  </div>
+
+  <div class="form-row">
+
+    <label class="col-1 col-form-label">CONDUCTOR</label>
+    <div class="col-md mb-2">
+      <select name="worker" class="selectpicker form-control" data-live-search="true">
+        {% for worker in workers %}
+        <option value="{{ worker.id }}" data-tokens="{{ worker.id }}"> {{ worker.username }} </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <label class="col-1 col-form-label">PLACA DE REMOLQUE</label>
+    <div class="col-md mb-2">
+      <select name="vehicle" class="selectpicker form-control" data-live-search="true">
+        {% for vehicle in vehicles %}
+        <option value="{{ vehicle.id }}" data-tokens="{{ vehicle.id }}"> {{ vehicle.plate_number }} </option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div class="form-row">
+
+    <label class="col-1 col-form-label">KILOMETRAJE</label>
+    <div class="col-md mb-2">
+      <input type="text" class="form-control" id="validationDefault02" placeholder="Last name" value="Otto" required>
+    </div>
+
+    <label class="col-1 col-form-label">PLACA DE SEMIREMOLQUE</label>
+    <div class="col-md mb-2">
+      <input type="text" class="form-control" id="validationDefault02" placeholder="Last name" value="Otto" required>
+    </div>
+  </div>
+
+  <div class="form-row">
+
+    <label class="col-1 col-form-label">ORIGEN</label>
+    <div class="col-md mb-2">
+      <input type="text" class="form-control" id="validationDefault02" placeholder="Last name" value="Otto" required>
+    </div>
+
+    <label class="col-1 col-form-label">DESTINO</label>
+    <div class="col-md mb-2">
+      <input type="text" class="form-control" id="validationDefault02" placeholder="Last name" value="Otto" required>
+    </div>
+  </div>
+
+
+  <div class="form-check" hidden>
+    <input type="checkbox" class="form-check-input" name="current" id="id_current" checked=“checked”>
+    <label class="form-check-label" for="exampleCheck1">Current</label>
+  </div>
+
+  <div class="text-center">
+    <button type="submit" class="btn btn-success">Crear</button>
+  </div>
+</form>
+
+{% endblock %}

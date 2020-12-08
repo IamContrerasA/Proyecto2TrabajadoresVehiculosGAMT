@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Check List: {{ check_list.id }}</h1>
+</div>
+
+<table class="table">
+  <tbody>
+    <tr>
+      <th scope="row">Nombre del Trabajador</th>
+      <td>{{ check_list.worker.username }}</td>
+    </tr>    
+    <tr>
+      <th scope="row">Placa del Vehículo</th>
+      <td>{{ check_list.vehicle.plate_number }}</td>
+    </tr>    
+  </tbody>
+</table>
+
+{% endblock %}

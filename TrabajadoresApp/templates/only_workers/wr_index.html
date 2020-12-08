@@ -1,0 +1,112 @@
+{% extends "welcome_workers.html" %}
+
+{% block content %}
+
+
+{% if fatigues %}
+<canvas class="my-4 w-100" id="myChart" width="1900" height="380"></canvas>
+{% endif %}
+
+
+<div class="card text-center">
+	<div class="card-body">
+		<h2>Resultados</h2>
+
+		<table class="table " id="id_table">
+			<thead class="thead-dark">
+				<tr>
+					<th scope="col">Id</th>
+					<th scope="col">Horas de sueño</th>
+					<th scope="col">Hora que se acostó</th>
+					<th scope="col">Hora que se levantó</th>					
+				</tr>
+			</thead>
+
+			<tbody>
+				{% for fatigue in fatigues %}
+				<tr>
+					<td>{{ fatigue.id }}</td>
+					<td>{{ fatigue.slept_hours }}</td>
+					<td>{{ fatigue.time_to_bed }}</td>
+					<td>{{ fatigue.time_to_wake }}</td>				
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+
+	</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+
+	var token = '{{csrf_token}}';
+
+	$(document).ready(function getCookie() {
+		$.ajax({
+			headers: { "X-CSRFToken": token },
+			type: 'POST',
+			dataType: 'json',
+			url: '/workers/result_hours/index',
+			data: "data",
+			success: function (response) {
+				resultados = response.json_fatigues
+				console.log(resultados);
+
+				//GRAFICA
+				var array_dias = [];
+				var array_horas_dormidas = [];
+
+				resultados.forEach(element => {
+					var aux_dias = element.time_to_wake;
+					console.log(aux_dias);
+					array_dias.push(aux_dias.substring(0, element.time_to_wake.indexOf("T")));
+					array_horas_dormidas.push(element.slept_hours);
+
+				});
+				// Graphs
+				var ctx = document.getElementById('myChart')
+				// eslint-disable-next-line no-unused-vars
+				if (ctx != null) {
+					var myChart = new Chart(ctx, {
+						type: 'line',
+						data: {
+							//Eje X
+							labels: array_dias,
+							datasets: [{
+								//Eje Y
+								label: 'Horas Dormidas',
+								data: array_horas_dormidas,
+								lineTension: 0,
+								backgroundColor: 'transparent',
+								borderColor: '#007bff',
+								borderWidth: 4,
+								pointBackgroundColor: '#007bff'
+							}]
+						},
+						options: {
+							scales: {
+								yAxes: [{
+									ticks: {
+										beginAtZero: false
+									}
+								}]
+							},
+							legend: {
+								display: true
+							}
+						}
+					})
+				}
+
+			}
+		});
+	});
+
+</script>
+
+
+
+{% endblock %}

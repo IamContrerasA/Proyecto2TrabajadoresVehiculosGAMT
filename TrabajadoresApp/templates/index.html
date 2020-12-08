@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+	<h1 class="h2">Lista de Trabajadores</h1>
+	<div class="btn-toolbar mb-2 mb-md-0">
+		<div class="btn-group mr-2">			
+			<!--<a href="/workers/emp" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Crear Trabajador</a>-->
+		</div>
+	</div>
+</div>
+
+
+<table class="table " id="id_table">
+	<thead class="thead-dark">
+		<tr>
+			<th scope="col">DNI</th>
+			<th scope="col">Nombre</th>
+			<th scope="col">Area</th>
+			<th scope="col">Correo</th>
+			<th scope="col">Horas Dormidas</th>
+			<th scope="col">Horas Dormidas</th>
+			<th scope="col">Actions</th>
+
+
+		</tr>
+	</thead>
+	<tbody>
+		{% for worker in workers %}
+		<tr>
+			<td>{{ worker.dni }}</td>
+			<td>{{ worker.username }}</td>
+			<td>{{ worker.area.name }}</td>
+			<td>{{ worker.email }}</td>
+			<td>{{ worker.slept_hours }}</td>
+			<td><a href="/workers/{{ worker.id }}/results/index"><span class="glyphicon glyphicon-pencil">Resultados</span></a></td>
+			<td>
+				<a href="/workers/show/{{ worker.id }}"><span class="glyphicon glyphicon-pencil">Show</span></a>
+				<a href="/workers/edit/{{ worker.id }}"><span class="glyphicon glyphicon-pencil">Edit</span></a>
+				<a href="/workers/delete/{{ worker.id }}">Delete</a>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}
