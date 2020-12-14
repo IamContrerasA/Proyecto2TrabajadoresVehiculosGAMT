@@ -772,12 +772,23 @@
   {% endif %}
 </div>
 
-
-
-
-
-
-
+<!--Modal de circulo que procesa-->
+<div class="modal" id="myModal2" data-backdrop="static">
+	<div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">PROCESANDO...</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        </div><div class="container"></div>
+        <div class="modal-body">
+          <link href="{% static '/css/modal_gift.css' %}" rel="stylesheet">
+          <div class="show_loader" id="id_show_loader">            
+            <div class="loader">    
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
 
 {% endblock %}
 
@@ -836,6 +847,7 @@
         fd.append('file_lev',file_lev);        
         fd.append('fecha',"{{file.created_at|date:'c'}}");
         fd.append('lugar',id_lugar);
+        $("#myModal2").modal();
         // AJAX request
         $.ajax({
           headers: { "X-CSRFToken": token },
@@ -888,6 +900,7 @@
         fd.append('file_lev',file_lev); 
         fd.append('fecha',"{{file.created_at|date:'c'}}");
         fd.append('lugar',id_lugar);
+        $("#myModal2").modal();
         // AJAX request
         $.ajax({
           headers: { "X-CSRFToken": token },
@@ -940,6 +953,7 @@
         fd.append('file_lev',file_lev); 
         fd.append('fecha',"{{file.created_at|date:'c'}}");
         fd.append('lugar',id_lugar);
+        $("#myModal2").modal();
         // AJAX request
         $.ajax({
           headers: { "X-CSRFToken": token },
@@ -992,6 +1006,7 @@
         fd.append('file_lev',file_lev); 
         fd.append('fecha',"{{file.created_at|date:'c'}}");
         fd.append('lugar',id_lugar);
+        $("#myModal2").modal();
         // AJAX request
         $.ajax({
           headers: { "X-CSRFToken": token },
