@@ -32,5 +32,5 @@ urlpatterns = [
     path('excel/', include('ExcelApp.urls')),
     path('reports/', include('ReportesApp.urls')),
     
-] + static(settings.STATIC_URL, document_root = os.path.join(settings.BASE_DIR, 'static'))
+] + static(settings.STATIC_URL, document_root = settings.STATIC_ROOT)
 
