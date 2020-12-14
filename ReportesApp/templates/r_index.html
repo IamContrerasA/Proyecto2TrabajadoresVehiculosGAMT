@@ -81,7 +81,14 @@
 	<tbody>		
 	</tbody>
 </table>
+<link href="{% static '/css/gift.css' %}" rel="stylesheet">
 
+<div style = "display: none;" class="show_loader" id="id_show_loader">
+  <h1 >PROCESANDO CONSULTA</h1>
+  <div class="loader">    
+</div>
+ 
+</div>
 <!--Modal para ver imagenes grande-->
 <div class="modal left fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
@@ -113,6 +120,9 @@
 				opens: 'left'
 			}, function(start, end, label) {
 				console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+				var loader = document.getElementById("id_show_loader");
+				loader.style.display = "block";
+				
 				var t = $('#id_table').DataTable();
 				var contratista = $('#id_contratista')[0].value;
 				var lugar = $('#id_lugar')[0].value;
@@ -179,6 +189,7 @@
 								t.row.add(["","","","","","","","","","","","","",""]).draw( false );	
 							}
 						}
+						loader.style.display = "none";
 					}
 				});
 			});
