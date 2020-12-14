@@ -3,68 +3,42 @@
 {% load static %}
 
 {% block content %}
-<style>
-  .loader {
-    z-index: 99;
-    top: 0;
-    left: 0;
-    background: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
 
-.loader > img {
-    width: 100px;
-}
+<link href="{% static '/css/gift.css' %}" rel="stylesheet">
 
-.loader.hidden {
-    animation: fadeOut 1s;
-    animation-fill-mode: forwards;
-}
-
-@keyframes fadeOut {
-    100% {
-        opacity: 0;
-        visibility: hidden;
-    }
-}
-
-.thumb {
-    height: 100px;
-    border: 1px solid black;
-    margin: 10px;
-}
-</style>
-
-<div style="display: none;" class="loader" id="id_loader">
-  <img src="{% static '/gifts/loading.gif' %}" alt="PROCESANDO EXCEL..." />  PROCESANDO EXCEL...
-</div>
-
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-  <h1 class="h2">Subir Archivo Excel</h1>
-</div>
-
-<form method = "post" enctype="multipart/form-data">
- {% csrf_token %}
+<div style="display: none;" class="show_loader" id="id_show_loader">
+  <h1 >PROCESANDO EXCEL...</h1>
+  <div class="loader">    
+  </div>
  
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">Nombre del Archivo:</label>
-    <div class="col-sm-4">
-      <input type="text" name="name" class="form-control" id="id_name" required />    
-    </div>
+</div>
+
+<div class="show_content_forms" id="id_show_content_forms">
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Subir Archivo Excel</h1>
   </div>
 
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label">Subir Archivo:</label>
-    <div class="col-sm-4">
-      <input type="file" name="file" class="form-control" id="id_file" required />   
-    </div>
-  </div>
+  <form method = "post" enctype="multipart/form-data">
+  {% csrf_token %}
   
-   <button id="id_submit" type="submit" class="btn btn-primary">Subir </button>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">Nombre del Archivo:</label>
+      <div class="col-sm-4">
+        <input type="text" name="name" class="form-control" id="id_name" required />    
+      </div>
+    </div>
 
-</form>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">Subir Archivo:</label>
+      <div class="col-sm-4">
+        <input type="file" name="file" class="form-control" id="id_file" required />   
+      </div>
+    </div>
+    
+    <button id="id_submit" type="submit" class="btn btn-primary">Subir </button>
+
+  </form>
+</div>
 
 <script>
   
@@ -74,15 +48,15 @@
   if(id_name.value != null && id_file.value != null){    
     submit.onclick = function() {
       console.log("algo");   
-      var x = document.getElementById("id_loader");  
-      x.style.display = "initial";   
+      var x = document.getElementById("id_show_loader");  
+      x.style.display = "block";
 
       id_name.readOnly= true;
       id_file.readOnly= true;
       submit.readOnly= true;
 
       window.addEventListener("load", function () {
-        const loader = document.querySelector(".loader");
+        const loader = document.querySelector(".show_loader");
         loader.className += " hidden"; // class "loader hidden"
       });    
     }
