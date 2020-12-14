@@ -17,7 +17,11 @@ from django.contrib import admin
 from django.urls import path, include  
 from django.conf import settings
 from django.conf.urls.static import static 
-import os
+
+if settings.DEBUG == True:
+    static_root_path = settings.STATICFILES_DIRS
+elif settings.DEBUG == False:
+    static_root_path = settings.STATIC_ROOT
 
 urlpatterns = [  
     path('admin/', admin.site.urls), 
@@ -32,5 +36,5 @@ urlpatterns = [
     path('excel/', include('ExcelApp.urls')),
     path('reports/', include('ReportesApp.urls')),
     
-] + static(settings.STATIC_URL, document_root = settings.STATIC_ROOT)
+] + static(settings.STATIC_URL, document_root = static_root_path)
 
