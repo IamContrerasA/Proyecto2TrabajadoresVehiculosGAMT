@@ -169,7 +169,7 @@
             <div>
               <div class="modal-body mi-contenido">
                 <button class="btn btn-danger active mi-boton" id="save" type="button"> Guardar </button> 
-                <a onclick="dibujar()" class="btn btn-primary active mi-boton" id="dibujar_boton" >Dibujar</a>  
+                <a onclick="dibujar()" class="btn btn-primary active mi-boton" id="dibujar_boton" >Dibujar</a>
               </div>
             </div>
             <div>
@@ -283,6 +283,22 @@
   </form>
 </div>
 
+<div class="modal" id="myModal2" data-backdrop="static">
+	<div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">PROCESANDO...</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        </div><div class="container"></div>
+        <div class="modal-body">
+          <link href="{% static '/css/modal_gift.css' %}" rel="stylesheet">
+          <div class="show_loader" id="id_show_loader">            
+            <div class="loader">    
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -340,7 +356,7 @@ function myFunction() {
         success: function(response){
           if(response != 0){
             resultados = response.resultado
-            console.log(resultados);
+            //console.log(resultados);
             location.reload()
             // Show image preview
             //$('#preview').append("<img src='"+response+"' width='100' height='100' style='display: inline-block;'>");
@@ -363,7 +379,7 @@ function myFunction() {
 			$('#imagemodal').modal('show');  
       var image_path = $(this).find('img').attr('src');
       var id_obs = $(this).find('img').attr('id');
-      console.log(id_obs);
+      //console.log(id_obs);
       const canvas = document.getElementById('canvas');
       const saveButton = document.getElementById('save');
       const loadInput = document.getElementById('load');
@@ -383,12 +399,12 @@ function myFunction() {
       boton.firstChild.data  = "Dibujando";
       boton.className = "btn btn-warning active mi-boton";
       puede_dibujar = true;
-      console.log(cont);
+      //console.log(cont);
     }else{
       boton.firstChild.data  = "Dibujar";
       boton.className = "btn btn-primary active mi-boton";
       puede_dibujar = false;
-      console.log(cont);
+      //console.log(cont);
     }
   }
   </script>
@@ -483,7 +499,7 @@ function myFunction() {
         $(this).data('bs.modal', null);
         saveButton.removeEventListener('click', save_fuction,true);
         loadInput.removeEventListener('change', load_fuction,true);
-        console.log("modal borrado");
+        //console.log("modal borrado");
       });
 
       this.canvas = canvas;
@@ -521,8 +537,8 @@ function myFunction() {
       fd.append('imagen', data);
       fd.append('observacion_tipo', observacion_tipo);
       fd.append('observacion_id', observacion_id);
-      fd.append('image_path', image_path);  
-
+      fd.append('image_path', image_path);        
+      $("#myModal2").modal();
       // AJAX request
       $.ajax({
         headers: { "X-CSRFToken": token },
@@ -533,7 +549,7 @@ function myFunction() {
         processData: false,
         success: function(response){
           if(response != 0){
-            console.log(response+ observacion_tipo)           
+            //console.log(response+ observacion_tipo)           
             alert("Observacion Actualizada" );
             location.reload(true);            
           }else{
@@ -589,9 +605,7 @@ function myFunction() {
     }
   }  
 </script>
-<script>
 
-  </script>
 {% endblock %}
 
 
