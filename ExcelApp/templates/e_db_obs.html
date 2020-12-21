@@ -162,18 +162,17 @@
     <div class="modal-dialog">
       <div class="modal-content">              
         <div class="modal-body" >
-          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-          <!--<img src="" class="imagepreview" id="load">-->
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>         
           <img src="" id="load">
           <div class="container">
             <div>
               <div class="modal-body mi-contenido">
-                <button class="btn btn-danger active mi-boton" id="save" type="button"> Guardar </button> 
-                <a onclick="dibujar()" class="btn btn-primary active mi-boton" id="dibujar_boton" >Dibujar</a>
+                <button class="btn btn-danger active mi-boton" id="save1" type="button"> Guardar </button> 
+                <a onclick="dibujar()" class="btn btn-primary active mi-boton" id="dibujar_boton1" >Dibujar</a>
               </div>
             </div>
             <div>
-              <canvas class="canvas-content" id="canvas" width="1000" height="500"></canvas>
+              <canvas class="canvas-content" id="canvas1" width="1000" height="500"></canvas>
             </div>            
           </div>
 
@@ -216,6 +215,10 @@
 <div class="btn-toolbar mb-2 mb-md-0">
   <div class="btn-group mr-2">
     <a onclick="myFunction()" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Añadir Observación</a>
+  </div>
+  <!-- Trigger the modal with a button -->
+  <div class="btn-group mr-2">
+    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera()">EVIDENCIA CÁMARA</button>
   </div>
 </div>
 
@@ -299,7 +302,108 @@
         </div>
       </div>
     </div>
+  </div>
 </div>
+
+<!--Modal para ver la camara-->
+<div class="modal" id="myModalCamera" data-backdrop="static">
+	<div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">          
+          <button type="button" class="btn btn-danger" value="Take Snapshot" onClick="take_snapshot()">Tomar Foto</button>         
+          
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true" onClick="close_snapshot()">×</button>
+        </div><div class="container"></div>
+        <div class="modal-body">
+          
+          <style>
+            #my_camera{
+            width: 640px;
+            height: 480px;
+            border: 1px solid black;
+            }
+          </style>
+          
+          <div id="my_camera"></div>
+          
+          <div style="display: none;" id="results" >
+            <div class="modal-body mi-contenido">
+              <button class="btn btn-danger active mi-boton" id="save2" type="button"> Guardar </button> 
+              <a onclick="dibujar()" class="btn btn-primary active mi-boton" id="dibujar_boton2" >Dibujar</a>
+            </div>
+            <div>
+              <canvas class="canvas-content" id="canvas2" width="640" height="480"></canvas>
+            </div> 
+          </div>
+
+          <!-- Webcam.min.js -->
+          <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
+          
+          <!-- Configure a few settings and attach camera -->
+          <script>  
+            var camara_evidencia = null; 
+            var my_camera = document.getElementById('my_camera');
+            var results = document.getElementById('results');
+            
+            function accept_camera() {            
+                Webcam.set({
+                width: 640,
+                height: 480,
+                image_format: 'jpeg',
+                jpeg_quality: 90,
+                constraints: {
+                  video: true,
+                  facingMode: "environment"
+                }
+              });
+              Webcam.attach(my_camera);  
+            }            
+            
+            function take_snapshot() {
+              Webcam.snap( function(data_uri) {
+                camara_evidencia = data_uri;  
+              });
+
+              Webcam.reset();
+
+              var image_path = camara_evidencia;
+              var id_obs = -1;
+              
+              const canvas = document.getElementById('canvas2');
+              const saveButton = document.getElementById('save2');
+              const loadInput = results;
+              console.log(id_obs);
+              new Drawing(canvas, saveButton, loadInput, image_path, id_obs);
+
+              my_camera.style.display = "none";
+              loadInput.style.display = "block";
+            }
+
+            function close_snapshot() {
+              my_camera.style.display = "block";
+              results.style.display = "none";
+              Webcam.reset(); 
+            }
+
+            function reset_snapshot() {
+              my_camera.style.display = "block";
+              results.style.display = "none";
+              Webcam.attach(my_camera);
+            }
+            
+          </script>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal" onClick="close_snapshot()">Cerrar</button>
+          <button type="button" class="btn btn-warning" onClick="reset_snapshot()">Regresar</button>
+          <button type="button" class="btn btn-primary">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -380,9 +484,9 @@ function myFunction() {
 			$('#imagemodal').modal('show');  
       var image_path = $(this).find('img').attr('src');
       var id_obs = $(this).find('img').attr('id');
-      //console.log(id_obs);
-      const canvas = document.getElementById('canvas');
-      const saveButton = document.getElementById('save');
+      console.log(id_obs);
+      const canvas = document.getElementById('canvas1');
+      const saveButton = document.getElementById('save1');
       const loadInput = document.getElementById('load');
       draw = new Drawing(canvas, saveButton, loadInput, image_path, id_obs);
 		});		
@@ -394,18 +498,23 @@ function myFunction() {
   var cont = -1;
   var puede_dibujar = false;
   function dibujar() {
-    var boton =  document.getElementById("dibujar_boton");
+    var boton = document.getElementById("dibujar_boton1");
+    var boton2 = document.getElementById("dibujar_boton2");
     cont++;
     if(cont %2 == 0){
       boton.firstChild.data  = "Dibujando";
       boton.className = "btn btn-warning active mi-boton";
+      boton2.firstChild.data  = "Dibujando";
+      boton2.className = "btn btn-warning active mi-boton";
       puede_dibujar = true;
-      //console.log(cont);
+      console.log(cont);
     }else{
       boton.firstChild.data  = "Dibujar";
       boton.className = "btn btn-primary active mi-boton";
+      boton2.firstChild.data  = "Dibujar";
+      boton2.className = "btn btn-primary active mi-boton";
       puede_dibujar = false;
-      //console.log(cont);
+      console.log(cont);
     }
   }
   </script>
@@ -420,8 +529,12 @@ function myFunction() {
   class Drawing {
     constructor(canvas, saveButton, loadInput, image_path, id_obs) {       
       this.isDrawing = false;
+
+      //numero del canvas, 1 editar, 2 camara
+      var canvas_num = canvas.id.substring(6,7);     
+
       canvas.addEventListener('mousedown', () => this.startDrawing());
-      canvas.addEventListener('mousemove', (event) => this.draw(event));
+      canvas.addEventListener('mousemove', (event) => this.draw(event, canvas_num));
       canvas.addEventListener('mouseup', () => this.stopDrawing());
       
       canvas.addEventListener('mousedown', function(e) {
@@ -506,8 +619,7 @@ function myFunction() {
       this.canvas = canvas;
       this.context = this.canvas.getContext('2d');
       
-      this.loadTheImage(image_path);      
-      
+      this.loadTheImage(image_path);
     }
     startDrawing() {
       this.isDrawing = true;
@@ -515,15 +627,14 @@ function myFunction() {
     stopDrawing() {
       this.isDrawing = false;
     }
-    draw(event) {
-      this.resize();
+    draw(event, canvas_num) {
+      this.resize(canvas_num);
       if(puede_dibujar == true){
         if (this.isDrawing) {
-
           this.context.fillStyle = 'red';
           this.context.fillRect(event.pageX - offsetLeft, event.pageY - offsetTop, 4, 4);
           
-          //console.log(event.pageX + " " + event.pageY + " " +offsetLeft + " " + offsetTop);
+          console.log(event.pageX + " " + event.pageY + " " +offsetLeft + " " + offsetTop);
         }
       }
     }
@@ -531,33 +642,61 @@ function myFunction() {
     save(image_path, id_obs) {
       const data = this.canvas.toDataURL('image/png');
       
-      var observacion_tipo = id_obs.substring(0, id_obs.lastIndexOf("-"));
-      var observacion_id = id_obs.substring(id_obs.lastIndexOf("-") + 1,  id_obs.length);
+      //Si es una observacion tomada con cámara
+      if (id_obs == -1){
+        var fdcamera = new FormData();
+        fdcamera.append('imagen', data);     
+        $("#myModal2").modal();
+        console.log("nueva obs " + "{{observaciones.0.programacion_general_id.id}}");
 
-      var fd = new FormData();
-      fd.append('imagen', data);
-      fd.append('observacion_tipo', observacion_tipo);
-      fd.append('observacion_id', observacion_id);
-      fd.append('image_path', image_path);        
-      $("#myModal2").modal();
-      // AJAX request
-      $.ajax({
-        headers: { "X-CSRFToken": token },
-        url: '/excel/db/image_editor/'+observacion_id,          
-        type: 'POST',
-        data: fd,
-        contentType: false,
-        processData: false,
-        success: function(response){
-          if(response != 0){
-            //console.log(response+ observacion_tipo)           
-            alert("Observacion Actualizada" );
-            location.reload(true);            
-          }else{
-            alert('file not uploaded');
+        $.ajax({
+          headers: { "X-CSRFToken": token },
+          url: '/excel/db/obs_camera/'+"{{observaciones.0.programacion_general_id.id}}",
+          type: 'POST',
+          data: fdcamera,
+          contentType: false,
+          processData: false,
+          success: function(response){
+            if(response != 0){
+              //console.log(response+ observacion_tipo)           
+              alert("Observacion Creada" );
+              location.reload(true);            
+            }else{
+              alert('file not uploaded');
+            }
           }
-        }
-      });    
+        }); 
+
+      }else{        
+        
+        var observacion_tipo = id_obs.substring(0, id_obs.lastIndexOf("-"));
+        var observacion_id = id_obs.substring(id_obs.lastIndexOf("-") + 1,  id_obs.length);
+
+        var fd = new FormData();
+        fd.append('imagen', data);
+        fd.append('observacion_tipo', observacion_tipo);
+        fd.append('observacion_id', observacion_id);
+        fd.append('image_path', image_path);        
+        $("#myModal2").modal();
+        // AJAX request
+        $.ajax({
+          headers: { "X-CSRFToken": token },
+          url: '/excel/db/image_editor/'+observacion_id,          
+          type: 'POST',
+          data: fd,
+          contentType: false,
+          processData: false,
+          success: function(response){
+            if(response != 0){
+              //console.log(response+ observacion_tipo)           
+              alert("Observacion Actualizada" );
+              location.reload(true);            
+            }else{
+              alert('file not uploaded');
+            }
+          }
+        });    
+      }
     }
 
     load(event) {
@@ -573,24 +712,19 @@ function myFunction() {
         context.drawImage(img, 0, 0);        
       };
       img.src = image;
-      this.context.canvas.height = img.height;
-      this.context.canvas.width = img.width;
+      if(img.height == 0){
+        this.context.canvas.height = 640;
+        this.context.canvas.height = 480;
+      }else{
+        this.context.canvas.height = img.height;
+        this.context.canvas.width = img.width;
+      }
       //$('.modal-content').css({width:img.width+100}); 
-      
+      console.log("imagen cargada");
           
     }
-    resize(){  
-
-      /* 
-      if(img.width < $(window).width()){
-        $("#canvas").outerWidth(img.width -200);      
-      }
-      else{
-        $("#canvas").outerWidth($(window).width() -200);      
-      }
-      */
-
-      rect = $("#canvas")[0].getBoundingClientRect();
+    resize(canvas_num){
+      rect = $("#canvas" + canvas_num)[0].getBoundingClientRect();
       offsetLeft = rect.left ;
       offsetTop = rect.top ;
     }  

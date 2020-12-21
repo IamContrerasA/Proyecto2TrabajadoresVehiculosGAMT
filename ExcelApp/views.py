@@ -366,6 +366,28 @@ def obs(request, id, id2):
     
     return render(request,'e_db_obs.html',{'fila_programacion_general': fila_programacion_general, 'observaciones': observaciones, 'existe': True, 'id_file': id, 'id_registro': id2, 'categorias': categorias, 'lugares': lugares}) 
 
+def obs_camera(request, id): 
+    if not request.user.is_authenticated or request.user.role.id >= 4:
+        return redirect("/")
+    
+    if request.method == 'POST':
+        imagen = request.POST['imagen']  
+        imagen = "b'" + imagen[22:] + "'"        
+        
+        Observaciones(
+            programacion_general_id_id = 2452, 
+            descripcion = "des",  
+            accion_plan = "acp", 
+            evidencia_encode = imagen,
+            evidencia_correctiva_encode = "undefined",
+            date = "2020-12-07",
+            estado_id = 1,
+            categoria_id = 1,
+            lugar_id = 1
+            ).save() 
+        
+        return JsonResponse({"resultado": "exito"}) 
+
 def obs_update(request, id, id2, id3): 
     if not request.user.is_authenticated or request.user.role.id >= 4:
         return redirect("/")
