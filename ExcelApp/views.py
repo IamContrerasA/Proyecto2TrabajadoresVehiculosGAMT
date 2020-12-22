@@ -382,6 +382,10 @@ def obs_camera(request, id):
         imagen_correctiva = request.POST['imagen_correctiva']  
         if imagen_correctiva != "undefined":
             imagen_correctiva = "b'" + imagen_correctiva[22:] + "'"    
+       
+        fecha = request.POST['fecha']
+        fecha = fecha[:fecha.rfind('T')] 
+        print(fecha)
         
         Observaciones(
             programacion_general_id_id = id, 
@@ -389,7 +393,7 @@ def obs_camera(request, id):
             accion_plan = request.POST['plan_accion'],
             evidencia_encode = imagen_evidencia,
             evidencia_correctiva_encode = imagen_correctiva,
-            date = "2020-12-07",
+            date = fecha,
             estado_id = 2,
             categoria_id = request.POST['categoria'],
             lugar_id = request.POST['lugar']

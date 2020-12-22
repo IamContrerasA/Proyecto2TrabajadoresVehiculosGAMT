@@ -354,7 +354,7 @@
           <div style="display: none;" id="results" >
             <div class="modal-body mi-contenido">
               <button class="btn btn-danger active mi-boton" id="save2" type="button"> Guardar </button> 
-              <a onclick="dibujar()" class="btn btn-primary active mi-boton" id="dibujar_boton2" >Dibujar</a>
+              <a onclick="dibujar2()" class="btn btn-primary active mi-boton" id="dibujar_boton2" >Dibujar</a>
             </div>
             <div>
               <canvas class="canvas-content" id="canvas2" width="640" height="480"></canvas>
@@ -478,9 +478,6 @@ function myFunction() {
       var $this =  $(this).attr('name');
       var indice_obs = $this.substring($this.lastIndexOf("_") + 1, $this.lastIndexOf("-"));
       var indice_pg =  $this.substring($this.lastIndexOf("-") + 1,  $this.length);
-      //console.log("{{id_file}}");      
-      //console.log("{{fila_programacion_general.id}}");
-      //console.log(indice_obs);
 
       var fd = new FormData();
       var files = $('#id_evidencia_'+indice_obs)[0].files[0];
@@ -489,10 +486,7 @@ function myFunction() {
       var id_plan_accion = $('#id_plan_accion_'+indice_obs)[0].value;
       var id_categoria = $('#categoria_'+indice_obs)[0].value;
       var id_lugar = $('#lugar_'+indice_obs)[0].value;
-      
-      //console.log(files);
-      //console.log(id_mod_des);
-      
+            
       fd.append('file',files);
       fd.append('descripcion',id_mod_des);
       fd.append('plan_accion',id_plan_accion);
@@ -513,8 +507,6 @@ function myFunction() {
             resultados = response.resultado
             //console.log(resultados);
             location.reload()
-            // Show image preview
-            //$('#preview').append("<img src='"+response+"' width='100' height='100' style='display: inline-block;'>");
           }else{
             alert('file not uploaded');
           }
@@ -531,7 +523,7 @@ function myFunction() {
   
   $(document).ready(function(){
     $('[id^=btn_nuevo_camara]').click(function(){
-      
+      //console.log("{{fila_programacion_general}}")
       var fdcamera = new FormData();      
       var id_mod_des = $('#id_descripcion_camara')[0].value;
       var id_plan_accion = $('#id_plan_accion_camara')[0].value;
@@ -543,13 +535,14 @@ function myFunction() {
       fdcamera.append('descripcion',id_mod_des);
       fdcamera.append('plan_accion',id_plan_accion);      
       fdcamera.append('categoria',id_categoria);
-      fdcamera.append('lugar',id_lugar);     
+      fdcamera.append('lugar',id_lugar); 
+      fdcamera.append('fecha',"{{fila_programacion_general.0.excel.created_at|date:'c'}}");     
       $("#myModal2").modal();
 
       // AJAX request
       $.ajax({
         headers: { "X-CSRFToken": token },
-        url: '/excel/db/obs_camera/'+"{{observaciones.0.programacion_general_id.id}}",
+        url: '/excel/db/obs_camera/'+"{{fila_programacion_general.0.id}}",
         type: 'POST',
         data: fdcamera,
         contentType: false,
@@ -578,7 +571,7 @@ function myFunction() {
 			$('#imagemodal').modal('show');  
       var image_path = $(this).find('img').attr('src');
       var id_obs = $(this).find('img').attr('id');
-      console.log(id_obs);
+      //console.log(id_obs);
       const canvas = document.getElementById('canvas1');
       const saveButton = document.getElementById('save1');
       const loadInput = document.getElementById('load');
@@ -589,26 +582,34 @@ function myFunction() {
 
 <!--Script para habilitar el dibujar-->
 <script>
-  var cont = -1;
+  var cont = -1, cont2 = -1;
   var puede_dibujar = false;
   function dibujar() {
     var boton = document.getElementById("dibujar_boton1");
-    var boton2 = document.getElementById("dibujar_boton2");
     cont++;
     if(cont %2 == 0){
       boton.firstChild.data  = "Dibujando";
       boton.className = "btn btn-warning active mi-boton";
-      boton2.firstChild.data  = "Dibujando";
-      boton2.className = "btn btn-warning active mi-boton";
       puede_dibujar = true;
-      console.log(cont);
+      //console.log(cont);
     }else{
       boton.firstChild.data  = "Dibujar";
       boton.className = "btn btn-primary active mi-boton";
+      puede_dibujar = false;
+      //console.log(cont);
+    }
+  }
+    function dibujar2() {
+    var boton2 = document.getElementById("dibujar_boton2");
+    cont2++;
+    if(cont2 %2 == 0){
+      boton2.firstChild.data  = "Dibujando";
+      boton2.className = "btn btn-warning active mi-boton";
+      puede_dibujar = true;
+    }else{
       boton2.firstChild.data  = "Dibujar";
       boton2.className = "btn btn-primary active mi-boton";
       puede_dibujar = false;
-      console.log(cont);
     }
   }
   </script>
@@ -737,7 +738,7 @@ function myFunction() {
 
     save(image_path, id_obs, tipo_evidencia) {
       const data = this.canvas.toDataURL('image/png');
-      console.log(tipo_evidencia);
+      //console.log(tipo_evidencia);
       if(tipo_evidencia == "evidencia" && evidencia_flag == true){
         evidencia_flag = false;
         evidencia_src = data;
@@ -807,11 +808,10 @@ function myFunction() {
         this.context.canvas.width = img.width;
       }
       //$('.modal-content').css({width:img.width+100}); 
-      console.log("imagen cargada");
+      //console.log("imagen cargada");
           
     }
     resize(canvas_num){
-      console.log(canvas_num);
       rect = $("#canvas" + canvas_num)[0].getBoundingClientRect();
       offsetLeft = rect.left ;
       offsetTop = rect.top ;
