@@ -216,9 +216,9 @@
   <div class="btn-group mr-2">
     <a onclick="myFunction()" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Añadir Observación</a>
   </div>
-  <!-- Trigger the modal with a button -->
+  <!-- Añadir observación con cámara -->
   <div class="btn-group mr-2">
-    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera()">EVIDENCIA CÁMARA</button>
+    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#uploadModalCamara">Observación Cámara</button>
   </div>
 </div>
 
@@ -286,21 +286,42 @@
   </form>
 </div>
 
-<!--Modal de circulo que procesa-->
-<div class="modal" id="myModal2" data-backdrop="static">
-	<div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">PROCESANDO...</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        </div><div class="container"></div>
-        <div class="modal-body">
-          <link href="{% static '/css/modal_gift.css' %}" rel="stylesheet">
-          <div class="show_loader" id="id_show_loader">            
-            <div class="loader">    
-          </div>
-        </div>
+<!--Modal para agregar una observación-->
+<div id="uploadModalCamara" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">CERRAR</h4>
       </div>
+      <div class="modal-body">
+        <!-- Form -->
+        <form method = "post" action='' enctype="multipart/form-data">
+          {% csrf_token %} 
+          
+          Categoría :    
+          <select class="form-control" name="categoria" id="categoria_camara">
+            {% for categoria in categorias %}
+              <option value="{{ categoria.id }}"> {{ categoria.name }} </option>              
+            {% endfor %}
+          </select><br> 
+          Lugar :    
+          <select class="form-control" name="lugar" id="lugar_camara">
+            {% for lugar in lugares %}             
+                <option value="{{ lugar.id }}"> {{ lugar.name }} </option>
+            {% endfor %}
+          </select><br>          
+          Evidencia Fotográfica :<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('evidencia')">Tomar Evidencia</button><br>
+          <div id = "evidencia_camara"></div>
+          Descripción: <input type="text"  class="form-control" name="descripcion" id="id_descripcion_camara" required value="" /><br>
+          Plan de Acción: <input type="text"  class="form-control" name="plan_accion" id="id_plan_accion_camara" value="" /><br>
+          Evidencia Correctiva :<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('evidencia_correctiva')">Tomar Evidencia Correctiva</button><br><br>
+          <div id = "correctiva_camara"></div>
+          <input type='button' class='btn btn-info' value='Añadir Observacion' id='btn_nuevo_camara' name='btn_nuevo_camara'>
+        </form> 
+      </div>          
     </div>
   </div>
 </div>
@@ -342,10 +363,16 @@
           <!-- Configure a few settings and attach camera -->
           <script>  
             var camara_evidencia = null; 
+            var tipo_evidencia = null;
             var my_camera = document.getElementById('my_camera');
             var results = document.getElementById('results');
             
-            function accept_camera() {            
+            function accept_camera(tipo_evidencia) {            
+                this.tipo_evidencia = tipo_evidencia;
+                if(tipo_evidencia == "evidencia")
+                  evidencia_flag = true;
+                if(tipo_evidencia == "evidencia_correctiva")
+                  correctiva_flag = true;
                 Webcam.set({
                 width: 640,
                 height: 480,
@@ -373,13 +400,15 @@
               const saveButton = document.getElementById('save2');
               const loadInput = results;
               console.log(id_obs);
-              new Drawing(canvas, saveButton, loadInput, image_path, id_obs);
+              new Drawing(canvas, saveButton, loadInput, image_path, id_obs, tipo_evidencia);
 
               my_camera.style.display = "none";
               loadInput.style.display = "block";
             }
 
             function close_snapshot() {
+              evidencia_flag == false;
+              correctiva_flag == false;
               my_camera.style.display = "block";
               results.style.display = "none";
               Webcam.reset(); 
@@ -397,7 +426,24 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal" onClick="close_snapshot()">Cerrar</button>
           <button type="button" class="btn btn-warning" onClick="reset_snapshot()">Regresar</button>
-          <button type="button" class="btn btn-primary">Guardar</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!--Modal de circulo que procesa-->
+<div class="modal" id="myModal2" data-backdrop="static">
+	<div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">PROCESANDO...</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        </div><div class="container"></div>
+        <div class="modal-body">
+          <link href="{% static '/css/modal_gift.css' %}" rel="stylesheet">
+          <div class="show_loader" id="id_show_loader">            
+            <div class="loader">    
+          </div>
         </div>
       </div>
     </div>
@@ -475,6 +521,50 @@ function myFunction() {
 
 </script>
 
+<!--Script para añadir observacion en modal con cámara-->
+<script>
+  var token = '{{csrf_token}}';
+  
+  $(document).ready(function(){
+    $('[id^=btn_nuevo_camara]').click(function(){
+      
+      var fdcamera = new FormData();      
+      var id_mod_des = $('#id_descripcion_camara')[0].value;
+      var id_plan_accion = $('#id_plan_accion_camara')[0].value;
+      var id_categoria = $('#categoria_camara')[0].value;
+      var id_lugar = $('#lugar_camara')[0].value;
+      
+      fdcamera.append('imagen_evidencia', evidencia_src);
+      fdcamera.append('imagen_correctiva', correctiva_src);      
+      fdcamera.append('descripcion',id_mod_des);
+      fdcamera.append('plan_accion',id_plan_accion);      
+      fdcamera.append('categoria',id_categoria);
+      fdcamera.append('lugar',id_lugar);     
+      $("#myModal2").modal();
+
+      // AJAX request
+      $.ajax({
+        headers: { "X-CSRFToken": token },
+        url: '/excel/db/obs_camera/'+"{{observaciones.0.programacion_general_id.id}}",
+        type: 'POST',
+        data: fdcamera,
+        contentType: false,
+        processData: false,
+        success: function(response){
+          if(response['resultado'] == "fracaso"){            
+            alert('No hay evidencia o descripción');
+            $('#myModal2').modal('toggle');            
+          }else{
+            alert("Observacion Creada" );
+            location.reload(true);            
+          }
+        }
+      });
+    });
+  });
+
+</script>
+
 <!--Script para agrandar imagen en modal-->
 <script> 
   var draw;
@@ -488,7 +578,7 @@ function myFunction() {
       const canvas = document.getElementById('canvas1');
       const saveButton = document.getElementById('save1');
       const loadInput = document.getElementById('load');
-      draw = new Drawing(canvas, saveButton, loadInput, image_path, id_obs);
+      draw = new Drawing(canvas, saveButton, loadInput, image_path, id_obs, "undefined");
 		});		
   });  
 </script>
@@ -521,13 +611,15 @@ function myFunction() {
 <!--Script para Dibujar-->
 <script>
   var token = '{{csrf_token}}';
+  var evidencia_src = "undefined", correctiva_src = "undefined";
+  var evidencia_flag = true, correctiva_flag = true;
   var rect, offsetLeft, offsetTop, img;
   var dragging = false;
   var lastX;
   var marginLeft = 0;
   var control = 0;
   class Drawing {
-    constructor(canvas, saveButton, loadInput, image_path, id_obs) {       
+    constructor(canvas, saveButton, loadInput, image_path, id_obs, tipo_evidencia) {       
       this.isDrawing = false;
 
       //numero del canvas, 1 editar, 2 camara
@@ -602,7 +694,7 @@ function myFunction() {
         };
       }
 
-      var save_fuction = () => this.save(image_path, id_obs);
+      var save_fuction = () => this.save(image_path, id_obs, tipo_evidencia);
       var load_fuction = (event) => this.load(event);
 
       saveButton.addEventListener('click', save_fuction, true);
@@ -634,40 +726,31 @@ function myFunction() {
           this.context.fillStyle = 'red';
           this.context.fillRect(event.pageX - offsetLeft, event.pageY - offsetTop, 4, 4);
           
-          console.log(event.pageX + " " + event.pageY + " " +offsetLeft + " " + offsetTop);
+          //console.log(event.pageX + " " + event.pageY + " " +offsetLeft + " " + offsetTop);
         }
       }
     }
 
-    save(image_path, id_obs) {
+    save(image_path, id_obs, tipo_evidencia) {
       const data = this.canvas.toDataURL('image/png');
-      
+      console.log(tipo_evidencia);
+      if(tipo_evidencia == "evidencia" && evidencia_flag == true){
+        evidencia_flag = false;
+        evidencia_src = data;
+        close_snapshot();
+        $('#myModalCamera').modal('toggle');
+        document.getElementById('evidencia_camara').innerHTML = '<img src="'+evidencia_src+'" style="width:100px;height:100px;"><br><br>';
+      }
       //Si es una observacion tomada con cámara
-      if (id_obs == -1){
-        var fdcamera = new FormData();
-        fdcamera.append('imagen', data);     
-        $("#myModal2").modal();
-        console.log("nueva obs " + "{{observaciones.0.programacion_general_id.id}}");
-
-        $.ajax({
-          headers: { "X-CSRFToken": token },
-          url: '/excel/db/obs_camera/'+"{{observaciones.0.programacion_general_id.id}}",
-          type: 'POST',
-          data: fdcamera,
-          contentType: false,
-          processData: false,
-          success: function(response){
-            if(response != 0){
-              //console.log(response+ observacion_tipo)           
-              alert("Observacion Creada" );
-              location.reload(true);            
-            }else{
-              alert('file not uploaded');
-            }
-          }
-        }); 
-
-      }else{        
+      else if(tipo_evidencia == "evidencia_correctiva" && correctiva_flag == true){
+        correctiva_flag = false;
+        correctiva_src = data;
+        close_snapshot();
+        $('#myModalCamera').modal('toggle');
+        document.getElementById('correctiva_camara').innerHTML = '<img src="'+correctiva_src+'" style="width:100px;height:100px;"><br><br>';
+      }
+      
+      if(tipo_evidencia == "undefined"){        
         
         var observacion_tipo = id_obs.substring(0, id_obs.lastIndexOf("-"));
         var observacion_id = id_obs.substring(id_obs.lastIndexOf("-") + 1,  id_obs.length);
@@ -713,7 +796,7 @@ function myFunction() {
       };
       img.src = image;
       if(img.height == 0){
-        this.context.canvas.height = 640;
+        this.context.canvas.width = 640;
         this.context.canvas.height = 480;
       }else{
         this.context.canvas.height = img.height;
@@ -724,6 +807,7 @@ function myFunction() {
           
     }
     resize(canvas_num){
+      console.log(canvas_num);
       rect = $("#canvas" + canvas_num)[0].getBoundingClientRect();
       offsetLeft = rect.left ;
       offsetTop = rect.top ;

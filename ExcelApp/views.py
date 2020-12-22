@@ -370,20 +370,29 @@ def obs_camera(request, id):
     if not request.user.is_authenticated or request.user.role.id >= 4:
         return redirect("/")
     
-    if request.method == 'POST':
-        imagen = request.POST['imagen']  
-        imagen = "b'" + imagen[22:] + "'"        
+    if request.method == 'POST':         
+        
+        imagen_evidencia = request.POST['imagen_evidencia']
+        if imagen_evidencia == "undefined" or len(request.POST['descripcion']) == 0:
+            return JsonResponse({"resultado": "fracaso"})
+
+        if imagen_evidencia != "undefined":
+            imagen_evidencia = "b'" + imagen_evidencia[22:] + "'" 
+
+        imagen_correctiva = request.POST['imagen_correctiva']  
+        if imagen_correctiva != "undefined":
+            imagen_correctiva = "b'" + imagen_correctiva[22:] + "'"    
         
         Observaciones(
-            programacion_general_id_id = 2452, 
-            descripcion = "des",  
-            accion_plan = "acp", 
-            evidencia_encode = imagen,
-            evidencia_correctiva_encode = "undefined",
+            programacion_general_id_id = id, 
+            descripcion = request.POST['descripcion'],
+            accion_plan = request.POST['plan_accion'],
+            evidencia_encode = imagen_evidencia,
+            evidencia_correctiva_encode = imagen_correctiva,
             date = "2020-12-07",
-            estado_id = 1,
-            categoria_id = 1,
-            lugar_id = 1
+            estado_id = 2,
+            categoria_id = request.POST['categoria'],
+            lugar_id = request.POST['lugar']
             ).save() 
         
         return JsonResponse({"resultado": "exito"}) 
