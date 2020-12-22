@@ -4,7 +4,11 @@
 
 
 {% block content %}
-
+<style>
+  .modal{
+    overflow-y:auto;
+  }
+</style>
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
   <h1 class="h2">Observaciones</h1>
 </div>
@@ -407,8 +411,8 @@
             }
 
             function close_snapshot() {
-              evidencia_flag == false;
-              correctiva_flag == false;
+              evidencia_flag = false;
+              correctiva_flag = false;
               my_camera.style.display = "block";
               results.style.display = "none";
               Webcam.reset(); 
