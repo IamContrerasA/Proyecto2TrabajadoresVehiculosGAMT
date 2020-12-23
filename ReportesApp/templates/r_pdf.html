@@ -81,7 +81,6 @@ h1 {
 			<th>Responsable</th>	
 			<th>Fecha de Levantamiento</th>
 			<th>Evidencia Correctiva</th>
-			<th>Estado</th>      
     </tr>
   </thead>
 
@@ -109,8 +108,7 @@ h1 {
         {% if observacion.evidencia_correctiva_encode != "undefined"  %}
             <img src="data:image/png;base64,{{observacion.evidencia_correctiva_encode|slice:'2:-1'}}" height='200px'>        
         {% endif %}
-      </td>
-      <td>{{ observacion.estado.name }}</td>
+      </td>      
     </tr>
     {% endfor %}
   </tbody>
