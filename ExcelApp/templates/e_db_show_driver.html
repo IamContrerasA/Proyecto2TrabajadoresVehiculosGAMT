@@ -19,49 +19,78 @@
     <tr>
       <th scope="row">Iperc Foto</th>
       <td>
-        <a href="data:image/png;base64,{{conductor_archivos.iperc_file_encode|slice:'2:-1'}}" target="_blank">{{ conductor_archivos.iperc_file}}</a>        
+
       </td>
     </tr>
     {% if conductor_archivos.iperc_file_encode %}
     <tr>
       <th scope="row"></th>
-      <td>        
-        <img src="data:image/png;base64,{{conductor_archivos.iperc_file_encode|slice:'2:-1'}}" style="width:500px;height:600px;">
+      <td>
+        <a href='#' class='pop'>
+          <img src="data:image/png;base64,{{conductor_archivos.iperc_file_encode|slice:'2:-1'}}" style="width:500px;height:600px;">
+        </a>       
       </td>
     </tr>
     {% endif %}
     
     <tr>
       <th scope="row">Declaración Foto</th>
-      <td>
-        <a href="data:image/png;base64,{{conductor_archivos.declaracion_file_encode|slice:'2:-1'}}" target="_blank">{{ conductor_archivos.declaracion_file}}</a>        
+      <td>        
       </td>
     </tr>
     {% if conductor_archivos.declaracion_file_encode %}
       <tr>
         <th scope="row"></th>
         <td>        
-          <img src="data:image/png;base64,{{conductor_archivos.declaracion_file_encode|slice:'2:-1'}}" style="width:500px;height:600px;">
+          <a href='#' class='pop'>
+            <img src="data:image/png;base64,{{conductor_archivos.declaracion_file_encode|slice:'2:-1'}}" style="width:500px;height:600px;">
+          </a>
         </td>
       </tr>
     {% endif %}
 
     <tr>
       <th scope="row">Fatiga Foto</th>
-      <td>
-        <a href="data:image/png;base64,{{conductor_archivos.fatiga_file_encode|slice:'2:-1'}}" target="_blank">{{ conductor_archivos.fatiga_file}}</a>        
+      <td>        
       </td>
     </tr>
     {% if conductor_archivos.fatiga_file_encode %}
       <tr>
         <th scope="row"></th>
         <td>        
-          <img src="data:image/png;base64,{{conductor_archivos.fatiga_file_encode|slice:'2:-1'}}" style="width:500px;height:600px;">
+          <a href='#' class='pop'>
+            <img src="data:image/png;base64,{{conductor_archivos.fatiga_file_encode|slice:'2:-1'}}"  target="_blank" style="width:500px;height:600px;">
+          </a>
         </td>
       </tr>
     {% endif %}
 
   </tbody>
 </table>
+<!--Modal para ver imagenes grande-->
+<div class="modal left fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">              
+			<div class="modal-body" >
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<div class="container">					
+						<img src="" class="imagepreview" >
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
 
+{% block scripts %}
+<!--Script para agrandar imagen en modal-->
+<script>
+  $(function() {			
+    $(document).on('click', '.pop', function() {				
+      $('.imagepreview').attr('src', $(this).find('img').attr('src'));
+      $('#imagemodal').modal('show');   
+    });		
+  });
+</script>
 {% endblock %}

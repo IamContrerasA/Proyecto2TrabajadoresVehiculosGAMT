@@ -18,21 +18,46 @@
 
     <tr>
       <th scope="row">ChecList Foto</th>
-      <td>
-        <a href="data:image/png;base64,{{vehiculo_archivos.checklist_file_encode|slice:'2:-1'}}" target="_blank">{{ vehiculo_archivos.checklist_file}}</a>        
+      <td>        
       </td>
     </tr>
     {% if vehiculo_archivos.checklist_file_encode %}
     <tr>
       <th scope="row"></th>
-      <td>        
-        <img src="data:image/png;base64,{{vehiculo_archivos.checklist_file_encode|slice:'2:-1'}}" style="width:500px;height:600px;">
+      <td>
+        <a href='#' class='pop'>
+          <img src="data:image/png;base64,{{vehiculo_archivos.checklist_file_encode|slice:'2:-1'}}" style="width:500px;height:600px;">
+        </a>   
       </td>
     </tr>
-    {% endif %}    
-    
-
+    {% endif %}  
   </tbody>
 </table>
 
+<!--Modal para ver imagenes grande-->
+<div class="modal left fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">              
+			<div class="modal-body" >
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<div class="container">					
+						<img src="" class="imagepreview" >
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!--Script para agrandar imagen en modal-->
+<script>
+  $(function() {			
+    $(document).on('click', '.pop', function() {				
+      $('.imagepreview').attr('src', $(this).find('img').attr('src'));
+      $('#imagemodal').modal('show');   
+    });		
+  });
+</script>
 {% endblock %}
