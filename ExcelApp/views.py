@@ -185,6 +185,7 @@ def db(request, id):
     conductor_ids = tabla.values_list('conductor', flat = True).distinct()
     num_convoy_ids = tabla.values_list('num_convoy', flat = True).distinct()
     placa_ids = tabla.values_list('conductor_placa', flat = True).distinct()
+    registros_paginator = 10
 
     if request.method == 'POST':         
 
@@ -209,11 +210,11 @@ def db(request, id):
         elif f_transporte > -1 :
             transporte_ids = tabla.values_list('transporte', flat = True).distinct()
             tabla = ProgramacionGeneral.objects.filter(excel_id = id, transporte = f_transporte).order_by('id')
- 
+
         elif f_contratista > -1 :
             contratista_ids = tabla.values_list('contratista', flat = True).distinct()
             tabla = ProgramacionGeneral.objects.filter(excel_id = id, contratista = f_contratista).order_by('id')
-        
+
         elif f_conductor > -1 :
             conductor_ids = tabla.values_list('conductor', flat = True).distinct()
             tabla = ProgramacionGeneral.objects.filter(excel_id = id, conductor = f_conductor).order_by('id')
@@ -224,8 +225,10 @@ def db(request, id):
 
         elif f_placa > -1 :
             placa_ids = tabla.values_list('conductor_placa', flat = True).distinct()
-            tabla = ProgramacionGeneral.objects.filter(excel_id = id, conductor_placa = f_placa).order_by('id')        
-        
+            tabla = ProgramacionGeneral.objects.filter(excel_id = id, conductor_placa = f_placa).order_by('id')   
+
+        registros_paginator = tabla.count()
+
     transportes = Transporte.objects.filter(id__in = transporte_ids).order_by('name')
     contratistas = Contratista.objects.filter(id__in = contratista_ids).order_by('name')
     trabajadores = Conductor.objects.filter(id__in = conductor_ids).order_by('name')
@@ -240,7 +243,7 @@ def db(request, id):
 
     page = request.GET.get('page', 1)
 
-    paginator = Paginator(tabla, 10)
+    paginator = Paginator(tabla, registros_paginator)
     try:
         tabla = paginator.page(page)
     except PageNotAnInteger:
