@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 
 from django.core.files.storage import FileSystemStorage
-from django.conf import settings
+from django.contrib.staticfiles.storage import staticfiles_storage
+from io import BytesIO
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 from ExcelApp.forms import ExcelForm
 from ExcelApp.models import Excel, ProgramacionGeneral, Contratista, Transporte, ModalidadIngreso, TipoVehiculo, Carga, Destino, NumConvoy, Estado, Motivo, Conductor, Placa, ConductorArchivos, Observaciones, Categoria, PlacaArchivos, Lugar
 
@@ -500,26 +502,24 @@ def __obs_modales(request, id, id2, tipo_archivo, categoria, pertenece_a):
     
     #Solo para el archivo fatiga, declaracion jurada e iperc, independiente de la observacion
     if pertenece_a == "conductor":              
-        if uploaded_file:              
-            name = __encode64(uploaded_file)
-
-            ConductorArchivos.objects.get_or_create(date = fecha, conductor_id = id)  
+        if uploaded_file:
+            imagen_watermark = __water_mark_function(request, fecha, uploaded_file)
+            ConductorArchivos.objects.get_or_create(date = fecha, conductor_id = id)    
             if tipo_archivo == "fatigas":
-                ConductorArchivos.objects.filter(date = fecha, conductor_id = id).update(fatiga_file_encode = name)
+                ConductorArchivos.objects.filter(date = fecha, conductor_id = id).update(fatiga_file_encode = imagen_watermark)
             if tipo_archivo == "declaracion":
-                ConductorArchivos.objects.filter(date = fecha, conductor_id = id).update(declaracion_file_encode = name)
+                ConductorArchivos.objects.filter(date = fecha, conductor_id = id).update(declaracion_file_encode = imagen_watermark)
             if tipo_archivo == "iperc":
-                ConductorArchivos.objects.filter(date = fecha, conductor_id = id).update(iperc_file_encode = name)
+                ConductorArchivos.objects.filter(date = fecha, conductor_id = id).update(iperc_file_encode = imagen_watermark)
             return JsonResponse({"resultado": "ok conductor"})
     
     #solo para checklist
     if pertenece_a == "vehiculo":              
         if uploaded_file:
-            name = __encode64(uploaded_file)
-
             PlacaArchivos.objects.get_or_create(date = fecha, placa_id = id)  
-            if tipo_archivo == "checklist":
-                PlacaArchivos.objects.filter(date = fecha, placa_id = id).update(checklist_file_encode = name)
+            if tipo_archivo == "checklist":     
+                imagen_watermark = __water_mark_function(request, fecha, uploaded_file)
+                PlacaArchivos.objects.filter(date = fecha, placa_id = id).update(checklist_file_encode = imagen_watermark)
             return JsonResponse({"resultado": "ok checklist"})
     
     #ver si existe una observacion a ser insertada en base a la imagen o a la descripcion ingresada    
@@ -565,3 +565,52 @@ def __encode64(photo):
   enc =  base64.b64encode(photo.read())
   
   return enc
+
+def __water_mark_function(request, fecha, uploaded_file):  
+   
+	#cargar template de la marca de agua           
+	url = staticfiles_storage.path('img/water_mark.png')
+	personal_water_mark = Image.open(url)
+	draw = ImageDraw.Draw(personal_water_mark)
+	#dibujar datos que iran
+	font = ImageFont.truetype(staticfiles_storage.path('fonts/Roboto/Roboto-Bold.ttf'), size=45)
+	(x, y) = (180, 350)
+	nombre_usuario = request.user.username
+	color = 'rgb(0, 0, 0)' # black color
+	draw.text((x, y), nombre_usuario, fill=color, font=font)
+
+	font = ImageFont.truetype(staticfiles_storage.path('fonts/Roboto/Roboto-Bold.ttf'), size=35)
+	(x, y) = (320, 400)
+	empresa = 'SCANGLOBAL'
+	color = 'rgb(255, 0, 0)' # red color
+	draw.text((x, y), empresa, fill=color, font=font)
+
+	(x, y) = (330, 440)
+	color = 'rgb(0, 0, 0)' # black color
+	draw.text((x, y), fecha, fill=color, font=font)
+
+	#cargar imagen subida del form
+	base_image = Image.open(uploaded_file)
+	#rotar por si esta horizontal
+	base_image = ImageOps.exif_transpose(base_image)
+	#obtener dimensiones de la imagen subida
+	width, height = base_image.size
+	#ubicar siempre abajo izquierda la marca de agua
+	position = (width - 384 , height - 384)
+	#disminuir el tamanio de la marca de agua
+	size = 384, 384
+	personal_water_mark.thumbnail(size, Image.ANTIALIAS)
+	#poner marca de agua
+	base_image.paste(personal_water_mark, position, mask=personal_water_mark)
+	#base_image.save('greeting_card.png')#solo para verificar
+
+	#abrir un buffer para base64
+	buf = BytesIO()
+	base_image.save(buf, 'jpeg', optimize=True, quality=90)                
+	buf.seek(0)
+	#codificar base 64
+	imagen_base64 = __encode64(buf)
+	buf.close()
+
+	return imagen_base64
+	  
