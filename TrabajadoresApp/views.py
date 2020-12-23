@@ -15,7 +15,7 @@ from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 
 def emp(request):
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     if request.method == "POST":
         form = WorkerForm(request.POST)
@@ -31,21 +31,21 @@ def emp(request):
     return render(request, 'new.html', {'form': form, 'areas': areas})
 
 def index(request):
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     workers = Worker.objects.all()
     return render(request, "index.html", {'workers': workers})
 
 
 def show(request, id):
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     workers = Worker.objects.get(id=id)
     return render(request, "show.html", {'worker': workers})
 
 
 def edit(request, id):
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     workers = Worker.objects.get(id=id)
     areas = Area.objects.all()
@@ -53,7 +53,7 @@ def edit(request, id):
 
 
 def update(request, id):
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     workers = Worker.objects.get(id=id)
     form = WorkerForm(request.POST, instance=workers)
@@ -64,7 +64,7 @@ def update(request, id):
 
 
 def destroy(request, id):
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     workers = Worker.objects.get(id=id)
     workers.delete()
@@ -73,7 +73,7 @@ def destroy(request, id):
 
 
 def r_create(request, id):    
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     if request.method == "POST":
         form = FatigueForm(request.POST)
@@ -90,7 +90,7 @@ def r_create(request, id):
     return render(request, 'results/r_new.html', {'form': form, 'worker': worker, 'fatigue': fatigue})
 
 def r_index(request, id):
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     worker = Worker.objects.get(id=id)
     fatigues = Fatigue.objects.filter(worker_id=id).order_by('time_to_wake')
@@ -102,21 +102,21 @@ def r_index(request, id):
     return render(request, "results/r_index.html", {'worker': worker, 'fatigues': fatigues})
 
 def r_show(request, id, id2):
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     fatigue = Fatigue.objects.get(id=id2)
     return render(request, "results/r_show.html", {'fatigue': fatigue})
 
 
 def r_edit(request, id, id2):
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     fatigue = Fatigue.objects.get(id=id2)
     return render(request, 'results/r_edit.html', {'fatigue': fatigue})
 
 
 def r_update(request, id, id2):
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     fatigue = Fatigue.objects.get(id=id2)
     form = FatigueForm(request.POST, instance=fatigue)
@@ -127,7 +127,7 @@ def r_update(request, id, id2):
 
 
 def r_destroy(request, id, id2):
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     fatigue = Fatigue.objects.get(id=id2)
     fatigue.delete()

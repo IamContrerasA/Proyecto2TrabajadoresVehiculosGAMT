@@ -9,9 +9,9 @@ from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.hashers import make_password
 
 def create(request):  
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
-    roles = Role.objects.all()  
+    roles = Role.objects.all().order_by('id')
     if request.method == "POST":  
         form = UserForm(request.POST)        
         
@@ -36,26 +36,26 @@ def create(request):
     return render(request,'u_new.html',{'form':form, 'roles':roles}) 
 
 def index(request):     
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     users = User.objects.all()  
     return render(request,"u_index.html",{'users':users})  
 
 def show(request, id):  
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     users = User.objects.get(id=id)  
     return render(request,"u_show.html",{'user':users}) 
 
 def edit(request, id):  
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     users = User.objects.get(id=id)  
     roles = Role.objects.all()  
     return render(request,'u_edit.html', {'user':users, 'roles':roles})  
 
 def update(request, id):  
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     if request.method == "POST":  
         users = User.objects.get(id=id) 
@@ -74,7 +74,7 @@ def update(request, id):
     return render(request, 'u_edit.html', {'users': users})  
 
 def destroy(request, id):  
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     users = User.objects.get(id=id)  
     users.delete()  
@@ -83,14 +83,14 @@ def destroy(request, id):
     return redirect("/users/index")  
 
 def edit_password(request, id):  
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     users = User.objects.get(id=id)  
     roles = Role.objects.all()  
     return render(request,'up_edit.html', {'user':users, 'roles':roles})  
 
 def update_password(request, id):  
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     if request.method == "POST":  
         users = User.objects.get(id=id) 

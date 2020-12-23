@@ -9,7 +9,7 @@ from EmpresasApp.models import Company
 from django.http import JsonResponse, HttpResponse
 
 def create(request):  
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     if request.method == "POST":  
         indice = request.POST
@@ -42,19 +42,19 @@ def create(request):
     return render(request,'cl_new.html',{'form':form, 'workers':workers, 'vehicles':vehicles, 'companies':companies}) 
 
 def index(request):  
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     check_lists = CheckList.objects.all()  
     return render(request,"cl_index.html",{'check_lists':check_lists})  
 
 def show(request, id):  
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     check_lists = CheckList.objects.get(id=id)  
     return render(request,"cl_show.html",{'check_list':check_lists}) 
 
 def edit(request, id):  
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     check_lists = CheckList.objects.get(id=id)  
     workers = Worker.objects.all()  
@@ -62,7 +62,7 @@ def edit(request, id):
     return render(request,'cl_edit.html', {'check_list':check_lists, 'workers':workers, 'vehicles':vehicles})  
 
 def update(request, id):  
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     check_lists = CheckList.objects.get(id=id)  
     form = CheckListForm(request.POST, instance = check_lists)  
@@ -72,7 +72,7 @@ def update(request, id):
     return render(request, 'cl_edit.html', {'check_lists': check_lists})  
 
 def destroy(request, id):  
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/") 
     check_lists = CheckList.objects.get(id=id)  
     check_lists.delete()  

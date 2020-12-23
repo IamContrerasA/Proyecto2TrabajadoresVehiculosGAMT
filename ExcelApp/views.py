@@ -18,7 +18,7 @@ from django.http import JsonResponse, HttpResponse
 
 #subir un archivo al servidor
 def create(request):  
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/")
     if request.method == 'POST':
         data = request.POST
@@ -37,6 +37,9 @@ def create(request):
 def index(request):  
     if not request.user.is_authenticated or request.user.role.id >= 4:
         return redirect("/")
+    if request.user.role.name == "Despachador":
+        files = Excel.objects.filter(created_at__icontains = str(datetime.datetime.now())[:10]).values('id', 'name', 'created_at')
+        return render(request,"e_index.html", {'files': files})     
     files = Excel.objects.all().values('id', 'name', 'created_at')
     return render(request,"e_index.html", {'files': files}) 
 

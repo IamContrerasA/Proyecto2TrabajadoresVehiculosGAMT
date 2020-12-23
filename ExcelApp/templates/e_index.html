@@ -8,7 +8,9 @@
 	<h1 class="h2">Matriz</h1>
 	<div class="btn-toolbar mb-2 mb-md-0">
 		<div class="btn-group mr-2">
+			{% if user.get_role.id < 3 %}
 			<a href="/excel/create" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Subir Archivo</a>
+			{% endif %}
 		</div>
 	</div>
 </div>
