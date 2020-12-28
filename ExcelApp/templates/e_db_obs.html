@@ -599,7 +599,7 @@ function myFunction() {
       //console.log(cont);
     }
   }
-    function dibujar2() {
+  function dibujar2() {
     var boton2 = document.getElementById("dibujar_boton2");
     cont2++;
     if(cont2 %2 == 0){
@@ -612,7 +612,7 @@ function myFunction() {
       puede_dibujar = false;
     }
   }
-  </script>
+</script>
 <!--Script para Dibujar-->
 <script>
   var token = '{{csrf_token}}';
@@ -620,7 +620,8 @@ function myFunction() {
   var evidencia_flag = true, correctiva_flag = true;
   var rect, offsetLeft, offsetTop, img;
   var dragging = false;
-  var lastX;
+  var lastX, startX, startY, circle, radius, context_circle;
+  var circles = [];
   var marginLeft = 0;
   var control = 0;
   class Drawing {
@@ -631,7 +632,7 @@ function myFunction() {
       var canvas_num = canvas.id.substring(6,7);     
 
       canvas.addEventListener('mousedown', () => this.startDrawing());
-      canvas.addEventListener('mousemove', (event) => this.draw(event, canvas_num));
+      canvas.addEventListener('mousemove', (event) => this.draw(event, canvas_num, image_path));
       canvas.addEventListener('mouseup', () => this.stopDrawing());
       
       canvas.addEventListener('mousedown', function(e) {
@@ -710,6 +711,7 @@ function myFunction() {
         $(this).data('bs.modal', null);
         saveButton.removeEventListener('click', save_fuction,true);
         loadInput.removeEventListener('change', load_fuction,true);
+        circles = [];
         //console.log("modal borrado");
       });
 
@@ -719,23 +721,51 @@ function myFunction() {
       this.loadTheImage(image_path);
     }
     startDrawing() {
-      this.isDrawing = true;
+      this.isDrawing = true; 
+      startX=parseInt(event.pageX-offsetLeft);
+      startY=parseInt(event.pageY-offsetTop); 
+      circle = new Circle(startX, startY);
+      circles.push(circle);   
     }
     stopDrawing() {
-      this.isDrawing = false;
+      this.isDrawing = false;      
+      
+      context_circle = this.context;
+      circles.forEach(function(circ) {            
+        circ.draw(context_circle);
+      }); 
     }
-    draw(event, canvas_num) {
+    draw(event, canvas_num, image_path) { 
       this.resize(canvas_num);
       if(puede_dibujar == true){
         if (this.isDrawing) {
-          this.context.fillStyle = 'red';
-          this.context.fillRect(event.pageX - offsetLeft, event.pageY - offsetTop, 4, 4);
-          
+          this.context.fillStyle = 'red';          
           //console.log(event.pageX + " " + event.pageY + " " +offsetLeft + " " + offsetTop);
+                    
+          circle.radius = this.getDistance(startX, startY, event.pageX - offsetLeft, event.pageY - offsetTop);
+          /*       
+          this.context.fillRect(event.pageX - offsetLeft, event.pageY - offsetTop, 4, 4);
+          */
+          this.context.clearRect(0, 0,this.canvas.width, this.canvas.height);          
+          context_circle = this.context;
+          circles.forEach(function(circ) {
+            this.loadTheImage(image_path); 
+            context_circle.beginPath();
+            context_circle.arc(circ.startX, circ.startY, circ.radius, 0, 2 * Math.PI);
+            context_circle.strokeStyle = "#f00";
+            context_circle.lineWidth = 4;
+            context_circle.stroke();           
+            //circ.draw( this.context);
+          }, this); 
+          
+
         }
       }
     }
-
+    getDistance(p1X, p1Y, p2X, p2Y) {
+      return Math.sqrt(Math.pow(p1X - p2X, 2) + Math.pow(p1Y - p2Y, 2))
+    }
+    
     save(image_path, id_obs, tipo_evidencia) {
       const data = this.canvas.toDataURL('image/png');
       //console.log(tipo_evidencia);
@@ -826,7 +856,20 @@ function myFunction() {
         reader.readAsDataURL(file);
       })
     }
-  }  
+  } 
+
+  function Circle(startX, startY) {
+    this.startX = startX;
+    this.startY = startY;
+    this.radius;
+    this.draw = function(context) {      
+      context.beginPath();
+      context.arc(this.startX, this.startY, this.radius, 0, 2 * Math.PI);
+      context.strokeStyle = "#f00";
+      context.lineWidth = 4;
+      context.stroke();
+    }
+  }
 </script>
 
 {% endblock %}
