@@ -492,7 +492,21 @@ def image_editor(request, id):
             observacion_registro.update(evidencia_correctiva_encode = imagen)
 
         return JsonResponse({"resultado": "ok"})        
+
+#actualizar evidencia correctiva con la camara
+def update_image_editor(request, id):
+    if not request.user.is_authenticated or request.user.role.id >= 4:
+        return redirect("/")    
+    if request.method == 'POST': 
+        imagen = request.POST['data']
+        observacion_registro = Observaciones.objects.get(id = id)
+
+        imagen = "b'" + imagen[22:] + "'"
         
+        observacion_registro.evidencia_correctiva_encode = imagen
+        observacion_registro.save()
+        
+        return JsonResponse({"resultado": "ok"})
 ################################################### metodos privados##############################
 
 #metodo para insertar una observacion en cualquier modal

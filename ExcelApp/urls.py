@@ -25,6 +25,7 @@ urlpatterns = [
 
     path('db/obs_camera/<int:id>',views.obs_camera),
     path('db/image_editor/<int:id>', views.image_editor), 
+    path('db/update_image_editor/<int:id>', views.update_image_editor), 
 ] 
 
 if settings.DEBUG:

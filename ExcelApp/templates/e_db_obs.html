@@ -85,6 +85,8 @@
             <a href="#" class="pop" id="pop{{observacion.id}}_evidencia_correctiva">
               <img src="data:image/png;base64,{{observacion.evidencia_correctiva_encode|slice:'2:-1'}}" style="width:100px;height:100px;" id="evidencia_correctiva-{{observacion.id}}">              
             </a>
+          {% else %}  
+            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="actualizar_correctiva('{{observacion.id}}')">Tomar Foto</button>
           {% endif %}
         </td>
         <td>{{ observacion.estado.name }}</td>
@@ -370,15 +372,21 @@
           <script>  
             var camara_evidencia = null; 
             var tipo_evidencia = null;
+            var id_obs = -1;
             var my_camera = document.getElementById('my_camera');
             var results = document.getElementById('results');
-            
+            function actualizar_correctiva(id) {               
+              id_obs = id;
+              accept_camera("actualizar_correctiva");
+            }
             function accept_camera(tipo_evidencia) {            
                 this.tipo_evidencia = tipo_evidencia;
                 if(tipo_evidencia == "evidencia")
                   evidencia_flag = true;
                 if(tipo_evidencia == "evidencia_correctiva")
                   correctiva_flag = true;
+                if(tipo_evidencia == "actualizar_correctiva")
+                  actualizar_correctiva_flag = true;
                 Webcam.set({
                 width: 640,
                 height: 480,
@@ -399,13 +407,12 @@
 
               Webcam.reset();
 
-              var image_path = camara_evidencia;
-              var id_obs = -1;
+              var image_path = camara_evidencia;              
               
               const canvas = document.getElementById('canvas2');
               const saveButton = document.getElementById('save2');
               const loadInput = results;
-              console.log(id_obs);
+              //console.log(id_obs);
               new Drawing(canvas, saveButton, loadInput, image_path, id_obs, tipo_evidencia);
 
               my_camera.style.display = "none";
@@ -415,6 +422,7 @@
             function close_snapshot() {
               evidencia_flag = false;
               correctiva_flag = false;
+              actualizar_correctiva_flag = false;
               my_camera.style.display = "block";
               results.style.display = "none";
               circles = [];
@@ -657,7 +665,7 @@ function myFunction() {
 <script>
   var token = '{{csrf_token}}';
   var evidencia_src = "undefined", correctiva_src = "undefined";
-  var evidencia_flag = true, correctiva_flag = true;
+  var evidencia_flag = true, correctiva_flag = true, actualizar_correctiva_flag = true;
   var rect, offsetLeft, offsetTop, img;
   var dragging = false;
   var lastX, startX, startY, circle, radius, context_circle;
@@ -828,7 +836,25 @@ function myFunction() {
         $('#myModalCamera').modal('toggle');
         document.getElementById('correctiva_camara').innerHTML = '<img src="'+correctiva_src+'" style="width:100px;height:100px;"><br><br>';
       }
-      
+      //Actualizar evidencia correctiva
+      else if(tipo_evidencia == "actualizar_correctiva" && actualizar_correctiva_flag == true){
+        actualizar_correctiva_flag = false;
+        var fdcamera_update = new FormData();        
+        fdcamera_update.append('data', data); 
+        // AJAX request
+        $.ajax({
+          headers: { "X-CSRFToken": token },
+          url: '/excel/db/update_image_editor/'+ id_obs,
+          type: 'POST',
+          data: fdcamera_update,
+          contentType: false,
+          processData: false,
+          success: function(response){            
+              alert("Observacion Creada" );
+              location.reload(true); 
+          }
+        });
+      }
       if(tipo_evidencia == "undefined"){        
         
         var observacion_tipo = id_obs.substring(0, id_obs.lastIndexOf("-"));
