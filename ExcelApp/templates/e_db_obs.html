@@ -171,8 +171,9 @@
           <div class="container">
             <div>
               <div class="modal-body mi-contenido">
-                <button class="btn btn-danger active mi-boton" id="save1" type="button"> Guardar </button> 
-                <a onclick="dibujar()" class="btn btn-primary active mi-boton" id="dibujar_boton1" >Dibujar</a>
+                <button class="btn btn-danger active mi-boton" id="save1" type="button"> Guardar </button></br></br>
+                <a onclick="dibujar()" class="btn btn-primary active mi-boton" id="dibujar_boton1" >Dibujar</a></br></br>
+                <a class="btn btn-primary active mi-boton" id="dibujar_boton3" style="display: none;">A mano</a>
               </div>
             </div>
             <div>
@@ -353,8 +354,9 @@
           
           <div style="display: none;" id="results" >
             <div class="modal-body mi-contenido">
-              <button class="btn btn-danger active mi-boton" id="save2" type="button"> Guardar </button> 
-              <a onclick="dibujar2()" class="btn btn-primary active mi-boton" id="dibujar_boton2" >Dibujar</a>
+              <button class="btn btn-danger active mi-boton" id="save2" type="button"> Guardar </button></br></br>
+              <a onclick="dibujar2()" class="btn btn-primary active mi-boton" id="dibujar_boton2" >Dibujar</a></br></br>
+              <a class="btn btn-primary active mi-boton" id="dibujar_boton4" style="display: none;">A mano</a>
             </div>
             <div>
               <canvas class="canvas-content" id="canvas2" width="640" height="480"></canvas>
@@ -415,12 +417,14 @@
               correctiva_flag = false;
               my_camera.style.display = "block";
               results.style.display = "none";
+              circles = [];
               Webcam.reset(); 
             }
 
             function reset_snapshot() {
               my_camera.style.display = "block";
               results.style.display = "none";
+              circles = [];
               Webcam.attach(my_camera);
             }
             
@@ -582,34 +586,70 @@ function myFunction() {
 
 <!--Script para habilitar el dibujar-->
 <script>
-  var cont = -1, cont2 = -1;
+  var cont = -1, cont2 = -1, cont3 = -1, cont4 = -1;
   var puede_dibujar = false;
+  var puede_dibujar_a_mano = false;
   function dibujar() {
     var boton = document.getElementById("dibujar_boton1");
+    var boton3 = document.getElementById("dibujar_boton3");
     cont++;
     if(cont %2 == 0){
       boton.firstChild.data  = "Dibujando";
       boton.className = "btn btn-warning active mi-boton";
-      puede_dibujar = true;
+      puede_dibujar = true;      
+      boton3.style.display = "block";
+      boton3.onclick = function() {
+        cont3++;
+        if(cont3 %2 == 0){          
+          boton3.className = "btn btn-warning active mi-boton";
+          puede_dibujar_a_mano = true;
+        }
+        else{          
+          boton3.className = "btn btn-primary active mi-boton";
+          puede_dibujar_a_mano = false;
+        }
+      };
       //console.log(cont);
     }else{
       boton.firstChild.data  = "Dibujar";
       boton.className = "btn btn-primary active mi-boton";
       puede_dibujar = false;
+      boton3.className = "btn btn-primary active mi-boton";      
+      boton3.style.display = "none";
+      puede_dibujar_a_mano = false; 
+      cont3 = -1;     
       //console.log(cont);
     }
   }
+
   function dibujar2() {
     var boton2 = document.getElementById("dibujar_boton2");
+    var boton4 = document.getElementById("dibujar_boton4");
     cont2++;
     if(cont2 %2 == 0){
       boton2.firstChild.data  = "Dibujando";
       boton2.className = "btn btn-warning active mi-boton";
       puede_dibujar = true;
+      boton4.style.display = "block";
+      boton4.onclick = function() {
+        cont4++;
+        if(cont4 %2 == 0){          
+          boton4.className = "btn btn-warning active mi-boton";
+          puede_dibujar_a_mano = true;
+        }
+        else{          
+          boton4.className = "btn btn-primary active mi-boton";
+          puede_dibujar_a_mano = false;
+        }
+      };
     }else{
       boton2.firstChild.data  = "Dibujar";
       boton2.className = "btn btn-primary active mi-boton";
       puede_dibujar = false;
+      boton4.className = "btn btn-primary active mi-boton";      
+      boton4.style.display = "none";
+      puede_dibujar_a_mano = false; 
+      cont4 = -1;  
     }
   }
 </script>
@@ -622,11 +662,12 @@ function myFunction() {
   var dragging = false;
   var lastX, startX, startY, circle, radius, context_circle;
   var circles = [];
-  var marginLeft = 0;
+  var marginLeft = 150;
   var control = 0;
   class Drawing {
     constructor(canvas, saveButton, loadInput, image_path, id_obs, tipo_evidencia) {       
       this.isDrawing = false;
+      canvas.style.marginLeft = marginLeft + "px";
 
       //numero del canvas, 1 editar, 2 camara
       var canvas_num = canvas.id.substring(6,7);     
@@ -729,11 +770,12 @@ function myFunction() {
     }
     stopDrawing() {
       this.isDrawing = false;      
-      
-      context_circle = this.context;
-      circles.forEach(function(circ) {            
-        circ.draw(context_circle);
-      }); 
+      if(!puede_dibujar_a_mano){
+        context_circle = this.context;
+        circles.forEach(function(circ) {            
+          circ.draw(context_circle);
+        }); 
+      }
     }
     draw(event, canvas_num, image_path) { 
       this.resize(canvas_num);
@@ -741,23 +783,25 @@ function myFunction() {
         if (this.isDrawing) {
           this.context.fillStyle = 'red';          
           //console.log(event.pageX + " " + event.pageY + " " +offsetLeft + " " + offsetTop);
-                    
-          circle.radius = this.getDistance(startX, startY, event.pageX - offsetLeft, event.pageY - offsetTop);
-          /*       
-          this.context.fillRect(event.pageX - offsetLeft, event.pageY - offsetTop, 4, 4);
-          */
-          this.context.clearRect(0, 0,this.canvas.width, this.canvas.height);          
-          context_circle = this.context;
-          circles.forEach(function(circ) {
-            this.loadTheImage(image_path); 
-            context_circle.beginPath();
-            context_circle.arc(circ.startX, circ.startY, circ.radius, 0, 2 * Math.PI);
-            context_circle.strokeStyle = "#f00";
-            context_circle.lineWidth = 4;
-            context_circle.stroke();           
-            //circ.draw( this.context);
-          }, this); 
           
+          if(puede_dibujar_a_mano){
+            this.context.fillRect(event.pageX - offsetLeft, event.pageY - offsetTop, 4, 4);
+          }
+          else{
+            circle.radius = this.getDistance(startX, startY, event.pageX - offsetLeft, event.pageY - offsetTop);
+            
+            this.context.clearRect(0, 0,this.canvas.width, this.canvas.height);          
+            context_circle = this.context;
+            circles.forEach(function(circ) {
+              this.loadTheImage(image_path); 
+              context_circle.beginPath();
+              context_circle.arc(circ.startX, circ.startY, circ.radius, 0, 2 * Math.PI);
+              context_circle.strokeStyle = "#f00";
+              context_circle.lineWidth = 4;
+              context_circle.stroke();           
+              //circ.draw( this.context);
+            }, this);
+          }
 
         }
       }
