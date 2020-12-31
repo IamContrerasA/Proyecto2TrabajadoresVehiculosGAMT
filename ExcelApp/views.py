@@ -300,11 +300,12 @@ def show_driver(request, id, id2):
     fecha = str(file.created_at)
     fecha = fecha[:fecha.rfind(' ')]  
     conductor_archivos = ConductorArchivos.objects.filter(date = fecha, conductor_id = id2)  
+    conductor = Conductor.objects.get(id=id2)
 
     if conductor_archivos.exists(): 
-        return render(request,'e_db_show_driver.html',{'conductor_archivos': conductor_archivos[0]}) 
+        return render(request,'e_db_show_driver.html',{'conductor_archivos': conductor_archivos[0], 'conductor': conductor}) 
 
-    return render(request,'e_db_show_driver.html') 
+    return render(request,'e_db_show_driver.html', {'conductor': conductor}) 
 
 def show_vehicle(request, id, id2):    
     if not request.user.is_authenticated or request.user.role.id >= 4:
@@ -313,11 +314,12 @@ def show_vehicle(request, id, id2):
     fecha = str(file.created_at)
     fecha = fecha[:fecha.rfind(' ')]  
     vehiculo_archivos = PlacaArchivos.objects.filter(date = fecha, placa_id = id2) 
+    vehiculo = Placa.objects.get(id=id2)
 
     if vehiculo_archivos.exists(): 
-        return render(request,'e_db_show_vehicle.html',{'vehiculo_archivos': vehiculo_archivos[0]}) 
+        return render(request,'e_db_show_vehicle.html', {'vehiculo_archivos': vehiculo_archivos[0], 'vehiculo':vehiculo}) 
 
-    return render(request,'e_db_show_vehicle.html') 
+    return render(request,'e_db_show_vehicle.html', {'vehiculo':vehiculo}) 
 
 def obs(request, id, id2): 
     if not request.user.is_authenticated or request.user.role.id >= 4:
@@ -409,7 +411,7 @@ def obs_camera(request, id):
 
         fila_programacion_general = ProgramacionGeneral.objects.filter(id=id)
         fila_programacion_general.update(estado_id = 2)
-        
+
         return JsonResponse({"resultado": "exito"}) 
 
 def obs_update(request, id, id2, id3): 
