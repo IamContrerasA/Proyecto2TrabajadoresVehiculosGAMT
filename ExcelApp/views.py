@@ -405,7 +405,10 @@ def obs_camera(request, id):
             estado_id = 2,
             categoria_id = request.POST['categoria'],
             lugar_id = request.POST['lugar']
-            ).save() 
+            ).save()
+
+        fila_programacion_general = ProgramacionGeneral.objects.filter(id=id)
+        fila_programacion_general.update(estado_id = 2)
         
         return JsonResponse({"resultado": "exito"}) 
 
