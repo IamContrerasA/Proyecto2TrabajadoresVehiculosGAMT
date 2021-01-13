@@ -418,7 +418,7 @@ def obs_update(request, id, id2, id3):
     if not request.user.is_authenticated or request.user.role.id >= 4:
         return redirect("/")
     excel = Excel.objects.get(id=id)    
-    str(timezone.localtime(excel.created_at))
+    fecha = str(timezone.localtime(excel.created_at))
     fecha = fecha[:fecha.rfind(' ')] 
 
     if request.method == 'POST':    
