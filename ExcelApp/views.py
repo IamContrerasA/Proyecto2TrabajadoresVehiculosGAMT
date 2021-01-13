@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-
+from django.utils import timezone
 from django.core.files.storage import FileSystemStorage
 from django.contrib.staticfiles.storage import staticfiles_storage
 from io import BytesIO
@@ -235,8 +235,8 @@ def db(request, id):
     convoys = NumConvoy.objects.filter(id__in = num_convoy_ids).order_by('name')
     placas = Placa.objects.filter(id__in = placa_ids).order_by('placa1')
     lugares = Lugar.objects.all().order_by('name')
-
-    fecha = str(file.created_at)
+    
+    fecha = str(timezone.localtime(file.created_at))
     fecha = fecha[:fecha.rfind(' ')]        
     conductor_archivos = ConductorArchivos.objects.filter(date = fecha) 
     vehiculo_archivos = PlacaArchivos.objects.filter(date = fecha)  
@@ -297,7 +297,7 @@ def show_driver(request, id, id2):
     if not request.user.is_authenticated or request.user.role.id >= 4:
         return redirect("/")
     file = Excel.objects.get(id=id)
-    fecha = str(file.created_at)
+    fecha = str(timezone.localtime(file.created_at))
     fecha = fecha[:fecha.rfind(' ')]  
     conductor_archivos = ConductorArchivos.objects.filter(date = fecha, conductor_id = id2)  
     conductor = Conductor.objects.get(id=id2)
@@ -311,7 +311,7 @@ def show_vehicle(request, id, id2):
     if not request.user.is_authenticated or request.user.role.id >= 4:
         return redirect("/")
     file = Excel.objects.get(id=id)
-    fecha = str(file.created_at)
+    fecha = str(timezone.localtime(file.created_at))
     fecha = fecha[:fecha.rfind(' ')]  
     vehiculo_archivos = PlacaArchivos.objects.filter(date = fecha, placa_id = id2) 
     vehiculo = Placa.objects.get(id=id2)
@@ -324,8 +324,8 @@ def show_vehicle(request, id, id2):
 def obs(request, id, id2): 
     if not request.user.is_authenticated or request.user.role.id >= 4:
         return redirect("/")    
-    excel = Excel.objects.get(id=id)
-    fecha = str(excel.created_at)
+    excel = Excel.objects.get(id=id)    
+    fecha = str(timezone.localtime(excel.created_at))
     fecha = fecha[:fecha.rfind(' ')]  
 
     observaciones = Observaciones.objects.filter(programacion_general_id = id2, date = fecha)  
@@ -417,8 +417,8 @@ def obs_camera(request, id):
 def obs_update(request, id, id2, id3): 
     if not request.user.is_authenticated or request.user.role.id >= 4:
         return redirect("/")
-    excel = Excel.objects.get(id=id)
-    fecha = str(excel.created_at)
+    excel = Excel.objects.get(id=id)    
+    str(timezone.localtime(excel.created_at))
     fecha = fecha[:fecha.rfind(' ')] 
 
     if request.method == 'POST':    
@@ -519,7 +519,7 @@ def __obs_modales(request, id, id2, tipo_archivo, categoria, pertenece_a):
     if not request.user.is_authenticated or request.user.role.id >= 4:
         return redirect("/")
     data = request.POST   
-    fecha = str(data['fecha'])
+    fecha = str(data['fecha'])    
     fecha = fecha[:fecha.rfind('T')]
     uploaded_file = request.FILES['file'] if 'file' in request.FILES else False
     uploaded_file_obs = request.FILES['file_obs'] if 'file_obs' in request.FILES else False
