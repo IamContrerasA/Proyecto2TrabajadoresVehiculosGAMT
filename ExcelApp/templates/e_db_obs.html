@@ -342,8 +342,8 @@
           
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true" onClick="close_snapshot()">×</button>
         </div><div class="container"></div>
-        <div class="modal-body">
-          
+        <div class="modal-body">          
+
           <style>
             #my_camera{
             width: 640px;
@@ -351,7 +351,9 @@
             border: 1px solid black;
             }
           </style>
-          
+          <!--cargar script para redimensionar camara-->
+          <script src="{% static '/js/check_device_camera.js' %}"></script>
+
           <div id="my_camera"></div>
           
           <div style="display: none;" id="results" >
@@ -388,8 +390,8 @@
                 if(tipo_evidencia == "actualizar_correctiva")
                   actualizar_correctiva_flag = true;
                 Webcam.set({
-                width: 640,
-                height: 480,
+                width: camera_width,
+                height: camera_height,
                 image_format: 'jpeg',
                 jpeg_quality: 90,
                 constraints: {
@@ -901,8 +903,8 @@ function myFunction() {
       };
       img.src = image;
       if(img.height == 0){
-        this.context.canvas.width = 640;
-        this.context.canvas.height = 480;
+        this.context.canvas.width = camera_width;
+        this.context.canvas.height = camera_height;
       }else{
         this.context.canvas.height = img.height;
         this.context.canvas.width = img.width;
