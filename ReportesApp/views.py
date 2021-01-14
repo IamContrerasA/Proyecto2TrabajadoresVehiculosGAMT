@@ -24,7 +24,88 @@ def create(request):
     lugar_id = int(data['lugar'])
     categoria_id = int(data['categoria'])
 
-    if contratista_id != -1:
+    if contratista_id != -1 and lugar_id != -1 and categoria_id != -1:
+      observaciones = Observaciones.objects.filter(
+        date__range = [data['start_date'],data['end_date']],
+        programacion_general_id__contratista__id = contratista_id,
+        lugar_id = lugar_id,
+        categoria_id = categoria_id
+        ).values(
+          'id',
+          'categoria__name',
+          'lugar__name',
+          'estado__name',
+          'descripcion',
+          'evidencia_encode',
+          'accion_plan',
+          'evidencia_correctiva_encode',
+          'date',
+          'programacion_general_id__contratista__name',
+          'programacion_general_id__transporte__name',
+          'programacion_general_id__conductor_placa__placa1',
+          'programacion_general_id__conductor_placa__placa2'
+          )
+    elif contratista_id != -1 and lugar_id != -1:
+      observaciones = Observaciones.objects.filter(
+        date__range = [data['start_date'],data['end_date']],
+        programacion_general_id__contratista__id = contratista_id,
+        lugar_id = lugar_id
+        ).values(
+          'id',
+          'categoria__name',
+          'lugar__name',
+          'estado__name',
+          'descripcion',
+          'evidencia_encode',
+          'accion_plan',
+          'evidencia_correctiva_encode',
+          'date',
+          'programacion_general_id__contratista__name',
+          'programacion_general_id__transporte__name',
+          'programacion_general_id__conductor_placa__placa1',
+          'programacion_general_id__conductor_placa__placa2'
+          )
+    elif contratista_id != -1 and categoria_id != -1:
+      observaciones = Observaciones.objects.filter(
+        date__range = [data['start_date'],data['end_date']],
+        programacion_general_id__contratista__id = contratista_id,
+        categoria_id = categoria_id
+        ).values(
+          'id',
+          'categoria__name',
+          'lugar__name',
+          'estado__name',
+          'descripcion',
+          'evidencia_encode',
+          'accion_plan',
+          'evidencia_correctiva_encode',
+          'date',
+          'programacion_general_id__contratista__name',
+          'programacion_general_id__transporte__name',
+          'programacion_general_id__conductor_placa__placa1',
+          'programacion_general_id__conductor_placa__placa2'
+          )
+    elif lugar_id != -1 and categoria_id != -1:
+      observaciones = Observaciones.objects.filter(
+        date__range = [data['start_date'],data['end_date']],
+        lugar_id = lugar_id,
+        categoria_id = categoria_id
+        ).values(
+          'id',
+          'categoria__name',
+          'lugar__name',
+          'estado__name',
+          'descripcion',
+          'evidencia_encode',
+          'accion_plan',
+          'evidencia_correctiva_encode',
+          'date',
+          'programacion_general_id__contratista__name',
+          'programacion_general_id__transporte__name',
+          'programacion_general_id__conductor_placa__placa1',
+          'programacion_general_id__conductor_placa__placa2'
+          )
+    elif contratista_id != -1:
       observaciones = Observaciones.objects.filter(
         date__range = [data['start_date'],data['end_date']],
         programacion_general_id__contratista__id = contratista_id      
