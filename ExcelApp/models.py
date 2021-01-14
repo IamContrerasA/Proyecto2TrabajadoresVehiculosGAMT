@@ -95,6 +95,10 @@ class PlacaArchivos(models.Model):
   placa = models.ForeignKey(Placa, on_delete=models.CASCADE)  
   checklist_file = models.CharField(max_length=200)
   checklist_file_encode = models.TextField(null=True)
+  photo1_encode = models.TextField(null=True)
+  photo2_encode = models.TextField(null=True)
+  photo3_encode = models.TextField(null=True)
+  photo4_encode = models.TextField(null=True)
   date = models.CharField(max_length=10)  
   
   class Meta:
