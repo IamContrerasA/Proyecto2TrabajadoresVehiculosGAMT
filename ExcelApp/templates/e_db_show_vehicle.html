@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% include "_camera.html" %}
 {% load static %}
 
 {% block content %}
@@ -13,26 +13,260 @@
   <tbody>
     <tr>
       <th scope="row">Fecha</th>
-      <td>{{ vehiculo_archivos.date}}</td>
+      <td>{{ fecha }}</td>
     </tr>
 
     <tr>
       <th scope="row">ChecList Foto</th>
-      <td>        
-      </td>
-    </tr>
-    {% if vehiculo_archivos.checklist_file_encode %}
-    <tr>
-      <th scope="row"></th>
-      <td>
+      <td> 
+        {% if vehiculo_archivos.checklist_file_encode %}
         <a href='#' class='pop'>
-          <img src="data:image/png;base64,{{vehiculo_archivos.checklist_file_encode|slice:'2:-1'}}" style="width:500px;height:600px;">
-        </a>   
+          <img src="data:image/png;base64,{{vehiculo_archivos.checklist_file_encode|slice:'2:-1'}}" style="width:160px;height:120px;">
+        </a>  
+        {% endif %}  
       </td>
     </tr>
-    {% endif %}  
+    
   </tbody>
 </table>
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Fotos</h1>
+</div>
+
+<table class="table">
+  <tbody>
+    <tr>
+      <td scope="row">
+        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('foto1')">Tomar Foto 1</button>
+      </td>
+      <td> 
+        {% if vehiculo_archivos.photo1_encode %}
+        <a href='#' class='pop'>
+          <img src="data:image/png;base64,{{vehiculo_archivos.photo1_encode|slice:'2:-1'}}" style="width:160px;height:120px;">
+        </a>  
+        {% endif %}  
+      </td>
+    </tr>    
+
+    <tr>
+      <td scope="row">
+        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('foto2')">Tomar Foto 2</button>
+      </td>
+      <td> 
+        {% if vehiculo_archivos.photo2_encode %}
+        <a href='#' class='pop'>
+          <img src="data:image/png;base64,{{vehiculo_archivos.photo2_encode|slice:'2:-1'}}" style="width:160px;height:120px;">
+        </a>  
+        {% endif %}  
+      </td>
+    </tr>   
+
+    <tr>
+      <td scope="row">
+        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('foto3')">Tomar Foto 3</button>
+      </td>
+      <td> 
+        {% if vehiculo_archivos.photo3_encode %}
+        <a href='#' class='pop'>
+          <img src="data:image/png;base64,{{vehiculo_archivos.photo3_encode|slice:'2:-1'}}" style="width:160px;height:120px;">
+        </a>  
+        {% endif %}  
+      </td>
+    </tr>   
+
+    <tr>
+      <td scope="row">
+        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('foto4')">Tomar Foto 4</button>
+      </td>
+      <td> 
+        {% if vehiculo_archivos.photo4_encode %}
+        <a href='#' class='pop'>
+          <img src="data:image/png;base64,{{vehiculo_archivos.photo4_encode|slice:'2:-1'}}" style="width:160px;height:120px;">
+        </a>  
+        {% endif %}  
+      </td>
+    </tr>   
+
+  </tbody>
+</table>
+
+<!--Modal para ver la camara-->
+<div class="modal" id="myModalCamera" data-backdrop="static">
+	<div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">          
+          <button type="button" class="btn btn-danger" value="Take Snapshot" onClick="take_snapshot()">Tomar Foto</button>         
+          
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true" onClick="close_snapshot()">×</button>
+        </div><div class="container"></div>
+        <div class="modal-body">          
+
+          <style>
+            #my_camera{
+            width: 640px;
+            height: 480px;
+            border: 1px solid black;
+            }
+          </style>
+          <!--cargar script para redimensionar camara-->
+          <script src="{% static '/js/check_device_camera.js' %}"></script>
+
+          <div id="my_camera"></div>
+          
+          <div style="display: none;" id="results" >
+            <div class="modal-body mi-contenido">
+              <button class="btn btn-primary active mi-boton" id="save2" type="button"> Guardar </button></br></br>              
+            </div>
+            <div>
+              <canvas class="canvas-content" id="canvas2" width="640" height="480"></canvas>
+            </div> 
+          </div>
+
+          <!-- Webcam.min.js -->
+          <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
+          
+          <!-- Configure a few settings and attach camera -->
+          <script>              
+            var my_camera = document.getElementById('my_camera');
+            var results = document.getElementById('results');
+            var num_foto;
+            function accept_camera(num_foto) {
+              this.num_foto = num_foto;
+                Webcam.set({
+                width: camera_width,
+                height: camera_height,
+                image_format: 'jpeg',
+                jpeg_quality: 90,
+                constraints: {
+                  video: true,
+                  facingMode: "environment"
+                }
+              });
+              Webcam.attach(my_camera);  
+            }            
+            
+            function take_snapshot() {
+              Webcam.snap( function(data_uri) {
+                camara_evidencia = data_uri;  
+              });
+
+              Webcam.reset();
+
+              var image_path = camara_evidencia;              
+              
+              const canvas = document.getElementById('canvas2');
+              const saveButton = document.getElementById('save2');
+              const loadInput = results;
+              //console.log(id_obs);
+              new Photo(canvas, saveButton, loadInput, image_path, num_foto);  
+              my_camera.style.display = "none";
+              loadInput.style.display = "block";
+            }
+
+            function close_snapshot() {              
+              my_camera.style.display = "block";
+              results.style.display = "none";              
+              Webcam.reset(); 
+            }
+
+            function reset_snapshot() {
+              my_camera.style.display = "block";
+              results.style.display = "none";              
+              Webcam.attach(my_camera);
+            }
+
+            var img;
+            class Photo {              
+              constructor(canvas, saveButton, loadInput, image_path, num_foto) {
+
+                var save_fuction = () => this.save(image_path, num_foto);
+                var load_fuction = (event) => this.load(event);
+
+                saveButton.addEventListener('click', save_fuction, true);
+                loadInput.addEventListener('change', load_fuction, true);   
+
+                //si se cierra el modal se liberan los listener
+                $("#imagemodal").on('hidden.bs.modal', function () {
+                  $(this).data('bs.modal', null);
+                  saveButton.removeEventListener('click', save_fuction,true);
+                  loadInput.removeEventListener('change', load_fuction,true);                  
+                  //console.log("modal borrado");
+                });
+
+                this.canvas = canvas;
+                this.context = this.canvas.getContext('2d');
+                
+                this.loadTheImage(image_path);
+              }
+              load(event) {
+                const file = [...event.target.files].pop();
+                this.readTheFile(file).then((image) => this.loadTheImage(image))
+              }
+              loadTheImage(image) {
+                img = new Image();
+                const canvas = this.canvas;
+                img.onload = function () {
+                  const context = canvas.getContext('2d');
+                  context.clearRect(0, 0, canvas.width, canvas.height);
+                  context.drawImage(img, 0, 0);    
+                     
+                };
+                img.src = image;                
+                this.context.canvas.width = camera_width;
+                this.context.canvas.height = camera_height;
+              }
+
+              save(image_path, num_foto) {
+                this.context.canvas.width = final_width;
+                this.context.canvas.height = final_height;
+                this.context.drawImage(img, 
+                      0, 0, img.width, img.height, 
+                      0, 0, final_width, final_height
+                  ); 
+                var token = '{{csrf_token}}';
+                const data = this.canvas.toDataURL('image/png');
+                console.log("{{vehiculo.id}}")
+               
+                var fd = new FormData();
+                fd.append('imagen', data);
+                fd.append('num_foto', num_foto);
+                fd.append('fecha', "{{fecha}}");
+
+                $("#myModal2").modal();
+                // AJAX request
+                $.ajax({
+                  headers: { "X-CSRFToken": token },
+                  url: '/excel/db/take_photo_vehicle/'+"{{vehiculo.id}}",          
+                  type: 'POST',
+                  data: fd,
+                  contentType: false,
+                  processData: false,
+                  success: function(response){
+                    if(response != 0){
+                      //console.log(response+ observacion_tipo)           
+                      alert("Foto "+ num_foto + " tomada " );
+                      location.reload(true);            
+                    }else{
+                      alert('file not uploaded');
+                    }
+                  }
+                });    
+               
+              }
+
+            }
+          </script>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal" onClick="close_snapshot()">Cerrar</button>
+          <button type="button" class="btn btn-warning" onClick="reset_snapshot()">Regresar</button>
+        </div>
+      </div>
+    </div>
+</div>
+
 
 <!--Modal para ver imagenes grande-->
 <div class="modal left fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -48,6 +282,26 @@
 		</div>
 	</div>
 </div>
+
+<!--Modal de circulo que procesa-->
+<div class="modal" id="myModal2" data-backdrop="static">
+	<div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">PROCESANDO...</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        </div><div class="container"></div>
+        <div class="modal-body">
+          <link href="{% static '/css/modal_gift.css' %}" rel="stylesheet">
+          <div class="show_loader" id="id_show_loader">            
+            <div class="loader">    
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}

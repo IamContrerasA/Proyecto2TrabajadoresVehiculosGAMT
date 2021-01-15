@@ -317,9 +317,9 @@ def show_vehicle(request, id, id2):
     vehiculo = Placa.objects.get(id=id2)
 
     if vehiculo_archivos.exists(): 
-        return render(request,'e_db_show_vehicle.html', {'vehiculo_archivos': vehiculo_archivos[0], 'vehiculo':vehiculo}) 
+        return render(request,'e_db_show_vehicle.html', {'vehiculo_archivos': vehiculo_archivos[0], 'vehiculo':vehiculo, 'fecha': fecha}) 
 
-    return render(request,'e_db_show_vehicle.html', {'vehiculo':vehiculo}) 
+    return render(request,'e_db_show_vehicle.html', {'vehiculo':vehiculo, 'fecha': fecha}) 
 
 def obs(request, id, id2): 
     if not request.user.is_authenticated or request.user.role.id >= 4:
@@ -512,6 +512,29 @@ def update_image_editor(request, id):
         observacion_registro.save()
         
         return JsonResponse({"resultado": "ok"})
+
+def take_photo_vehicle(request, id):
+    if not request.user.is_authenticated or request.user.role.id >= 4:
+        return redirect("/")    
+    if request.method == 'POST': 
+        imagen = request.POST['imagen']
+        imagen = "b'" + imagen[22:] + "'"
+
+        num_foto = request.POST['num_foto']
+        fecha = request.POST['fecha']
+
+        PlacaArchivos.objects.get_or_create(date = fecha, placa_id = id)  
+
+        if num_foto == "foto1":
+            PlacaArchivos.objects.filter(date = fecha, placa_id = id).update(photo1_encode = imagen)
+        if num_foto == "foto2":
+            PlacaArchivos.objects.filter(date = fecha, placa_id = id).update(photo2_encode = imagen)
+        if num_foto == "foto3":
+            PlacaArchivos.objects.filter(date = fecha, placa_id = id).update(photo3_encode = imagen)
+        if num_foto == "foto4":
+            PlacaArchivos.objects.filter(date = fecha, placa_id = id).update(photo4_encode = imagen)
+
+        return JsonResponse({"resultado": "ok"}) 
 ################################################### metodos privados##############################
 
 #metodo para insertar una observacion en cualquier modal
