@@ -106,6 +106,7 @@
 			<th scope="col">Modalidad de Ingreso</th>
       <th scope="col">Tipo de Vehículo</th>	
       <th scope="col">Placa 1 | Placa 2</th>	
+      <th scope="col">Desinfectado</th>	
       <th scope="col">CHECKLIST</th>	      
       <th scope="col">Apellidos y Nombres</th>	
       <th scope="col">Nº Licencia</th>
@@ -152,7 +153,55 @@
       <td>{{ fila.modalidad_ingreso.name }}</td>
       <td>{{ fila.tipo_vehiculo.name }}</td>
       <td>
-        <a href="/excel/db/{{file.id}}/show_vehicle/{{fila.conductor_placa.id}}"><span class="glyphicon glyphicon-pencil">{{ fila.conductor_placa.placa1 }}  {{ fila.conductor_placa.placa2 }}</span></a>
+        {% if fila.cantidad_desinfectado %}
+          <a href="/excel/db/{{file.id}}/show_vehicle/{{fila.conductor_placa.id}}/{{fila.cantidad_desinfectado}}"><span class="glyphicon glyphicon-pencil">{{ fila.conductor_placa.placa1 }}  {{ fila.conductor_placa.placa2 }}</span></a>          
+        {% else %}
+        <a href="/excel/db/{{file.id}}/show_vehicle/{{fila.conductor_placa.id}}/0"><span class="glyphicon glyphicon-pencil">{{ fila.conductor_placa.placa1 }}  {{ fila.conductor_placa.placa2 }}</span></a>                    
+        {% endif %}
+        
+      </td> 
+      <td>
+        <script type="text/javascript">          
+          function onClick(conductor_placa_id) {
+            
+            var comentario = prompt("Estas seguro de agregar una desinfección? Escribe tu comentario:", "Ninguno");
+            if (comentario == null || comentario == "") {
+            }
+            else{
+              var fd = new FormData();              
+              fd.append('file_id','{{file.id}}');
+              fd.append('conductor_placa_id',conductor_placa_id);
+              fd.append('comentario',comentario);
+
+              // AJAX request
+              $.ajax({
+                headers: { "X-CSRFToken": token },
+                url: '/excel/db/add_disinfect', 
+                type: 'POST',
+                data: fd,
+                contentType: false,
+                processData: false,
+                success: function(response){
+                  if(response != 0){
+                    alert('Desinfección Actualizada');
+                    resultados = response.resultado
+                    location.reload()                    
+                  }else{
+                    alert('file not uploaded');
+                  }
+                }
+              });
+            }
+          };
+          </script>
+          {% if fila.cantidad_desinfectado %}
+            <button class = "btn btn-danger" type="button" onClick="onClick('{{fila.conductor_placa.id}}')" id="{{fila.conductor_placa.id}}">Desinfectado: {{fila.cantidad_desinfectado}}</button><br>
+            Comentario: {{fila.comentario}}
+          {% else %}
+            <button class = "btn btn-danger" type="button" onClick="onClick('{{fila.conductor_placa.id}}')" id="{{fila.conductor_placa.id}}">Desinfectado: 0</button><br>
+            Comentario: Ninguno
+          {% endif %}
+          
       </td> 
       {% if fila.conductor_placa.placa1 %} 
         <!--modal checklist-->

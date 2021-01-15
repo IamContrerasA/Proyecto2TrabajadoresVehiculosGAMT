@@ -112,6 +112,8 @@ class ProgramacionGeneral(models.Model):
   modalidad_ingreso = models.ForeignKey(ModalidadIngreso, on_delete=models.PROTECT, null=True)
   tipo_vehiculo = models.ForeignKey(TipoVehiculo, on_delete=models.PROTECT, null=True)
   conductor_placa = models.ForeignKey(Placa, on_delete=models.PROTECT, related_name='conductor_placa', null=True)
+  cantidad_desinfectado = models.IntegerField(null=True)   
+  comentario = models.CharField(max_length=200, null=True)   
   conductor = models.ForeignKey(Conductor, on_delete=models.PROTECT, related_name='conductor', null=True)
   conductor_relevo = models.ForeignKey(Conductor, on_delete=models.PROTECT, related_name='conductor_relevo', null=True)  
   conductor_relevo_placa = models.ForeignKey(Placa, on_delete=models.PROTECT, related_name='conductor_relevo_placa', null=True)

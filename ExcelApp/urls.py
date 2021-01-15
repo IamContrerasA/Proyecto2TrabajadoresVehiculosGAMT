@@ -17,7 +17,7 @@ urlpatterns = [
     path('db/<int:id>/iperc_modal/<int:id2>',views.iperc_modal),
     path('db/<int:id>/checklist_modal/<int:id2>',views.checklist_modal),
     path('db/<int:id>/show_driver/<int:id2>',views.show_driver),
-    path('db/<int:id>/show_vehicle/<int:id2>',views.show_vehicle),
+    path('db/<int:id>/show_vehicle/<int:id2>/<int:id3>',views.show_vehicle),
     path('db/<int:id>/obs/<int:id2>',views.obs),    
     path('db/<int:id>/obs_update/<int:id2>/<int:id3>',views.obs_update),
     path('db/<int:id>/obs_aprove/<int:id2>/<int:id3>',views.obs_aprove),
@@ -28,6 +28,7 @@ urlpatterns = [
     path('db/update_image_editor/<int:id>', views.update_image_editor), 
 
     path('db/take_photo_vehicle/<int:id>', views.take_photo_vehicle), 
+    path('db/add_disinfect', views.add_disinfect), 
     
 ] 
 

@@ -307,7 +307,7 @@ def show_driver(request, id, id2):
 
     return render(request,'e_db_show_driver.html', {'conductor': conductor}) 
 
-def show_vehicle(request, id, id2):    
+def show_vehicle(request, id, id2, id3):    
     if not request.user.is_authenticated or request.user.role.id >= 4:
         return redirect("/")
     file = Excel.objects.get(id=id)
@@ -315,11 +315,12 @@ def show_vehicle(request, id, id2):
     fecha = fecha[:fecha.rfind(' ')]  
     vehiculo_archivos = PlacaArchivos.objects.filter(date = fecha, placa_id = id2) 
     vehiculo = Placa.objects.get(id=id2)
+    desinfecciones = id3
 
     if vehiculo_archivos.exists(): 
-        return render(request,'e_db_show_vehicle.html', {'vehiculo_archivos': vehiculo_archivos[0], 'vehiculo':vehiculo, 'fecha': fecha}) 
+        return render(request,'e_db_show_vehicle.html', {'vehiculo_archivos': vehiculo_archivos[0], 'vehiculo':vehiculo, 'fecha': fecha, 'desinfecciones': desinfecciones}) 
 
-    return render(request,'e_db_show_vehicle.html', {'vehiculo':vehiculo, 'fecha': fecha}) 
+    return render(request,'e_db_show_vehicle.html', {'vehiculo':vehiculo, 'fecha': fecha, 'desinfecciones': desinfecciones}) 
 
 def obs(request, id, id2): 
     if not request.user.is_authenticated or request.user.role.id >= 4:
@@ -534,6 +535,26 @@ def take_photo_vehicle(request, id):
         if num_foto == "foto4":
             PlacaArchivos.objects.filter(date = fecha, placa_id = id).update(photo4_encode = imagen)
 
+        return JsonResponse({"resultado": "ok"}) 
+
+def add_disinfect(request):
+    if not request.user.is_authenticated or request.user.role.id >= 4:
+        return redirect("/")    
+    if request.method == 'POST': 
+        file_id = request.POST['file_id']
+        conductor_placa_id = request.POST['conductor_placa_id']
+        comentario = request.POST['comentario']
+
+        results = ProgramacionGeneral.objects.filter(excel_id = file_id, conductor_placa_id = conductor_placa_id)  
+        for result in results:
+            if result.cantidad_desinfectado is None:
+                result.cantidad_desinfectado = 1
+                result.comentario = comentario
+                result.save()
+            else:
+                result.cantidad_desinfectado += 1
+                result.comentario = comentario
+                result.save()
         return JsonResponse({"resultado": "ok"}) 
 ################################################### metodos privados##############################
 
