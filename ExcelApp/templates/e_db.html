@@ -3,7 +3,11 @@
 {% load static %}
 
 {% block content %}
-
+<style>
+  .modal{
+    overflow-y:auto;
+  }
+</style>
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
   <!--<h1 class="h2">Base de Datos - Consultas: {{file.name}} --- Enlace: {{file.file}} </h1>-->
   <h1 class="h2">Consultas: {{file.name}}</h1>
@@ -245,7 +249,8 @@
                   
                   <form method = "post" action='' enctype="multipart/form-data">
                     {% csrf_token %}
-                    Arhivo CheckList : <input type='file' name='file_cl{{fila.conductor_placa.id}}' id='file_cl{{fila.conductor_placa.id}}_{{fila.id}}' class='form-control' ><br>                    
+                    Arhivo CheckList : <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('check_list', 'file_cl{{fila.conductor_placa.id}}_{{fila.id}}')" >Tomar Foto</button><br><br>
+                    <div name='file_cl{{fila.conductor_placa.id}}' id='file_cl{{fila.conductor_placa.id}}_{{fila.id}}'></div>
                     <button type="button" onclick="myFunction()" class="btn btn-danger">Añadir Observacion</button>
                     <!--Ocultar Observaciones-->
                     <div id="myDIV4" style="display:none;"><br>
@@ -255,10 +260,14 @@
                             <option value="{{ lugar.id }}"> {{ lugar.name }} </option>
                         {% endfor %}
                       </select><br>   
-                      Evidencia Fotográfica : <input type='file' name='file_obs_cl{{fila.conductor_placa.id}}' id='file_obs_cl{{fila.conductor_placa.id}}_{{fila.id}}' class='form-control'><br>
+                      Evidencia Fotográfica : <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('evidencia', 'file_obs_cl{{fila.conductor_placa.id}}_{{fila.id}}')" >Tomar Evidencia</button><br>
+                      <div name='file_obs_cl{{fila.conductor_placa.id}}' id='file_obs_cl{{fila.conductor_placa.id}}_{{fila.id}}'></div>
+                      
                       Descripcción: <input type="text"  class="form-control" name="modal_descripcion_cl" id='id_modal_descripcion_cl{{fila.conductor_placa.id}}_{{fila.id}}'/><br>
                       Plan de accion: <input type="text"  class="form-control" name="modal_plan_accion_cl" id="id_modal_plan_accion_cl{{fila.conductor_placa.id}}_{{fila.id}}"/><br>
-                      Evidencia Levantamiento : <input type='file' name='file_lev_cl{{fila.conductor_placa.id}}' id='file_lev_cl{{fila.conductor_placa.id}}_{{fila.id}}' class='form-control' ><br>
+                      Evidencia Levantamiento : <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('evidencia_correctiva', 'file_lev_cl{{fila.conductor_placa.id}}_{{fila.id}}')" >Tomar Evidencia Correctiva</button><br><br>
+                      <div name='file_lev_cl{{fila.conductor_placa.id}}' id='file_lev_cl{{fila.conductor_placa.id}}_{{fila.id}}'></div>
+
                     </div>
                     <input type='button' class='btn btn-info' value='SUBIR CHECKLIST' id='btn_cl{{fila.conductor_placa.id}}_{{fila.id}}' name='{{fila.conductor_placa.id}}'>
                   </form> 
@@ -322,7 +331,9 @@
                   
                   <form method = "post" action='' enctype="multipart/form-data">
                     {% csrf_token %}
-                    Arhivo Fatiga : <input type='file' name='file{{fila.conductor.id}}' id='file{{fila.conductor.id}}_{{fila.id}}' class='form-control' ><br>                    
+                    Arhivo Fatiga : 
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('fatiga', 'file{{fila.conductor.id}}_{{fila.id}}')" >Tomar Foto</button><br><br>
+                    <div name='file{{fila.conductor.id}}' id='file{{fila.conductor.id}}_{{fila.id}}'></div>
                     <button type="button" onclick="myFunction()" class="btn btn-danger">Añadir Observacion</button>
                     <!--Ocultar Observaciones-->
                     <div id="myDIV" style="display:none;"><br>
@@ -332,10 +343,14 @@
                             <option value="{{ lugar.id }}"> {{ lugar.name }} </option>                          
                         {% endfor %}
                       </select><br>
-                      Evidencia Fotográfica : <input type='file' name='file_obs{{fila.conductor.id}}' id='file_obs{{fila.conductor.id}}_{{fila.id}}' class='form-control'><br>
+                      Evidencia Fotográfica : 
+                      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('evidencia', 'file_obs{{fila.conductor.id}}_{{fila.id}}')" >Tomar Evidencia</button><br>
+                      <div  name='file_obs{{fila.conductor.id}}' id='file_obs{{fila.conductor.id}}_{{fila.id}}'></div>                                            
                       Descripcción: <input type="text"  class="form-control" name="modal_descripcion" id='id_modal_descripcion{{fila.conductor.id}}_{{fila.id}}' /><br>
                       Plan de accion: <input type="text"  class="form-control" name="modal_plan_accion" id="id_modal_plan_accion{{fila.conductor.id}}_{{fila.id}}" /><br>
-                      Evidencia Levantamiento : <input type='file' name='file_lev{{fila.conductor.id}}' id='file_lev{{fila.conductor.id}}_{{fila.id}}' class='form-control' ><br>
+                      Evidencia Levantamiento : 
+                      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('evidencia_correctiva', 'file_lev{{fila.conductor.id}}_{{fila.id}}')" >Tomar Evidencia Correctiva</button><br><br>
+                      <div name='file_lev{{fila.conductor.id}}' id='file_lev{{fila.conductor.id}}_{{fila.id}}'></div>                      
                     </div>
                     <input type='button' class='btn btn-info' value='SUBIR FATIGA' id='btn_upload{{fila.conductor.id}}_{{fila.id}}' name='{{fila.conductor.id}}'>
                   </form> 
@@ -388,7 +403,9 @@
                   <!-- Form -->
                   <form method = "post" action='' enctype="multipart/form-data">
                     {% csrf_token %}
-                    Arhivo Declaración Jurada : <input type='file' name='file_dj{{fila.conductor.id}}' id='file_dj{{fila.conductor.id}}_{{fila.id}}' class='form-control' ><br>
+                    Arhivo Declaración Jurada : 
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('declaracion', 'file_dj{{fila.conductor.id}}_{{fila.id}}')" >Tomar Foto</button><br><br>
+                    <div name='file_dj{{fila.conductor.id}}' id='file_dj{{fila.conductor.id}}_{{fila.id}}'></div>                    
                     <button type="button" onclick="myFunction()" class="btn btn-danger">Añadir Observacion</button>
                     <!--Ocultar Observaciones-->
                     <div id="myDIV2" style="display:none;"><br>
@@ -398,10 +415,14 @@
                             <option value="{{ lugar.id }}"> {{ lugar.name }} </option>
                         {% endfor %}
                       </select><br>
-                      Evidencia Fotográfica : <input type='file' name='file_obs_dj{{fila.conductor.id}}' id='file_obs_dj{{fila.conductor.id}}_{{fila.id}}' class='form-control'><br>
+                      Evidencia Fotográfica :
+                      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('evidencia', 'file_obs_dj{{fila.conductor.id}}_{{fila.id}}')" >Tomar Evidencia</button><br>
+                      <div name='file_obs_dj{{fila.conductor.id}}' id='file_obs_dj{{fila.conductor.id}}_{{fila.id}}'></div>                      
                       Descripcción: <input type="text"  class="form-control" name="modal_descripcion" id='id_modal_descripcion_dj{{fila.conductor.id}}_{{fila.id}}' /><br>
                       Plan de accion: <input type="text"  class="form-control" name="modal_plan_accion" id="id_modal_plan_accion_dj{{fila.conductor.id}}_{{fila.id}}" /><br>
-                      Evidencia Levantamiento : <input type='file' name='file_lev_dj{{fila.conductor.id}}' id='file_lev_dj{{fila.conductor.id}}_{{fila.id}}' class='form-control' ><br>
+                      Evidencia Levantamiento :
+                      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('evidencia_correctiva', 'file_lev_dj{{fila.conductor.id}}_{{fila.id}}')" >Tomar Evidencia Correctiva</button><br><br>
+                      <div name='file_lev_dj{{fila.conductor.id}}' id='file_lev_dj{{fila.conductor.id}}_{{fila.id}}'></div>                      
                     </div>
                     <input type='button' class='btn btn-info' value='SUBIR DECLARACION' id='btn_dj{{fila.conductor.id}}_{{fila.id}}' name='{{fila.conductor.id}}'>
                   </form>                   
@@ -453,7 +474,9 @@
                   <!-- Form -->
                   <form method = "post" action='' enctype="multipart/form-data">
                     {% csrf_token %}
-                    Archivo Iperc : <input type='file' name='file_i{{fila.conductor.id}}' id='file_i{{fila.conductor.id}}_{{fila.id}}' class='form-control' ><br>
+                    Archivo Iperc : 
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('iperc', 'file_i{{fila.conductor.id}}_{{fila.id}}')" >Tomar Foto</button><br><br>
+                    <div name='file_i{{fila.conductor.id}}' id='file_i{{fila.conductor.id}}_{{fila.id}}'></div>                    
                     <button type="button" onclick="myFunction()" class="btn btn-danger">Añadir Observacion</button>
                     <!--Ocultar Observaciones-->
                     <div id="myDIV3" style="display:none;"><br>
@@ -463,10 +486,14 @@
                             <option value="{{ lugar.id }}"> {{ lugar.name }} </option>
                         {% endfor %}
                       </select><br>
-                      Evidencia Fotográfica : <input type='file' name='file_obs_i{{fila.conductor.id}}' id='file_obs_i{{fila.conductor.id}}_{{fila.id}}' class='form-control'><br>
+                      Evidencia Fotográfica : 
+                      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('evidencia', 'file_obs_i{{fila.conductor.id}}_{{fila.id}}')" >Tomar Evidencia</button><br>
+                      <div name='file_obs_i{{fila.conductor.id}}' id='file_obs_i{{fila.conductor.id}}_{{fila.id}}'></div>                      
                       Descripcción: <input type="text"  class="form-control" name="modal_descripcion" id='id_modal_descripcion_i{{fila.conductor.id}}_{{fila.id}}' /><br>
                       Plan de accion: <input type="text"  class="form-control" name="modal_plan_accion" id="id_modal_plan_accion_i{{fila.conductor.id}}_{{fila.id}}" /><br>
-                      Evidencia Levantamiento : <input type='file' name='file_lev_i{{fila.conductor.id}}' id='file_lev_i{{fila.conductor.id}}_{{fila.id}}' class='form-control' ><br>                    
+                      Evidencia Levantamiento : 
+                      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('evidencia_correctiva', 'file_lev_i{{fila.conductor.id}}_{{fila.id}}')" >Tomar Evidencia Correctiva</button><br><br>
+                      <div name='file_lev_i{{fila.conductor.id}}' id='file_lev_i{{fila.conductor.id}}_{{fila.id}}'></div>                                         
                     </div>
                     <input type='button' class='btn btn-info' value='SUBIR IPERC' id='btn_i{{fila.conductor.id}}_{{fila.id}}' name='{{fila.conductor.id}}'>
                   </form> 
@@ -529,7 +556,9 @@
                   
                   <form method = "post" action='' enctype="multipart/form-data">
                     {% csrf_token %}
-                    Arhivo Fatiga : <input type='file' name='file{{fila.conductor_relevo.id}}' id='file{{fila.conductor_relevo.id}}_{{fila.id}}' class='form-control' ><br>                    
+                    Arhivo Fatiga : 
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('fatiga', 'file{{fila.conductor_relevo.id}}_{{fila.id}}')" >Tomar Foto</button><br><br>
+                    <div name='file{{fila.conductor_relevo.id}}' id='file{{fila.conductor_relevo.id}}_{{fila.id}}'></div>                                        
                     <button type="button" onclick="myFunction()" class="btn btn-danger">Añadir Observacion</button>
                     <!--Ocultar Observaciones-->
                     <div id="myDIV" style="display:none;"><br>
@@ -539,10 +568,14 @@
                             <option value="{{ lugar.id }}"> {{ lugar.name }} </option>
                         {% endfor %}
                       </select><br>
-                      Evidencia Fotográfica : <input type='file' name='file_obs{{fila.conductor_relevo.id}}' id='file_obs{{fila.conductor_relevo.id}}_{{fila.id}}' class='form-control'><br>
+                      Evidencia Fotográfica : 
+                      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('evidencia', 'file_obs{{fila.conductor_relevo.id}}_{{fila.id}}')" >Tomar Evidencia</button><br>
+                      <div name='file_obs{{fila.conductor_relevo.id}}' id='file_obs{{fila.conductor_relevo.id}}_{{fila.id}}' ></div>
                       Descripcción: <input type="text"  class="form-control" name="modal_descripcion" id='id_modal_descripcion{{fila.conductor_relevo.id}}_{{fila.id}}' /><br>
                       Plan de accion: <input type="text"  class="form-control" name="modal_plan_accion" id="id_modal_plan_accion{{fila.conductor_relevo.id}}_{{fila.id}}" /><br>
-                      Evidencia Levantamiento : <input type='file' name='file_lev{{fila.conductor_relevo.id}}' id='file_lev{{fila.conductor_relevo.id}}_{{fila.id}}' class='form-control' ><br>
+                      Evidencia Levantamiento : 
+                      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('evidencia_correctiva', 'file_lev{{fila.conductor_relevo.id}}_{{fila.id}}')" >Tomar Evidencia Correctiva</button><br><br>
+                      <div name='file_lev{{fila.conductor_relevo.id}}' id='file_lev{{fila.conductor_relevo.id}}_{{fila.id}}'></div>
                     </div>
                     <input type='button' class='btn btn-info' value='SUBIR FATIGA' id='btn_upload{{fila.conductor_relevo.id}}_{{fila.id}}' name='{{fila.conductor_relevo.id}}'>
                   </form> 
@@ -595,7 +628,9 @@
                   <!-- Form -->
                   <form method = "post" action='' enctype="multipart/form-data">
                     {% csrf_token %}
-                    Arhivo Declaración Jurada : <input type='file' name='file_dj{{fila.conductor_relevo.id}}' id='file_dj{{fila.conductor_relevo.id}}_{{fila.id}}' class='form-control' ><br>
+                    Arhivo Declaración Jurada : 
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('declaracion', 'file_dj{{fila.conductor_relevo.id}}_{{fila.id}}')" >Tomar Foto</button><br><br>
+                    <div name='file_dj{{fila.conductor_relevo.id}}' id='file_dj{{fila.conductor_relevo.id}}_{{fila.id}}'></div>
                     <button type="button" onclick="myFunction()" class="btn btn-danger">Añadir Observacion</button>
                     <!--Ocultar Observaciones-->
                     <div id="myDIV2" style="display:none;"><br>
@@ -605,10 +640,14 @@
                             <option value="{{ lugar.id }}"> {{ lugar.name }} </option>
                         {% endfor %}
                       </select><br>
-                      Evidencia Fotográfica : <input type='file' name='file_obs_dj{{fila.conductor_relevo.id}}' id='file_obs_dj{{fila.conductor_relevo.id}}_{{fila.id}}' class='form-control'><br>
+                      Evidencia Fotográfica : 
+                      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('evidencia', 'file_obs_dj{{fila.conductor_relevo.id}}_{{fila.id}}')" >Tomar Evidencia</button><br>
+                      <div name='file_obs_dj{{fila.conductor_relevo.id}}' id='file_obs_dj{{fila.conductor_relevo.id}}_{{fila.id}}'></div>
                       Descripcción: <input type="text"  class="form-control" name="modal_descripcion" id='id_modal_descripcion_dj{{fila.conductor_relevo.id}}_{{fila.id}}' /><br>
                       Plan de accion: <input type="text"  class="form-control" name="modal_plan_accion" id="id_modal_plan_accion_dj{{fila.conductor_relevo.id}}_{{fila.id}}" /><br>
-                      Evidencia Levantamiento : <input type='file' name='file_lev_dj{{fila.conductor_relevo.id}}' id='file_lev_dj{{fila.conductor_relevo.id}}_{{fila.id}}' class='form-control' ><br>
+                      Evidencia Levantamiento : 
+                      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('evidencia_correctiva', 'file_lev_dj{{fila.conductor_relevo.id}}_{{fila.id}}')" >Tomar Evidencia Correctiva</button><br><br>
+                      <div name='file_lev_dj{{fila.conductor_relevo.id}}' id='file_lev_dj{{fila.conductor_relevo.id}}_{{fila.id}}'></div>
                     </div>
                     <input type='button' class='btn btn-info' value='SUBIR DECLARACION' id='btn_dj{{fila.conductor_relevo.id}}_{{fila.id}}' name='{{fila.conductor_relevo.id}}'>
                   </form>                   
@@ -660,7 +699,9 @@
                   <!-- Form -->
                   <form method = "post" action='' enctype="multipart/form-data">
                     {% csrf_token %}
-                    Archivo Iperc : <input type='file' name='file_i{{fila.conductor_relevo.id}}' id='file_i{{fila.conductor_relevo.id}}_{{fila.id}}' class='form-control' ><br>
+                    Archivo Iperc : 
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('iperc', 'file_i{{fila.conductor_relevo.id}}_{{fila.id}}')" >Tomar Foto</button><br><br>
+                    <div name='file_i{{fila.conductor_relevo.id}}' id='file_i{{fila.conductor_relevo.id}}_{{fila.id}}'></div>
                     <button type="button" onclick="myFunction()" class="btn btn-danger">Añadir Observacion</button>
                     <!--Ocultar Observaciones-->
                     <div id="myDIV3" style="display:none;"><br>
@@ -670,10 +711,14 @@
                             <option value="{{ lugar.id }}"> {{ lugar.name }} </option>
                         {% endfor %}
                       </select><br>
-                      Evidencia Fotográfica : <input type='file' name='file_obs_i{{fila.conductor_relevo.id}}' id='file_obs_i{{fila.conductor_relevo.id}}_{{fila.id}}' class='form-control'><br>
+                      Evidencia Fotográfica :
+                      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('evidencia', 'file_obs_i{{fila.conductor_relevo.id}}_{{fila.id}}')" >Tomar Evidencia</button><br>
+                      <div name='file_obs_i{{fila.conductor_relevo.id}}' id='file_obs_i{{fila.conductor_relevo.id}}_{{fila.id}}'></div>
                       Descripcción: <input type="text"  class="form-control" name="modal_descripcion" id='id_modal_descripcion_i{{fila.conductor_relevo.id}}_{{fila.id}}' /><br>
                       Plan de accion: <input type="text"  class="form-control" name="modal_plan_accion" id="id_modal_plan_accion_i{{fila.conductor_relevo.id}}_{{fila.id}}" /><br>
-                      Evidencia Levantamiento : <input type='file' name='file_lev_i{{fila.conductor_relevo.id}}' id='file_lev_i{{fila.conductor_relevo.id}}_{{fila.id}}' class='form-control' ><br>                    
+                      Evidencia Levantamiento : 
+                      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('evidencia_correctiva', 'file_lev_i{{fila.conductor_relevo.id}}_{{fila.id}}')" >Tomar Evidencia Correctiva</button><br><br>
+                      <div name='file_lev_i{{fila.conductor_relevo.id}}' id='file_lev_i{{fila.conductor_relevo.id}}_{{fila.id}}'></div>
                     </div>
                     <input type='button' class='btn btn-info' value='SUBIR IPERC' id='btn_i{{fila.conductor_relevo.id}}_{{fila.id}}' name='{{fila.conductor_relevo.id}}'>
                   </form> 
@@ -736,7 +781,9 @@
                   
                   <form method = "post" action='' enctype="multipart/form-data">
                     {% csrf_token %}
-                    Arhivo CheckList : <input type='file' name='file_cl{{fila.conductor_relevo_placa.id}}' id='file_cl{{fila.conductor_relevo_placa.id}}_{{fila.id}}' class='form-control' ><br>                    
+                    Arhivo CheckList : 
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('check_list', 'file_cl{{fila.conductor_relevo_placa.id}}_{{fila.id}}')" >Tomar Foto</button><br><br>
+                    <div name='file_cl{{fila.conductor_relevo_placa.id}}' id='file_cl{{fila.conductor_relevo_placa.id}}_{{fila.id}}'></div>                                       
                     <button type="button" onclick="myFunction()" class="btn btn-danger">Añadir Observacion</button>
                     <!--Ocultar Observaciones-->
                     <div id="myDIV4" style="display:none;"><br>
@@ -746,10 +793,14 @@
                             <option value="{{ lugar.id }}"> {{ lugar.name }} </option>
                         {% endfor %}
                       </select><br>
-                      Evidencia Fotográfica : <input type='file' name='file_obs_cl{{fila.conductor_relevo_placa.id}}' id='file_obs_cl{{fila.conductor_relevo_placa.id}}_{{fila.id}}' class='form-control'><br>
+                      Evidencia Fotográfica : 
+                      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('evidencia', 'file_obs_cl{{fila.conductor_relevo_placa.id}}_{{fila.id}}')" >Tomar Evidencia</button><br>
+                      <div name='file_obs_cl{{fila.conductor_relevo_placa.id}}' id='file_obs_cl{{fila.conductor_relevo_placa.id}}_{{fila.id}}'></div>
                       Descripcción: <input type="text"  class="form-control" name="modal_descripcion_cl" id='id_modal_descripcion_cl{{fila.conductor_relevo_placa.id}}_{{fila.id}}'/><br>
                       Plan de accion: <input type="text"  class="form-control" name="modal_plan_accion_cl" id="id_modal_plan_accion_cl{{fila.conductor_relevo_placa.id}}_{{fila.id}}"/><br>
-                      Evidencia Levantamiento : <input type='file' name='file_lev_cl{{fila.conductor_relevo_placa.id}}' id='file_lev_cl{{fila.conductor_relevo_placa.id}}_{{fila.id}}' class='form-control' ><br>
+                      Evidencia Levantamiento : 
+                      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="accept_camera('evidencia_correctiva', 'file_lev_cl{{fila.conductor_relevo_placa.id}}_{{fila.id}}')" >Tomar Evidencia Correctiva</button><br><br>
+                      <div name='file_lev_cl{{fila.conductor_relevo_placa.id}}' id='file_lev_cl{{fila.conductor_relevo_placa.id}}_{{fila.id}}'></div>
                     </div>
                     <input type='button' class='btn btn-info' value='SUBIR CHECKLIST' id='btn_cl{{fila.conductor_relevo_placa.id}}_{{fila.id}}' name='{{fila.conductor_relevo_placa.id}}'>
                   </form> 
@@ -819,6 +870,128 @@
     {% endif %}
     <a class="btn btn-outline-info mb-4" href="?page={{ tabla.next_page_number }}">Página Siguiente »</a>
   {% endif %}
+</div>
+
+<!--Modal para ver la camara-->
+<div class="modal" id="myModalCamera" data-backdrop="static">
+	<div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">          
+          <button type="button" class="btn btn-danger" value="Take Snapshot" onClick="take_snapshot()">Tomar Foto</button>         
+          
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true" onClick="close_snapshot()">×</button>
+        </div><div class="container"></div>
+        <div class="modal-body">          
+
+          <style>
+            #my_camera{
+            width: 640px;
+            height: 480px;
+            border: 1px solid black;
+            }
+          </style>
+          <!--cargar script para redimensionar camara-->
+          <script src="{% static '/js/check_device_camera.js' %}"></script>
+
+          <div id="my_camera"></div>
+          
+          <div style="display: none;" id="results" >
+            <div class="modal-body mi-contenido">
+              <button class="btn btn-danger active mi-boton" id="save2" type="button"> Guardar </button></br></br>
+              <a onclick="dibujar2()" class="btn btn-primary active mi-boton" id="dibujar_boton2" >Dibujar</a></br></br>
+              <a class="btn btn-primary active mi-boton" id="dibujar_boton4" style="display: none;">A mano</a>
+            </div>
+            <div>
+              <canvas class="canvas-content" id="canvas2" width="640" height="480"></canvas>
+            </div> 
+          </div>
+
+          <!-- Webcam.min.js -->
+          <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
+          
+          <!-- Configure a few settings and attach camera -->
+          <script>  
+            var camara_evidencia = null; 
+            var tipo_evidencia = null;
+            var id_obs = -1, id_fila;
+            var my_camera = document.getElementById('my_camera');
+            var results = document.getElementById('results');
+            function accept_camera(tipo_evidencia, id_fila) {            
+                this.tipo_evidencia = tipo_evidencia;
+                this.id_fila = id_fila;
+                if(tipo_evidencia == "evidencia")
+                  evidencia_flag = true;
+                if(tipo_evidencia == "evidencia_correctiva")
+                  correctiva_flag = true;
+                if(tipo_evidencia == "check_list")
+                  check_list_flag = true;
+                if(tipo_evidencia == "fatiga")
+                  fatiga_flag = true;
+                if(tipo_evidencia == "declaracion")
+                  declaracion_flag = true;
+                if(tipo_evidencia == "iperc")
+                  iperc_flag = true;           
+                Webcam.set({
+                width: camera_width,
+                height: camera_height,
+                image_format: 'jpeg',
+                jpeg_quality: 90,
+                constraints: {
+                  video: true,
+                  facingMode: "environment"
+                }
+              });
+              Webcam.attach(my_camera);  
+            }            
+            
+            function take_snapshot() {
+              Webcam.snap( function(data_uri) {
+                camara_evidencia = data_uri;  
+              });
+
+              Webcam.reset();
+
+              var image_path = camara_evidencia;              
+              
+              const canvas = document.getElementById('canvas2');
+              const saveButton = document.getElementById('save2');
+              const loadInput = results;
+              //console.log(id_obs);
+              new Drawing(canvas, saveButton, loadInput, image_path, id_obs, tipo_evidencia, id_fila);
+
+              my_camera.style.display = "none";
+              loadInput.style.display = "block";
+            }
+
+            function close_snapshot() {
+              evidencia_flag = false;
+              correctiva_flag = false;
+              check_list_flag = false;
+              fatiga_flag = false;
+              declaracion_flag = false;
+              iperc_flag = false;
+              my_camera.style.display = "block";
+              results.style.display = "none";
+              circles = [];
+              Webcam.reset(); 
+            }
+
+            function reset_snapshot() {
+              my_camera.style.display = "block";
+              results.style.display = "none";
+              circles = [];
+              Webcam.attach(my_camera);
+            }
+            
+          </script>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal" onClick="close_snapshot()">Cerrar</button>
+          <button type="button" class="btn btn-warning" onClick="reset_snapshot()">Regresar</button>
+        </div>
+      </div>
+    </div>
 </div>
 
 <!--Modal de circulo que procesa-->
@@ -1080,5 +1253,339 @@
     });
 
   </script>
+<!--Script para habilitar el dibujar-->
+<script>
+  var cont = -1, cont2 = -1, cont3 = -1, cont4 = -1;
+  var puede_dibujar = false;
+  var puede_dibujar_a_mano = false;
+  function dibujar() {
+    var boton = document.getElementById("dibujar_boton1");
+    var boton3 = document.getElementById("dibujar_boton3");
+    cont++;
+    if(cont %2 == 0){
+      boton.firstChild.data  = "Dibujando";
+      boton.className = "btn btn-warning active mi-boton";
+      puede_dibujar = true;      
+      boton3.style.display = "block";
+      boton3.onclick = function() {
+        cont3++;
+        if(cont3 %2 == 0){          
+          boton3.className = "btn btn-warning active mi-boton";
+          puede_dibujar_a_mano = true;
+        }
+        else{          
+          boton3.className = "btn btn-primary active mi-boton";
+          puede_dibujar_a_mano = false;
+        }
+      };
+      //console.log(cont);
+    }else{
+      boton.firstChild.data  = "Dibujar";
+      boton.className = "btn btn-primary active mi-boton";
+      puede_dibujar = false;
+      boton3.className = "btn btn-primary active mi-boton";      
+      boton3.style.display = "none";
+      puede_dibujar_a_mano = false; 
+      cont3 = -1;     
+      //console.log(cont);
+    }
+  }
+
+  function dibujar2() {
+    var boton2 = document.getElementById("dibujar_boton2");
+    var boton4 = document.getElementById("dibujar_boton4");
+    cont2++;
+    if(cont2 %2 == 0){
+      boton2.firstChild.data  = "Dibujando";
+      boton2.className = "btn btn-warning active mi-boton";
+      puede_dibujar = true;
+      boton4.style.display = "block";
+      boton4.onclick = function() {
+        cont4++;
+        if(cont4 %2 == 0){          
+          boton4.className = "btn btn-warning active mi-boton";
+          puede_dibujar_a_mano = true;
+        }
+        else{          
+          boton4.className = "btn btn-primary active mi-boton";
+          puede_dibujar_a_mano = false;
+        }
+      };
+    }else{
+      boton2.firstChild.data  = "Dibujar";
+      boton2.className = "btn btn-primary active mi-boton";
+      puede_dibujar = false;
+      boton4.className = "btn btn-primary active mi-boton";      
+      boton4.style.display = "none";
+      puede_dibujar_a_mano = false; 
+      cont4 = -1;  
+    }
+  }
+</script>
+
+<!--Script para Dibujar-->
+<script>
+  var token = '{{csrf_token}}';
+  var evidencia_src = "undefined", correctiva_src = "undefined", check_list_src = "undefined", fatiga_src = "undefined", declaracion_src = "undefined", iperc_src = "undefined";
+  var evidencia_flag = true, correctiva_flag = true, check_list_flag = true, fatiga_flag= true, declaracion_flag = true, iperc_flag=true;
+  var rect, offsetLeft, offsetTop, img;
+  var dragging = false;
+  var lastX, startX, startY, circle, radius, context_circle;
+  var circles = [];
+  var marginLeft = 150;
+  var control = 0;
+  
+  class Drawing {
+    constructor(canvas, saveButton, loadInput, image_path, id_obs, tipo_evidencia, id_fila) {  
+      this.isDrawing = false;
+      canvas.style.marginLeft = marginLeft + "px";
+
+      //numero del canvas, 1 editar, 2 camara
+      var canvas_num = canvas.id.substring(6,7);     
+
+      canvas.addEventListener('mousedown', () => this.startDrawing());
+      canvas.addEventListener('mousemove', (event) => this.draw(event, canvas_num, image_path));
+      canvas.addEventListener('mouseup', () => this.stopDrawing());
+      
+      canvas.addEventListener('mousedown', function(e) {
+        if(puede_dibujar == false){
+          var evt = e || event;        
+          dragging = true;
+          lastX = evt.clientX;
+          e.preventDefault();
+        }
+      }, false);
+
+      window.addEventListener('mousemove', function(e) {
+        var evt = e || event;
+        if (dragging) {
+          var delta = evt.clientX - lastX;
+          lastX = evt.clientX;
+          marginLeft += delta;
+          canvas.style.marginLeft = marginLeft + "px";
+        }
+        e.preventDefault();
+      }, false);
+
+      window.addEventListener('mouseup', function() {
+          dragging = false;
+      }, false);
+
+
+      // Set up touch events for mobile, etc
+      canvas.addEventListener("touchstart", function (e) {
+        if(puede_dibujar == true){
+          var evt = e || event;        
+          dragging = true;
+          lastX = evt.clientX;
+          e.preventDefault();
+        
+          var mousePos = getTouchPos(canvas, e);
+          var touch = e.touches[0];
+          var mouseEvent = new MouseEvent("mousedown", { 
+            clientX: touch.clientX, clientY: touch.clientY,        
+            });
+          canvas.dispatchEvent(mouseEvent);
+        }
+      }, false);
+      
+      canvas.addEventListener("touchend", function (e) {
+          var mouseEvent = new MouseEvent("mouseup", {});
+          canvas.dispatchEvent(mouseEvent);
+      }, false);
+
+      canvas.addEventListener("touchmove", function (e) {
+      var touch = e.touches[0];
+      var mouseEvent = new MouseEvent("mousemove", {
+          clientX: touch.clientX,
+          clientY: touch.clientY
+        });      
+      canvas.dispatchEvent(mouseEvent);
+      }, false);
+
+      // Get the position of a touch relative to the canvas
+      function getTouchPos(canvasDom, touchEvent) {
+      var rect = canvasDom.getBoundingClientRect();
+        return {
+            x: touchEvent.touches[0].clientX - rect.left,
+            y: touchEvent.touches[0].clientY - rect.top
+        };
+      }
+
+      var save_fuction = () => this.save(image_path, id_obs, tipo_evidencia, id_fila);
+      var load_fuction = (event) => this.load(event);
+
+      saveButton.addEventListener('click', save_fuction, true);
+      loadInput.addEventListener('change', load_fuction, true);   
+
+      //si se cierra el modal se liberan los listener     
+      $("[id^=uploadModal]").on('hidden.bs.modal', function () {
+        $(this).data('bs.modal', null);
+        saveButton.removeEventListener('click', save_fuction,true);
+        loadInput.removeEventListener('change', load_fuction,true);
+        circles = [];
+        //console.log("modal borrado");
+      });
+
+      this.canvas = canvas;
+      this.context = this.canvas.getContext('2d');
+      
+      this.loadTheImage(image_path);
+    }
+    startDrawing() {
+      this.isDrawing = true; 
+      startX=parseInt(event.pageX-offsetLeft);
+      startY=parseInt(event.pageY-offsetTop - scroll_y); 
+      circle = new Circle(startX, startY);
+      circles.push(circle);   
+    }
+    stopDrawing() {
+      this.isDrawing = false;      
+      if(!puede_dibujar_a_mano){
+        context_circle = this.context;
+        circles.forEach(function(circ) {            
+          circ.draw(context_circle);
+        }); 
+      }
+    }
+    draw(event, canvas_num, image_path) { 
+      this.resize(canvas_num);
+      if(puede_dibujar == true){
+        if (this.isDrawing) {
+          this.context.fillStyle = 'red';          
+          //console.log(event.pageX + " " + event.pageY + " " +offsetLeft + " " + offsetTop);
+          
+          if(puede_dibujar_a_mano){
+            this.context.fillRect(event.pageX - offsetLeft, event.pageY - offsetTop - scroll_y, 4, 4);
+          }
+          else{
+            circle.radius = this.getDistance(startX, startY, event.pageX - offsetLeft, event.pageY - offsetTop  - scroll_y);
+            
+            this.context.clearRect(0, 0,this.canvas.width, this.canvas.height);          
+            context_circle = this.context;
+            circles.forEach(function(circ) {
+              this.loadTheImage(image_path); 
+              context_circle.beginPath();
+              context_circle.arc(circ.startX, circ.startY, circ.radius, 0, 2 * Math.PI);
+              context_circle.strokeStyle = "#f00";
+              context_circle.lineWidth = 4;
+              context_circle.stroke();           
+              //circ.draw( this.context);
+            }, this);
+          }
+
+        }
+      }
+    }
+    getDistance(p1X, p1Y, p2X, p2Y) {
+      return Math.sqrt(Math.pow(p1X - p2X, 2) + Math.pow(p1Y - p2Y, 2))
+    }
+    
+    save(image_path, id_obs, tipo_evidencia, id_fila) {
+      const data = this.canvas.toDataURL('image/png');
+      //console.log(tipo_evidencia);
+      if(tipo_evidencia == "evidencia" && evidencia_flag == true){      
+        evidencia_flag = false;
+        evidencia_src = data;
+        close_snapshot();
+        $('#myModalCamera').modal('toggle');
+        document.getElementById(id_fila).innerHTML = '<img src="'+evidencia_src+'" style="width:100px;height:100px;"><br><br>';
+      }
+      //Si es una observacion tomada con cámara
+      else if(tipo_evidencia == "evidencia_correctiva" && correctiva_flag == true){
+        correctiva_flag = false;
+        correctiva_src = data;
+        close_snapshot();
+        $('#myModalCamera').modal('toggle');
+        document.getElementById(id_fila).innerHTML = '<img src="'+correctiva_src+'" style="width:100px;height:100px;"><br><br>';
+      }
+      //Agregar foto
+      else if(tipo_evidencia == "check_list" && check_list_flag == true){
+        check_list_flag = false;
+        check_list_src = data;
+        close_snapshot();
+        $('#myModalCamera').modal('toggle');
+        document.getElementById(id_fila).innerHTML = '<img src="'+check_list_src+'" style="width:100px;height:100px;"><br><br>';
+      }
+      //Agregar foto
+      else if(tipo_evidencia == "fatiga" && fatiga_flag == true){
+        fatiga_flag = false;
+        fatiga_src = data;
+        close_snapshot();
+        $('#myModalCamera').modal('toggle');
+        document.getElementById(id_fila).innerHTML = '<img src="'+fatiga_src+'" style="width:100px;height:100px;"><br><br>';
+      }
+      //Agregar foto
+      else if(tipo_evidencia == "declaracion" && declaracion_flag == true){
+        declaracion_flag = false;
+        declaracion_src = data;
+        close_snapshot();
+        $('#myModalCamera').modal('toggle');
+        document.getElementById(id_fila).innerHTML = '<img src="'+declaracion_src+'" style="width:100px;height:100px;"><br><br>';
+      }
+      //Agregar foto
+      else if(tipo_evidencia == "iperc" && iperc_flag == true){
+        iperc_flag = false;
+        iperc_src = data;
+        close_snapshot();
+        $('#myModalCamera').modal('toggle');
+        document.getElementById(id_fila).innerHTML = '<img src="'+iperc_src+'" style="width:100px;height:100px;"><br><br>';
+      }
+    }
+
+    load(event) {
+      const file = [...event.target.files].pop();
+      this.readTheFile(file).then((image) => this.loadTheImage(image))
+    }
+    loadTheImage(image) {
+      img = new Image();
+      const canvas = this.canvas;
+      img.onload = function () {
+        const context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(img, 0, 0);        
+      };
+      img.src = image;
+      if(img.height == 0){
+        this.context.canvas.width = camera_width;
+        this.context.canvas.height = camera_height;
+      }else{
+        this.context.canvas.height = img.height;
+        this.context.canvas.width = img.width;
+      }
+      //$('.modal-content').css({width:img.width+100}); 
+      //console.log("imagen cargada");
+          
+    }
+    resize(canvas_num){
+      rect = $("#canvas" + canvas_num)[0].getBoundingClientRect();
+      offsetLeft = rect.left ;
+      offsetTop = rect.top ;
+    }  
+    
+    readTheFile(file) {
+      const reader = new FileReader();
+      return new Promise((resolve) => {
+        reader.onload = (event) => {
+          resolve(event.target.result);
+        };
+        reader.readAsDataURL(file);
+      })
+    }
+  } 
+
+  function Circle(startX, startY) {
+    this.startX = startX;
+    this.startY = startY;
+    this.radius;
+    this.draw = function(context) {      
+      context.beginPath();
+      context.arc(this.startX, this.startY, this.radius, 0, 2 * Math.PI);
+      context.strokeStyle = "#f00";
+      context.lineWidth = 4;
+      context.stroke();
+    }
+  }
+</script>
 
 {% endblock %}

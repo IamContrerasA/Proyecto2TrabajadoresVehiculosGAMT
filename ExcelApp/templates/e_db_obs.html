@@ -774,7 +774,7 @@ function myFunction() {
     startDrawing() {
       this.isDrawing = true; 
       startX=parseInt(event.pageX-offsetLeft);
-      startY=parseInt(event.pageY-offsetTop); 
+      startY=parseInt(event.pageY-offsetTop - scroll_y); 
       circle = new Circle(startX, startY);
       circles.push(circle);   
     }
@@ -795,10 +795,10 @@ function myFunction() {
           //console.log(event.pageX + " " + event.pageY + " " +offsetLeft + " " + offsetTop);
           
           if(puede_dibujar_a_mano){
-            this.context.fillRect(event.pageX - offsetLeft, event.pageY - offsetTop, 4, 4);
+            this.context.fillRect(event.pageX - offsetLeft, event.pageY - offsetTop - scroll_y, 4, 4);
           }
           else{
-            circle.radius = this.getDistance(startX, startY, event.pageX - offsetLeft, event.pageY - offsetTop);
+            circle.radius = this.getDistance(startX, startY, event.pageX - offsetLeft, event.pageY - offsetTop - scroll_y);
             
             this.context.clearRect(0, 0,this.canvas.width, this.canvas.height);          
             context_circle = this.context;
