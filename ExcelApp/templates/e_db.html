@@ -1049,24 +1049,18 @@
         //console.log(indice);
 
         indice_fila = indice_fila.substring(indice_fila.lastIndexOf("_")+1, indice_fila.length);
-        //console.log(indice_fila);
-        
+        //console.log(indice_fila);        
 
         var fd = new FormData();
-        var files = $('#file'+indice+'_'+indice_fila)[0].files[0];
-        var file_obs = $('#file_obs'+indice+'_'+indice_fila)[0].files[0];
         var id_mod_des = $('#id_modal_descripcion'+indice+'_'+indice_fila)[0].value;
         var id_plan_accion = $('#id_modal_plan_accion'+indice+'_'+indice_fila)[0].value;
-        var file_lev = $('#file_lev'+indice+'_'+indice_fila)[0].files[0]; 
         var id_lugar = $('#id_lugar'+indice+'_'+indice_fila)[0].value;       
 
-        //console.log(files);
-        //console.log(id_mod_des);
-        fd.append('file',files);
-        fd.append('file_obs',file_obs);
+        fd.append('file',fatiga_src);
+        fd.append('file_obs',evidencia_src);
         fd.append('id_mod_des',id_mod_des);
         fd.append('id_plan_accion',id_plan_accion);
-        fd.append('file_lev',file_lev);        
+        fd.append('file_lev',correctiva_src);
         fd.append('fecha',"{{file.created_at|date:'c'}}");
         fd.append('lugar',id_lugar);
         $("#myModal2").modal();
@@ -1108,18 +1102,15 @@
         indice_fila = indice_fila.substring(indice_fila.lastIndexOf("_")+1, indice_fila.length);      
 
         var fd = new FormData();        
-        var files = $('#file_dj'+indice+'_'+indice_fila)[0].files[0];
-        var file_obs = $('#file_obs_dj'+indice+'_'+indice_fila)[0].files[0];
         var id_mod_des = $('#id_modal_descripcion_dj'+indice+'_'+indice_fila)[0].value;
-        var id_plan_accion = $('#id_modal_plan_accion_dj'+indice+'_'+indice_fila)[0].value;
-        var file_lev = $('#file_lev_dj'+indice+'_'+indice_fila)[0].files[0]; 
+        var id_plan_accion = $('#id_modal_plan_accion_dj'+indice+'_'+indice_fila)[0].value;        
         var id_lugar = $('#id_lugar_dj'+indice+'_'+indice_fila)[0].value;       
 
-        fd.append('file',files);
-        fd.append('file_obs',file_obs);
+        fd.append('file',declaracion_src);
+        fd.append('file_obs',evidencia_src);
         fd.append('id_mod_des',id_mod_des);
         fd.append('id_plan_accion',id_plan_accion);
-        fd.append('file_lev',file_lev); 
+        fd.append('file_lev',correctiva_src); 
         fd.append('fecha',"{{file.created_at|date:'c'}}");
         fd.append('lugar',id_lugar);
         $("#myModal2").modal();
@@ -1160,19 +1151,16 @@
 
         indice_fila = indice_fila.substring(indice_fila.lastIndexOf("_")+1, indice_fila.length);   
 
-        var fd = new FormData();
-        var files = $('#file_i'+indice+'_'+indice_fila)[0].files[0];
-        var file_obs = $('#file_obs_i'+indice+'_'+indice_fila)[0].files[0];
+        var fd = new FormData();       
         var id_mod_des = $('#id_modal_descripcion_i'+indice+'_'+indice_fila)[0].value;
-        var id_plan_accion = $('#id_modal_plan_accion_i'+indice+'_'+indice_fila)[0].value;
-        var file_lev = $('#file_lev_i'+indice+'_'+indice_fila)[0].files[0]; 
+        var id_plan_accion = $('#id_modal_plan_accion_i'+indice+'_'+indice_fila)[0].value;       
         var id_lugar = $('#id_lugar_i'+indice+'_'+indice_fila)[0].value;       
 
-        fd.append('file',files);
-        fd.append('file_obs',file_obs);
+        fd.append('file',iperc_src);
+        fd.append('file_obs',evidencia_src);
         fd.append('id_mod_des',id_mod_des);
         fd.append('id_plan_accion',id_plan_accion);
-        fd.append('file_lev',file_lev); 
+        fd.append('file_lev',correctiva_src); 
         fd.append('fecha',"{{file.created_at|date:'c'}}");
         fd.append('lugar',id_lugar);
         $("#myModal2").modal();
@@ -1211,21 +1199,17 @@
         var indice = $this;
         var indice_fila = $(this).attr('id');  
 
-        indice_fila = indice_fila.substring(indice_fila.lastIndexOf("_")+1, indice_fila.length);   
-        
-        var fd = new FormData();
-        var files = $('#file_cl'+indice+'_'+indice_fila)[0].files[0];
-        var file_obs = $('#file_obs_cl'+indice+'_'+indice_fila)[0].files[0];
+        indice_fila = indice_fila.substring(indice_fila.lastIndexOf("_")+1, indice_fila.length);           
+        var fd = new FormData();        
         var id_mod_des = $('#id_modal_descripcion_cl'+indice+'_'+indice_fila)[0].value;
-        var id_plan_accion = $('#id_modal_plan_accion_cl'+indice+'_'+indice_fila)[0].value;
-        var file_lev = $('#file_lev_cl'+indice+'_'+indice_fila)[0].files[0];        
+        var id_plan_accion = $('#id_modal_plan_accion_cl'+indice+'_'+indice_fila)[0].value;        
         var id_lugar = $('#id_lugar_cl'+indice+'_'+indice_fila)[0].value;
 
-        fd.append('file',files);
-        fd.append('file_obs',file_obs);
+        fd.append('file',check_list_src);
+        fd.append('file_obs',evidencia_src);
         fd.append('id_mod_des',id_mod_des);
         fd.append('id_plan_accion',id_plan_accion);
-        fd.append('file_lev',file_lev); 
+        fd.append('file_lev',correctiva_src); 
         fd.append('fecha',"{{file.created_at|date:'c'}}");
         fd.append('lugar',id_lugar);
         $("#myModal2").modal();
