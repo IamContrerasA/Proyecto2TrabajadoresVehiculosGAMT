@@ -565,14 +565,15 @@ def __obs_modales(request, id, id2, tipo_archivo, categoria, pertenece_a):
     data = request.POST   
     fecha = str(data['fecha'])    
     fecha = fecha[:fecha.rfind('T')]
-    uploaded_file = request.POST['file'] 
-    uploaded_file = "b'" + uploaded_file[22:] + "'"
+    uploaded_file = request.POST['file']     
     uploaded_file_obs = request.POST['file_obs']
     uploaded_file_corrected = request.POST['file_lev']    
 
     #Solo para el archivo fatiga, declaracion jurada e iperc, independiente de la observacion
-    if pertenece_a == "conductor":              
+    if pertenece_a == "conductor":  
+        print(uploaded_file)            
         if uploaded_file != "undefined":
+            uploaded_file = "b'" + uploaded_file[22:] + "'"
             imagen_watermark = __water_mark_function(request, fecha, uploaded_file)
             ConductorArchivos.objects.get_or_create(date = fecha, conductor_id = id)    
             if tipo_archivo == "fatigas":
@@ -586,6 +587,7 @@ def __obs_modales(request, id, id2, tipo_archivo, categoria, pertenece_a):
     #solo para checklist
     if pertenece_a == "vehiculo":              
         if uploaded_file != "undefined":
+            uploaded_file = "b'" + uploaded_file[22:] + "'"
             PlacaArchivos.objects.get_or_create(date = fecha, placa_id = id)  
             if tipo_archivo == "checklist":                   
                 imagen_watermark = __water_mark_function(request, fecha, uploaded_file)
@@ -664,7 +666,7 @@ def __water_mark_function(request, fecha, uploaded_file):
     size = 1366, 768
     im.thumbnail(size, Image.ANTIALIAS)
     im = im.resize(size, Image.ANTIALIAS) 
-    
+
     #rotar por si esta horizontal
     base_image = ImageOps.exif_transpose(im)
     
