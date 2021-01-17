@@ -565,13 +565,14 @@ def __obs_modales(request, id, id2, tipo_archivo, categoria, pertenece_a):
     data = request.POST   
     fecha = str(data['fecha'])    
     fecha = fecha[:fecha.rfind('T')]
-    uploaded_file = request.FILES['file'] if 'file' in request.FILES else False
-    uploaded_file_obs = request.FILES['file_obs'] if 'file_obs' in request.FILES else False
-    uploaded_file_corrected = request.FILES['file_lev'] if 'file_lev' in request.FILES else False 
-    
+    uploaded_file = request.POST['file'] 
+    uploaded_file = "b'" + uploaded_file[22:] + "'"
+    uploaded_file_obs = request.POST['file_obs']
+    uploaded_file_corrected = request.POST['file_lev']    
+
     #Solo para el archivo fatiga, declaracion jurada e iperc, independiente de la observacion
     if pertenece_a == "conductor":              
-        if uploaded_file:
+        if uploaded_file != "undefined":
             imagen_watermark = __water_mark_function(request, fecha, uploaded_file)
             ConductorArchivos.objects.get_or_create(date = fecha, conductor_id = id)    
             if tipo_archivo == "fatigas":
@@ -584,15 +585,15 @@ def __obs_modales(request, id, id2, tipo_archivo, categoria, pertenece_a):
     
     #solo para checklist
     if pertenece_a == "vehiculo":              
-        if uploaded_file:
+        if uploaded_file != "undefined":
             PlacaArchivos.objects.get_or_create(date = fecha, placa_id = id)  
-            if tipo_archivo == "checklist":     
+            if tipo_archivo == "checklist":                   
                 imagen_watermark = __water_mark_function(request, fecha, uploaded_file)
                 PlacaArchivos.objects.filter(date = fecha, placa_id = id).update(checklist_file_encode = imagen_watermark)
             return JsonResponse({"resultado": "ok checklist"})
-    
+        
     #ver si existe una observacion a ser insertada en base a la imagen o a la descripcion ingresada    
-    if uploaded_file_obs or data['id_mod_des']:         
+    if uploaded_file_obs != "undefined" or data['id_mod_des']:         
         fila_programacion_general = ProgramacionGeneral.objects.filter(id=id2) 
         estado_desaprobado = Estado.objects.get(name = "DESAPROBADO")
         categoria = Categoria.objects.get(name = categoria)
@@ -604,11 +605,11 @@ def __obs_modales(request, id, id2, tipo_archivo, categoria, pertenece_a):
         else:
             last_id = "1"
 
-        if uploaded_file_obs :
-            name = __encode64(uploaded_file_obs)
+        if uploaded_file_obs != "undefined" :            
+            name = "b'" + uploaded_file_obs[22:] + "'"
 
-        if uploaded_file_corrected :
-            name_corrected = __encode64(uploaded_file_corrected)
+        if uploaded_file_corrected != "undefined":
+            name_corrected = "b'" + uploaded_file_corrected[22:] + "'"
                 
         Observaciones(
             programacion_general_id = fila_programacion_general[0], 
@@ -627,7 +628,7 @@ def __obs_modales(request, id, id2, tipo_archivo, categoria, pertenece_a):
 
     else:  
         return JsonResponse({"resultado": "no guardo nada"})
-
+    
 import base64
 def __encode64(photo):  
    
@@ -636,50 +637,57 @@ def __encode64(photo):
   return enc
 
 def __water_mark_function(request, fecha, uploaded_file):  
-   
-	#cargar template de la marca de agua           
-	url = staticfiles_storage.path('img/water_mark.png')
-	personal_water_mark = Image.open(url)
-	draw = ImageDraw.Draw(personal_water_mark)
-	#dibujar datos que iran
-	font = ImageFont.truetype(staticfiles_storage.path('fonts/Roboto/Roboto-Bold.ttf'), size=45)
-	(x, y) = (180, 350)
-	nombre_usuario = request.user.username
-	color = 'rgb(0, 0, 0)' # black color
-	draw.text((x, y), nombre_usuario, fill=color, font=font)
+    
+    #cargar template de la marca de agua           
+    url = staticfiles_storage.path('img/water_mark.png')
+    personal_water_mark = Image.open(url)
+    draw = ImageDraw.Draw(personal_water_mark)
+    #dibujar datos que iran
+    font = ImageFont.truetype(staticfiles_storage.path('fonts/Roboto/Roboto-Bold.ttf'), size=45)
+    (x, y) = (180, 350)
+    nombre_usuario = request.user.username
+    color = 'rgb(0, 0, 0)' # black color
+    draw.text((x, y), nombre_usuario, fill=color, font=font)
 
-	font = ImageFont.truetype(staticfiles_storage.path('fonts/Roboto/Roboto-Bold.ttf'), size=35)
-	(x, y) = (320, 400)
-	empresa = 'SCANGLOBAL'
-	color = 'rgb(255, 0, 0)' # red color
-	draw.text((x, y), empresa, fill=color, font=font)
+    font = ImageFont.truetype(staticfiles_storage.path('fonts/Roboto/Roboto-Bold.ttf'), size=35)
+    (x, y) = (320, 400)
+    empresa = 'SCANGLOBAL'
+    color = 'rgb(255, 0, 0)' # red color
+    draw.text((x, y), empresa, fill=color, font=font)
 
-	(x, y) = (330, 440)
-	color = 'rgb(0, 0, 0)' # black color
-	draw.text((x, y), fecha, fill=color, font=font)
+    (x, y) = (330, 440)
+    color = 'rgb(0, 0, 0)' # black color
+    draw.text((x, y), fecha, fill=color, font=font)
+            
+    data = uploaded_file[2:-1]
+    im = Image.open(BytesIO(base64.b64decode(data)))    
+    size = 1366, 768
+    im.thumbnail(size, Image.ANTIALIAS)
+    im = im.resize(size, Image.ANTIALIAS) 
+    
+    #rotar por si esta horizontal
+    base_image = ImageOps.exif_transpose(im)
+    
+    #obtener dimensiones de la imagen subida
+    width, height = base_image.size
+    
+    #ubicar siempre abajo izquierda la marca de agua
+    position = (width - 384 , height - 384)
+    #disminuir el tamanio de la marca de agua
+    size = 384, 384
+    personal_water_mark.thumbnail(size, Image.ANTIALIAS)
+    #poner marca de agua
+    base_image.paste(personal_water_mark, position, mask=personal_water_mark)
+    #base_image.save('greeting_card.png')#solo para verificar
 
-	#cargar imagen subida del form
-	base_image = Image.open(uploaded_file)
-	#rotar por si esta horizontal
-	base_image = ImageOps.exif_transpose(base_image)
-	#obtener dimensiones de la imagen subida
-	width, height = base_image.size
-	#ubicar siempre abajo izquierda la marca de agua
-	position = (width - 384 , height - 384)
-	#disminuir el tamanio de la marca de agua
-	size = 384, 384
-	personal_water_mark.thumbnail(size, Image.ANTIALIAS)
-	#poner marca de agua
-	base_image.paste(personal_water_mark, position, mask=personal_water_mark)
-	#base_image.save('greeting_card.png')#solo para verificar
-
-	#abrir un buffer para base64
-	buf = BytesIO()
-	base_image.save(buf, 'jpeg', optimize=True, quality=90)                
-	buf.seek(0)
-	#codificar base 64
-	imagen_base64 = __encode64(buf)
-	buf.close()
-
-	return imagen_base64
+    #abrir un buffer para base64
+    buf = BytesIO()
+    base_image.save(buf, 'png', optimize=True, quality=90)                
+    buf.seek(0)
+    #codificar base 64
+    imagen_base64 = __encode64(buf)
+    buf.close()
+    
+    return imagen_base64
+    
 	  
