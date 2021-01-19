@@ -130,6 +130,7 @@
 							</a>
 						</li>
 					</ul>	
+					{% if user.get_role.id < 4 %}
 					<ul class="nav flex-column mb-2">
 						<li class="nav-item">
 							<a class="nav-link {% if request.path == '/reports/index' %} active {% endif %}"
@@ -139,6 +140,7 @@
 							</a>
 						</li>
 					</ul>					
+					{% endif %}
 				</div>
 			</nav>
 

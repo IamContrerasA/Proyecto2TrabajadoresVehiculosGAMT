@@ -35,10 +35,11 @@ def create(request):
     return render(request,'e_new.html') 
 
 def index(request):  
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id == 4 or request.user.role.id >= 6:
         return redirect("/")
-    if request.user.role.name == "Despachador":
-        files = Excel.objects.filter(created_at__icontains = str(datetime.datetime.now())[:10]).values('id', 'name', 'created_at')
+    if request.user.role.name == "Despachador" or request.user.role.name == "Desinfector":
+        #files = Excel.objects.filter(created_at__icontains = str(datetime.datetime.now())[:10]).values('id', 'name', 'created_at')
+        files = Excel.objects.all().values('id', 'name', 'created_at')
         return render(request,"e_index.html", {'files': files})     
     files = Excel.objects.all().values('id', 'name', 'created_at')
     return render(request,"e_index.html", {'files': files}) 
@@ -175,7 +176,7 @@ def insertDataBase(row, id):
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def db(request, id):
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id == 4 or request.user.role.id >= 6:
         return redirect("/")
     form_datos = request.POST
     file = Excel.objects.get(id=id)
@@ -538,7 +539,7 @@ def take_photo_vehicle(request, id):
         return JsonResponse({"resultado": "ok"}) 
 
 def add_disinfect(request):
-    if not request.user.is_authenticated or request.user.role.id >= 4:
+    if not request.user.is_authenticated or request.user.role.id == 4 or request.user.role.id >= 6:
         return redirect("/")    
     if request.method == 'POST': 
         file_id = request.POST['file_id']

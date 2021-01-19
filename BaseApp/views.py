@@ -9,9 +9,10 @@ def base(request):
 
 @login_required
 def welcome(request):
-    if request.user.role.id >= 4:
+    if request.user.role.id == 4:
         return render(request, 'welcome_workers.html')
-
+    if request.user.role.id == 5:
+        return render(request, 'welcome.html')
     return render(request, 'welcome.html')
 
 
