@@ -15,7 +15,7 @@
 	</div>
 </div>
 
-<table class="table " id="id_table">
+<table class="table">
 	<thead class="thead-dark">
 		<tr>
 			<th scope="col">Id</th>	
@@ -52,5 +52,35 @@
 		{% endfor %}
 	</tbody>
 </table>
+<!-- Paginacion -->
+<div class="float-right">
+  {% if files.has_previous %}
+    <a class="btn btn-outline-info mb-4" href="?page={{ files.previous_page_number }}">« Página Anterior</a>
+    {% if files.number > 3 %}
+      <a class="btn btn-outline-info mb-4" href="?page=1">1</a>
+      {% if files.number > 4 %}
+        <button class="btn btn-outline-info mb-4" disabled="">...</button>
+      {% endif %}
+    {% endif %}
+  {% endif %}
+
+  {% for num in files.paginator.page_range %}
+    {% if files.number == num %}
+      <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+    {% elif num > files.number|add:'-3' and num < files.number|add:'3' %}
+      <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+    {% endif %}
+  {% endfor %}
+
+  {% if files.has_next %}
+    {% if files.number < files.paginator.num_pages|add:'-3' %}
+      <button class="btn btn-outline-info mb-4" disabled="">...</button>
+      <a class="btn btn-outline-info mb-4" href="?page={{ files.paginator.num_pages }}">{{ files.paginator.num_pages }}</a>
+    {% elif files.number < files.paginator.num_pages|add:'-2' %}
+      <a class="btn btn-outline-info mb-4" href="?page={{ files.paginator.num_pages }}">{{ files.paginator.num_pages }}</a>
+    {% endif %}
+    <a class="btn btn-outline-info mb-4" href="?page={{ files.next_page_number }}">Página Siguiente »</a>
+  {% endif %}
+</div>
 
 {% endblock %}

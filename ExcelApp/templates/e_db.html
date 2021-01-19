@@ -11,6 +11,17 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
   <!--<h1 class="h2">Base de Datos - Consultas: {{file.name}} --- Enlace: {{file.file}} </h1>-->
   <h1 class="h2">Consultas: {{file.name}}</h1>
+  {% if user.role.id != 5 %}
+  <div class = "btn btn-primary">
+    UNIDADES DESPACHADAS: {{unidades_despachadas}}
+  </div>
+  <div class = "btn btn-primary">
+    UNIDADES CANCELADAS: {{unidades_canceladas}}
+  </div>
+  <div class = "btn btn-danger">
+    UNIDADES DESINFECTADAS: {{unidades_desinfectadas}}
+  </div>
+  {% endif %}
 </div>
 
 <form method="POST" class="post-form" style="font-weight:bold" action="/excel/db/{{file.id}}">
@@ -855,12 +866,7 @@
 		</tr>
 	</thead>
 	<tbody>
-    {% for fila in tabla %}
-    {% if fila.estado.name == "DESAPROBADO" %}
-		  <tr class="table-danger">
-    {% else %}
-      <tr >
-    {% endif %}
+    {% for fila in tabla %}   
 
 			<td>{{ fila.ea }}</td>
       <td>{{ fila.tipo_vehiculo.name }}</td>

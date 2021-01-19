@@ -16,6 +16,9 @@ import Proyecto2
 import os.path
 from django.http import JsonResponse, HttpResponse
 
+#Paginator
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 #subir un archivo al servidor
 def create(request):  
     if not request.user.is_authenticated or request.user.role.id >= 3:
@@ -36,12 +39,18 @@ def create(request):
 
 def index(request):  
     if not request.user.is_authenticated or request.user.role.id == 4 or request.user.role.id >= 6:
-        return redirect("/")
-    if request.user.role.name == "Despachador" or request.user.role.name == "Desinfector":
-        #files = Excel.objects.filter(created_at__icontains = str(datetime.datetime.now())[:10]).values('id', 'name', 'created_at')
-        files = Excel.objects.all().values('id', 'name', 'created_at')
-        return render(request,"e_index.html", {'files': files})     
-    files = Excel.objects.all().values('id', 'name', 'created_at')
+        return redirect("/")        
+    files = Excel.objects.all().values('id', 'name', 'created_at').order_by('-created_at')
+    registros_paginator = 10
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(files, registros_paginator)
+    try:
+        files = paginator.page(page)
+    except PageNotAnInteger:
+        files = paginator.page(1)
+    except EmptyPage:
+        files = paginator.page(paginator.num_pages)
     return render(request,"e_index.html", {'files': files}) 
 
 #Procesar el excel
@@ -172,15 +181,15 @@ def insertDataBase(row, id):
         motivo = motivo[0]
         ).save()    
 
-
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
 def db(request, id):
     if not request.user.is_authenticated or request.user.role.id == 4 or request.user.role.id >= 6:
         return redirect("/")
     form_datos = request.POST
     file = Excel.objects.get(id=id)
     tabla = ProgramacionGeneral.objects.filter(excel_id = id).order_by('id')
+    unidades_despachadas = tabla.filter(estado_id = 1).count()
+    unidades_canceladas = tabla.filter(estado_id = 2).count()
+    unidades_desinfectadas = tabla.filter(cantidad_desinfectado__gte=1).count()
     transporte_ids = tabla.values_list('transporte', flat = True).distinct()
     contratista_ids = tabla.values_list('contratista', flat = True).distinct()
     conductor_ids = tabla.values_list('conductor', flat = True).distinct()
@@ -252,13 +261,15 @@ def db(request, id):
     except EmptyPage:
         tabla = paginator.page(paginator.num_pages)
 
-
     return render(
         request,
         "e_db.html", 
         {
             "file": file, 
-            "tabla": tabla, 
+            "tabla": tabla,
+            "unidades_despachadas": unidades_despachadas,
+            "unidades_canceladas": unidades_canceladas,
+            "unidades_desinfectadas": unidades_desinfectadas,
             "transportes": transportes, 
             "contratistas": contratistas,
             "trabajadores": trabajadores,
