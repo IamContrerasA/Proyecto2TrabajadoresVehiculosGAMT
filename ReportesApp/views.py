@@ -217,3 +217,87 @@ def generate_pdf(request):
   if pisa_status.err:
       return HttpResponse('We had some errors <pre>' + html + '</pre>')
   return response
+
+from io import BytesIO 
+import xlsxwriter
+from PIL import Image
+import base64
+
+def generate_excel(request):
+    # create our spreadsheet.  I will create it in memory with a StringIO
+    output = BytesIO()
+    workbook = xlsxwriter.Workbook(output)
+    worksheet = workbook.add_worksheet()
+    
+    observaciones = Observaciones.objects.filter(date__range = ['2021-01-12', '2021-01-14'])  
+
+    #tamaño de celda que coincida con 0.5 de la imagen
+    cell_width = 45.0
+    cell_height = 180.0
+    #aumentar tamaño de celda para las imagenes 
+    worksheet.set_column(1, 12, cell_width/2)
+    worksheet.set_column(8, 8, cell_width)
+    worksheet.set_column(12, 12, cell_width)
+    worksheet.set_default_row(cell_height)    
+    x_scale = 0.5
+    y_scale = 0.5
+    
+    #info cabecera
+    format = workbook.add_format()
+    format.set_font_size(20)
+    format.set_bold(True)    
+    worksheet.write('A1', "ITEM", format)
+    worksheet.write('B1', "FECHA", format)
+    worksheet.write('C1', "LUGAR", format)
+    worksheet.write('D1', "CONTRATISTA", format)
+    worksheet.write('E1', "EMPRESA TRANSPORTISTA", format)
+    worksheet.write('F1', "UNIDAD INVOLUCRADA", format)
+    worksheet.write('G1', "CATEGORÍA DE EVENTO", format)
+    worksheet.write('H1', "DESCRIPCIÓN", format)
+    worksheet.write('I1', "EVIDENCIA FOTOGRÁFICA", format)
+    worksheet.write('J1', "PLAN DE ACCIÓN", format)
+    worksheet.write('K1', "RESPONSABLE", format)
+    worksheet.write('L1', "FECHA DE LEVANTAMIENTO", format)
+    worksheet.write('M1', "EVIDENCIA CORRECTIVA", format)
+    i = 1
+    undefined = "PENDIENTE"
+    for obs in observaciones:      
+      worksheet.write('A'+ str(i +1), i)
+      worksheet.write('B'+ str(i +1), obs.date)
+      worksheet.write('C'+ str(i +1), obs.lugar.name)
+      worksheet.write('D'+ str(i +1), obs.programacion_general_id.contratista.name)
+      worksheet.write('E'+ str(i +1), obs.programacion_general_id.conductor_placa.placa1 + '|' + obs.programacion_general_id.conductor_placa.placa2)
+      worksheet.write('F'+ str(i +1), obs.programacion_general_id.transporte.name)
+      worksheet.write('G'+ str(i +1), obs.categoria.name)
+      worksheet.write('H'+ str(i +1), obs.descripcion)
+      if obs.evidencia_encode != "undefined":
+        data = obs.evidencia_encode[2:-1]
+        imgdata = base64.b64decode(data)
+        image = BytesIO(imgdata)
+        worksheet.insert_image('I'+ str(i +1), 'myimage.png', {'image_data': image, 'x_scale': x_scale, 'y_scale': y_scale})
+      else:
+        worksheet.write('I'+ str(i +1), undefined)  
+      worksheet.write('J'+ str(i +1), obs.accion_plan)
+      worksheet.write('K'+ str(i +1), "CONTRATISTA")
+      worksheet.write('L'+ str(i +1), obs.date)
+      if obs.evidencia_correctiva_encode != "undefined":
+        data = obs.evidencia_correctiva_encode[2:-1]
+        imgdata = base64.b64decode(data)
+        image = BytesIO(imgdata)
+        worksheet.insert_image('M'+ str(i +1), 'myimage.png', {'image_data': image, 'x_scale': x_scale, 'y_scale': y_scale})    
+      else:
+        worksheet.write('M'+ str(i +1), undefined)      
+      i = i +1
+    workbook.close()
+
+    # create a response
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+
+    # tell the browser what the file is named
+    response['Content-Disposition'] = 'attachment;filename="some_file_name.xlsx"'
+
+    # put the spreadsheet data into the response
+    response.write(output.getvalue())
+
+    # return the response
+    return response

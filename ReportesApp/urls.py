@@ -7,5 +7,6 @@ urlpatterns = [
     path('index',views.index, name="ReporteIndex"),  
     path('create',views.create),  
     path('generate_pdf',views.generate_pdf),  
+    path('generate_excel',views.generate_excel),  
         
 ] 
