@@ -15,6 +15,7 @@
 	</div>
 </div>
 
+<!--Muchos archivos-->
 <table class="table">
 	<thead class="thead-dark">
 		<tr>
@@ -30,6 +31,17 @@
 	</thead>
 
 	<tbody>
+		<!--Archivo del dia-->
+		{% if file %}
+			<tr>
+				<td>{{ file.id }}</td>
+				<td>{{ file.name }}</td>
+				<td>{% load tz %}{{ file.created_at| timezone:'America/Lima' }}</td>
+				<td>
+					<a href="/excel/db/{{ file.id }}" class="btn btn-primary btn-sm" >CONSULTAS</a>					
+				</td>
+			</tr>
+		{% endif %}
 		{% for file in files %}
 		<tr>
 			<td>{{ file.id }}</td>

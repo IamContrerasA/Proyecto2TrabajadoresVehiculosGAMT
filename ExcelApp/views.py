@@ -40,7 +40,15 @@ def create(request):
 def index(request):  
     if not request.user.is_authenticated or request.user.role.id == 4 or request.user.role.id >= 6:
         return redirect("/")        
-    files = Excel.objects.all().values('id', 'name', 'created_at').order_by('-created_at')
+    
+    if request.user.role.name == "Despachador" or request.user.role.name == "Desinfector":
+        file = Excel.objects.last()
+        if str(timezone.localtime(file.created_at))[0:10] == str(datetime.datetime.now())[:10]:    
+            return render(request,"e_index.html", {'file': file})           
+        return render(request,"e_index.html", {'file': file})
+        
+    files = Excel.objects.all().values('id', 'name', 'created_at').order_by('-created_at')        
+    
     registros_paginator = 10
     page = request.GET.get('page', 1)
 
