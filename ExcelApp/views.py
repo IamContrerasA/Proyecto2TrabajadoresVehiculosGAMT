@@ -43,9 +43,9 @@ def index(request):
     
     if request.user.role.name == "Despachador" or request.user.role.name == "Desinfector":
         file = Excel.objects.last()
-        if str(timezone.localtime(file.created_at))[0:10] == str(datetime.datetime.now())[:10]:    
+        if not str(timezone.localtime(file.created_at))[0:10] == str(datetime.datetime.now())[:10]:    
             return render(request,"e_index.html", {'file': file})           
-        return render(request,"e_index.html", {'file': file})
+        return render(request,"e_index.html", {'file': None})
         
     files = Excel.objects.all().values('id', 'name', 'created_at').order_by('-created_at')        
     
