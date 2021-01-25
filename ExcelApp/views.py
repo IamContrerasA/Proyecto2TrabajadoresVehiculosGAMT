@@ -24,12 +24,14 @@ def create(request):
     if not request.user.is_authenticated or request.user.role.id >= 3:
         return redirect("/")
     if request.method == 'POST':
-        data = request.POST
-        files = request.FILES
-        #form = ExcelForm(request.POST, request.FILES)
-        #if form.is_valid():
-        #    file = form.save()  
+        
+        file = Excel.objects.last()
+        if str(timezone.localtime(file.created_at))[0:10] == str(datetime.datetime.now())[:10]:    
+            mensaje= "YA EXISTE UN ARCHIVO DEL DIA"
+            return render(request,'e_new.html', {"mensaje": mensaje})
 
+        data = request.POST
+        files = request.FILES        
         e = Excel.objects.create(name = data['name'])          
         process_excel(files['file'], e.id)
 

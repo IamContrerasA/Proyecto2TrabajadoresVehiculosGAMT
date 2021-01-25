@@ -16,6 +16,9 @@
 <div class="show_content_forms" id="id_show_content_forms">
   <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Subir Archivo Excel</h1>
+    {% if mensaje %}
+      <h1 class="h2 text-danger">{{mensaje}}</h1>
+    {% endif %}
   </div>
 
   <form method = "post" enctype="multipart/form-data">
