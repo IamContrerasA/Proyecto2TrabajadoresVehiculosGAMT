@@ -37,6 +37,29 @@ def create(request):
     
     return render(request,'e_new.html') 
 
+def edit(request, id):  
+    if not request.user.is_authenticated or request.user.role.id >= 3:
+        return redirect("/")
+    excel = Excel.objects.get(id=id)  
+    return render(request,'e_edit.html', {'excel':excel})  
+
+def update(request, id): 
+    if not request.user.is_authenticated or request.user.role.id >= 3:
+        return redirect("/") 
+    excel = Excel.objects.filter(id=id).update(name = request.POST['name'])
+    return redirect("/excel/index")      
+
+def destroy(request, id):  
+    if not request.user.is_authenticated or request.user.role.id >= 3:
+        return redirect("/")
+    excel = Excel.objects.get(id=id) 
+    fecha = str(timezone.localtime(excel.created_at))
+    fecha = fecha[:fecha.rfind(' ')]  
+    excel.delete()  
+    PlacaArchivos.objects.filter(date = fecha).delete()
+    ConductorArchivos.objects.filter(date = fecha).delete()
+    return redirect("/excel/index")
+
 def index(request):  
     if not request.user.is_authenticated or request.user.role.id == 4 or request.user.role.id >= 6:
         return redirect("/")        

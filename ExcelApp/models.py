@@ -106,7 +106,7 @@ class PlacaArchivos(models.Model):
 
 class ProgramacionGeneral(models.Model):
   ea = models.CharField(max_length=10, null=True)   
-  excel = models.ForeignKey(Excel, on_delete=models.PROTECT, null=True)
+  excel = models.ForeignKey(Excel, on_delete=models.CASCADE, null=True)
   contratista = models.ForeignKey(Contratista, on_delete=models.PROTECT, null=True)
   transporte = models.ForeignKey(Transporte, on_delete=models.PROTECT, null=True)
   modalidad_ingreso = models.ForeignKey(ModalidadIngreso, on_delete=models.PROTECT, null=True)
@@ -150,7 +150,7 @@ class Lugar(models.Model):
 
 class Observaciones(models.Model):
 
-  programacion_general_id = models.ForeignKey(ProgramacionGeneral, on_delete=models.PROTECT, null=True)
+  programacion_general_id = models.ForeignKey(ProgramacionGeneral, on_delete=models.CASCADE, null=True)
   descripcion = models.CharField(max_length=250, null=True)
   accion_plan = models.CharField(max_length=250, null=True)
   estado = models.ForeignKey(Estado, on_delete=models.PROTECT, null=True)

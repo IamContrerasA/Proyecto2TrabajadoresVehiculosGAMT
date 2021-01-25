@@ -10,7 +10,10 @@ urlpatterns = [
     path('create', views.create),  
     path('index',views.index, name="ExcelIndex"),    
            
-    path('db/<int:id>', views.db),       
+    path('db/<int:id>', views.db),
+    path('db/edit/<int:id>', views.edit),  
+    path('db/update/<int:id>', views.update),  
+    path('db/delete/<int:id>', views.destroy),
     
     path('db/<int:id>/fatiga_modal/<int:id2>',views.fatiga_modal),
     path('db/<int:id>/declaracion_modal/<int:id2>',views.declaracion_modal),
