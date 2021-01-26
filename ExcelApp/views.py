@@ -581,6 +581,38 @@ def take_photo_vehicle(request, id):
             PlacaArchivos.objects.filter(date = fecha, placa_id = id).update(photo4_encode = imagen)
 
         return JsonResponse({"resultado": "ok"}) 
+        
+import zipfile 
+from wsgiref.util import FileWrapper
+def download_photos_v(request, id):
+    if not request.user.is_authenticated or request.user.role.id >= 4:
+        return redirect("/")    
+
+    #fecha son los primeros 10 caracteres, id los restantes
+    pa = PlacaArchivos.objects.get(placa_id = id[10:],date = id[:10])
+    name = pa.placa.placa1+'_'+pa.placa.placa2+'_'+id[:10]+'.zip'
+
+    hay_fotos = 1
+    foto1 = pa.photo1_encode[2:-1]
+    
+    if foto1 != None and foto1 != "undefined":
+        im = Image.open(BytesIO(base64.b64decode(foto1))) 
+        im.save('foto1.png', 'PNG')
+    else:
+        hay_fotos = 0
+    
+    if hay_fotos == 1:
+        with zipfile.ZipFile(name, 'w') as export_zip:        
+            export_zip.write("foto1.png")
+        wrapper = FileWrapper(open(name, 'rb'))
+        content_type = 'application/zip'
+        content_disposition = 'attachment; filename='+name
+
+        response = HttpResponse(wrapper, content_type=content_type)
+        response['Content-Disposition'] = content_disposition 
+        return response
+        
+    return HttpResponse('')
 
 def add_disinfect(request):
     if not request.user.is_authenticated or request.user.role.id == 4 or request.user.role.id >= 6:
