@@ -592,18 +592,51 @@ def download_photos_v(request, id):
     pa = PlacaArchivos.objects.get(placa_id = id[10:],date = id[:10])
     name = pa.placa.placa1+'_'+pa.placa.placa2+'_'+id[:10]+'.zip'
 
-    hay_fotos = 1
-    foto1 = pa.photo1_encode[2:-1]
+    hay_fotos = 0
+    foto1 = pa.photo1_encode
+    foto2 = pa.photo2_encode
+    foto3 = pa.photo3_encode
+    foto4 = pa.photo4_encode
+    checklist = pa.checklist_file_encode
     
     if foto1 != None and foto1 != "undefined":
+        foto1 = foto1[2:-1]    
         im = Image.open(BytesIO(base64.b64decode(foto1))) 
         im.save('foto1.png', 'PNG')
-    else:
-        hay_fotos = 0
+        hay_fotos = 1
+    if foto2 != None and foto2 != "undefined":
+        foto2 = foto2[2:-1]    
+        im = Image.open(BytesIO(base64.b64decode(foto2))) 
+        im.save('foto2.png', 'PNG')
+        hay_fotos = 1
+    if foto3 != None and foto3 != "undefined":
+        foto3 = foto3[2:-1]    
+        im = Image.open(BytesIO(base64.b64decode(foto3))) 
+        im.save('foto3.png', 'PNG')
+        hay_fotos = 1
+    if foto4 != None and foto4 != "undefined":
+        foto4 = foto4[2:-1]    
+        im = Image.open(BytesIO(base64.b64decode(foto4))) 
+        im.save('foto4.png', 'PNG')
+        hay_fotos = 1
+    if checklist != None and checklist != "undefined":
+        checklist = checklist[2:-1]    
+        im = Image.open(BytesIO(base64.b64decode(checklist))) 
+        im.save('checklist.png', 'PNG')
+        hay_fotos = 1
     
     if hay_fotos == 1:
         with zipfile.ZipFile(name, 'w') as export_zip:        
-            export_zip.write("foto1.png")
+            if foto1 != None and foto1 != "undefined":
+                export_zip.write("foto1.png")
+            if foto2 != None and foto2 != "undefined":
+                export_zip.write("foto2.png")
+            if foto3 != None and foto3 != "undefined":
+                export_zip.write("foto3.png")
+            if foto4 != None and foto4 != "undefined":
+                export_zip.write("foto4.png")
+            if checklist != None and checklist != "undefined":
+                export_zip.write("checklist.png")
         wrapper = FileWrapper(open(name, 'rb'))
         content_type = 'application/zip'
         content_disposition = 'attachment; filename='+name
