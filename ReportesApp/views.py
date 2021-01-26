@@ -228,8 +228,10 @@ def generate_excel(request):
     output = BytesIO()
     workbook = xlsxwriter.Workbook(output)
     worksheet = workbook.add_worksheet()
-    
-    observaciones = Observaciones.objects.filter(date__range = ['2021-01-12', '2021-01-14'])  
+
+    start_date = request.session.get('start_date')
+    end_date = request.session.get('end_date')
+    observaciones = Observaciones.objects.filter(date__range =[start_date, end_date])  
 
     #tamaño de celda que coincida con 0.5 de la imagen
     cell_width = 45.0
@@ -294,7 +296,7 @@ def generate_excel(request):
     response = HttpResponse(content_type='application/vnd.ms-excel')
 
     # tell the browser what the file is named
-    response['Content-Disposition'] = 'attachment;filename="some_file_name.xlsx"'
+    response['Content-Disposition'] = 'attachment;filename="repote '+start_date+'-'+end_date+'.xlsx"'
 
     # put the spreadsheet data into the response
     response.write(output.getvalue())
