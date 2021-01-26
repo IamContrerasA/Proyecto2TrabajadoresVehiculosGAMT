@@ -31,7 +31,8 @@ urlpatterns = [
     path('db/update_image_editor/<int:id>', views.update_image_editor), 
 
     path('db/take_photo_vehicle/<int:id>', views.take_photo_vehicle),
-    path('db/download_photos_v/<str:id>', views.download_photos_v), 
+    path('db/download_photos_v/<str:id>', views.download_photos_v),
+    path('db/download_photos_c/<str:id>', views.download_photos_c), 
     path('db/add_disinfect', views.add_disinfect), 
     
 ] 

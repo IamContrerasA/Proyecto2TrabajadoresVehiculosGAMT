@@ -348,9 +348,9 @@ def show_driver(request, id, id2):
     conductor = Conductor.objects.get(id=id2)
 
     if conductor_archivos.exists(): 
-        return render(request,'e_db_show_driver.html',{'conductor_archivos': conductor_archivos[0], 'conductor': conductor}) 
+        return render(request,'e_db_show_driver.html',{'conductor_archivos': conductor_archivos[0], 'conductor': conductor, 'fecha': fecha}) 
 
-    return render(request,'e_db_show_driver.html', {'conductor': conductor}) 
+    return render(request,'e_db_show_driver.html', {'conductor': conductor, 'fecha': fecha}) 
 
 def show_vehicle(request, id, id2, id3):    
     if not request.user.is_authenticated or request.user.role.id >= 4:
@@ -637,6 +637,54 @@ def download_photos_v(request, id):
                 export_zip.write("foto4.png")
             if checklist != None and checklist != "undefined":
                 export_zip.write("checklist.png")
+        wrapper = FileWrapper(open(name, 'rb'))
+        content_type = 'application/zip'
+        content_disposition = 'attachment; filename='+name
+
+        response = HttpResponse(wrapper, content_type=content_type)
+        response['Content-Disposition'] = content_disposition 
+        return response
+        
+    return HttpResponse('')
+
+def download_photos_c(request, id):
+    if not request.user.is_authenticated or request.user.role.id >= 4:
+        return redirect("/")    
+
+    #fecha son los primeros 10 caracteres, id los restantes
+    conductor = ConductorArchivos.objects.get(conductor_id = id[10:],date = id[:10])
+    name = conductor.conductor.name+'_'+id[:10]+'.zip'
+
+    hay_fotos = 0
+    declaracion = conductor.declaracion_file_encode
+    fatiga = conductor.fatiga_file_encode
+    iperc = conductor.iperc_file_encode
+    
+    if declaracion != None and declaracion != "undefined":
+        declaracion = declaracion[2:-1]    
+        im = Image.open(BytesIO(base64.b64decode(declaracion))) 
+        im.save('declaracion.png', 'PNG')
+        hay_fotos = 1
+    if fatiga != None and fatiga != "undefined":
+        fatiga = fatiga[2:-1]    
+        im = Image.open(BytesIO(base64.b64decode(fatiga))) 
+        im.save('fatiga.png', 'PNG')
+        hay_fotos = 1
+    if iperc != None and iperc != "undefined":
+        iperc = iperc[2:-1]    
+        im = Image.open(BytesIO(base64.b64decode(iperc))) 
+        im.save('iperc.png', 'PNG')
+        hay_fotos = 1
+    
+    if hay_fotos == 1:
+        with zipfile.ZipFile(name, 'w') as export_zip:        
+            if declaracion != None and declaracion != "undefined":
+                export_zip.write("declaracion.png")
+            if fatiga != None and fatiga != "undefined":
+                export_zip.write("fatiga.png")
+            if iperc != None and iperc != "undefined":
+                export_zip.write("iperc.png")
+
         wrapper = FileWrapper(open(name, 'rb'))
         content_type = 'application/zip'
         content_disposition = 'attachment; filename='+name

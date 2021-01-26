@@ -50,7 +50,7 @@
 			<td>
 				<a href="/excel/db/{{ file.id }}" class="btn btn-primary btn-sm" >CONSULTAS</a>	
 				{% if user.get_role.id < 3 %}
-					<a href="/excel/db/edit/{{ file.id }}" class="btn btn-primary btn-sm" >EDITAR</a>
+					<a href="/excel/db/edit/{{ file.id }}" class="btn btn-success btn-sm" >EDITAR</a>
 					<a href="/excel/db/delete/{{ file.id }}" class="btn btn-danger btn-sm" onclick="return confirm('ESTAS SEGURO QUE DESEA BORRAR EL ARCHIVO?')">BORRAR</a>
 				{% endif %}				
 			</td>

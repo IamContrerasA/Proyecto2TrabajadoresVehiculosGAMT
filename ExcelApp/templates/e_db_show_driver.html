@@ -7,13 +7,14 @@
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
   <h1 class="h2">Conductor: {{ conductor.name }}</h1>
+  <a href="/excel/db/download_photos_c/{{fecha}}{{conductor.id}}" class='btn btn-primary' role="button" aria-pressed="true" >Descargar fotos</a>
 </div>
 
 <table class="table">
   <tbody>
     <tr>
       <th scope="row">Fecha</th>
-      <td>{{ conductor_archivos.date}}</td>
+      <td>{{ fecha }}</td>
     </tr>
 
     <tr>
