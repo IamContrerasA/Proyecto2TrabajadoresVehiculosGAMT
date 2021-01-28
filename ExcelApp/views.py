@@ -5,7 +5,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from ExcelApp.forms import ExcelForm
-from ExcelApp.models import Excel, ProgramacionGeneral, Contratista, Transporte, ModalidadIngreso, TipoVehiculo, Carga, Destino, NumConvoy, Estado, Motivo, Conductor, Placa, ConductorArchivos, Observaciones, Categoria, PlacaArchivos, Lugar
+from ExcelApp.models import Excel, ProgramacionGeneral, Contratista, Transporte, ModalidadIngreso, TipoVehiculo, Carga, Destino, NumConvoy, Estado, Motivo, Conductor, Placa, ConductorArchivos, Observaciones, Categoria, PlacaArchivos, Lugar, FotosObservaciones
 
 #importar liberia xlrd de excel
 import datetime, xlrd
@@ -15,6 +15,7 @@ from datetime import time
 import Proyecto2
 import os.path
 from django.http import JsonResponse, HttpResponse
+import json
 
 #Paginator
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -420,35 +421,50 @@ def obs(request, id, id2):
     if not observaciones.exists():         
         return render(request,'e_db_obs.html',{'fila_programacion_general': fila_programacion_general, 'existe': False, 'id_file': id, 'id_registro': id2, 'categorias': categorias, 'lugares': lugares}) 
     
-    return render(request,'e_db_obs.html',{'fila_programacion_general': fila_programacion_general, 'observaciones': observaciones, 'existe': True, 'id_file': id, 'id_registro': id2, 'categorias': categorias, 'lugares': lugares}) 
+    fotos = []
+    contador = 0
+    for obs in observaciones:
+        fotos.append(FotosObservaciones.objects.filter(observacion_id = obs.id))
+    print(fotos)
+    
+    return render(request,'e_db_obs.html',{'fila_programacion_general': fila_programacion_general, 'observaciones': observaciones, 'fotos': fotos,'existe': True, 'id_file': id, 'id_registro': id2, 'categorias': categorias, 'lugares': lugares}) 
 
 def obs_camera(request, id): 
     if not request.user.is_authenticated or request.user.role.id >= 4:
         return redirect("/")
     
-    if request.method == 'POST':         
+    if request.method == 'POST':
+        imagen_evidencia = "undefined"
+        imagen_correctiva = "undefined"
+
+        aux_primera_ie = "undefined"
+        aux_primera_ic = "undefined"
+        if len(request.POST['imagen_evidencia']) > 2:            
+            imagen_evidencia = json.loads(request.POST['imagen_evidencia'])
         
-        imagen_evidencia = request.POST['imagen_evidencia']
+        if len(request.POST['imagen_correctiva']) > 2:            
+            imagen_correctiva = json.loads(request.POST['imagen_correctiva'])
+        
         if imagen_evidencia == "undefined" or len(request.POST['descripcion']) == 0:
-            return JsonResponse({"resultado": "fracaso"})
-
+            return JsonResponse({"resultado": "fracaso"})     
+        
         if imagen_evidencia != "undefined":
-            imagen_evidencia = "b'" + imagen_evidencia[22:] + "'" 
-
-        imagen_correctiva = request.POST['imagen_correctiva']  
+            imagen_evidencia[0] = "b'" + (imagen_evidencia[0])[22:] + "'" 
+            aux_primera_ie = imagen_evidencia[0]
+        
         if imagen_correctiva != "undefined":
-            imagen_correctiva = "b'" + imagen_correctiva[22:] + "'"    
+            imagen_correctiva[0] = "b'" + (imagen_correctiva[0])[22:] + "'"    
+            aux_primera_ic = imagen_correctiva[0]
        
         fecha = request.POST['fecha']
-        fecha = fecha[:fecha.rfind('T')] 
-        print(fecha)
+        fecha = fecha[:fecha.rfind('T')]         
         
         Observaciones(
             programacion_general_id_id = id, 
             descripcion = request.POST['descripcion'],
             accion_plan = request.POST['plan_accion'],
-            evidencia_encode = imagen_evidencia,
-            evidencia_correctiva_encode = imagen_correctiva,
+            evidencia_encode = aux_primera_ie,
+            evidencia_correctiva_encode = aux_primera_ic,
             date = fecha,
             estado_id = 2,
             categoria_id = request.POST['categoria'],
@@ -456,7 +472,54 @@ def obs_camera(request, id):
             ).save()
 
         fila_programacion_general = ProgramacionGeneral.objects.filter(id=id)
-        fila_programacion_general.update(estado_id = 2)
+        fila_programacion_general.update(estado_id = 2)        
+
+        vueltas_for = len(imagen_evidencia)
+        min_vueltas = 1
+        if imagen_correctiva != "undefined":
+            vueltas_for = max(len(imagen_evidencia), len(imagen_correctiva))
+            min_vueltas = min(len(imagen_evidencia), len(imagen_correctiva))
+        else:
+            imagen_correctiva = ""
+        if vueltas_for >= 2:
+            ultima_observacion = Observaciones.objects.last()
+            for i in range(1, vueltas_for):
+                if len(imagen_evidencia) == len(imagen_correctiva): 
+                    FotosObservaciones(
+                        observacion_id = ultima_observacion.id,                       
+                        evidencia_encode = "b'" + (imagen_evidencia[i])[22:] + "'",
+                        evidencia_correctiva_encode = "b'" + (imagen_correctiva[i])[22:] + "'",                       
+                    ).save()
+
+                if len(imagen_evidencia) > len(imagen_correctiva):                    
+                    if(min_vueltas <= i):
+                        FotosObservaciones(
+                            observacion_id = ultima_observacion.id,                         
+                            evidencia_encode = "b'" + (imagen_evidencia[i])[22:] + "'",
+                            evidencia_correctiva_encode = "undefined",                       
+                        ).save()
+                    else:
+                        FotosObservaciones(
+                            observacion_id = ultima_observacion.id,                         
+                            evidencia_encode = "b'" + (imagen_evidencia[i])[22:] + "'",
+                            evidencia_correctiva_encode = "b'" + (imagen_correctiva[i])[22:] + "'",                       
+                        ).save()
+                        
+                if len(imagen_correctiva) > len(imagen_evidencia):                    
+                    if(min_vueltas <= i):
+                        FotosObservaciones(
+                            observacion_id = ultima_observacion.id,                         
+                            evidencia_encode = "undefined",
+                            evidencia_correctiva_encode = "b'" + (imagen_correctiva[i])[22:],                       
+                        ).save()
+                    else:
+                        FotosObservaciones(
+                            observacion_id = ultima_observacion.id,                         
+                            evidencia_encode = "b'" + (imagen_evidencia[i])[22:] + "'",
+                            evidencia_correctiva_encode = "b'" + (imagen_correctiva[i])[22:] + "'",                       
+                        ).save()
+                    
+            return JsonResponse({"resultado": "insertar" + str(vueltas_for)})     
 
         return JsonResponse({"resultado": "exito"}) 
 
@@ -526,26 +589,36 @@ def obs_disaprove(request, id, id2, id3):
     ProgramacionGeneral.objects.filter(id=id2).update(estado = 2)
     return redirect("/excel/db/"+str(id)+"/obs/"+str(id2)) 
 
-def image_editor(request, id):
+def image_editor(request, id, id2):
     if not request.user.is_authenticated or request.user.role.id >= 4:
         return redirect("/")    
     if request.method == 'POST': 
         imagen = request.POST['imagen']
-        observacion_registro = Observaciones.objects.filter(id = id)
-        obs_tipo = request.POST['observacion_tipo']
-
         imagen = "b'" + imagen[22:] + "'"
-        
-        if obs_tipo == "evidencia":
-            observacion_registro.update(evidencia_encode = imagen)
 
-        if obs_tipo == "evidencia_correctiva":
-            observacion_registro.update(evidencia_correctiva_encode = imagen)
+        if(id2 == 0):
+            observacion_registro = Observaciones.objects.filter(id = id)
+            obs_tipo = request.POST['observacion_tipo']
+            
+            if obs_tipo == "evidencia":
+                observacion_registro.update(evidencia_encode = imagen)
+
+            if obs_tipo == "evidencia_correctiva":
+                observacion_registro.update(evidencia_correctiva_encode = imagen)
+        else:
+            fotos_observacion = FotosObservaciones.objects.filter(id = id2)
+            obs_tipo = request.POST['observacion_tipo']
+            
+            if obs_tipo == "evidencia":
+                fotos_observacion.update(evidencia_encode = imagen)
+
+            if obs_tipo == "evidencia_correctiva":
+                fotos_observacion.update(evidencia_correctiva_encode = imagen)
 
         return JsonResponse({"resultado": "ok"})        
 
 #actualizar evidencia correctiva con la camara
-def update_image_editor(request, id):
+def update_image_editor(request, id, id2):
     if not request.user.is_authenticated or request.user.role.id >= 4:
         return redirect("/")    
     if request.method == 'POST': 

@@ -165,3 +165,11 @@ class Observaciones(models.Model):
   class Meta:
     db_table = "observaciones"
 
+class FotosObservaciones(models.Model):
+
+  observacion = models.ForeignKey(Observaciones, on_delete=models.CASCADE, null=True)   
+  evidencia_encode = models.TextField(null=True)  
+  evidencia_correctiva_encode = models.TextField(null=True)
+
+  class Meta:
+    db_table = "fotos_observaciones"

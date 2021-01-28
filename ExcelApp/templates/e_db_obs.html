@@ -75,15 +75,27 @@
         <td>         
           {% if observacion.evidencia_encode != "undefined"  %}
           <a href="#" class="pop" id="pop{{observacion.id}}_evidencia">
-            <img src="data:image/png;base64,{{observacion.evidencia_encode|slice:'2:-1'}}" style="width:100px;height:100px;" id="evidencia-{{observacion.id}}">
-          </a>          
+            <img src="data:image/png;base64,{{observacion.evidencia_encode|slice:'2:-1'}}" style="width:100px;height:100px;" id="evidencia-{{observacion.id}}_f0">
+          </a>
+            {% for foto in fotos %}
+              {% if foto %}
+                {% for f in foto %}
+                  {% if f.observacion_id == observacion.id %}
+                  <a href="#" class="pop" id="pop{{observacion.id}}_evidencia">
+                    <img src="data:image/png;base64,{{f.evidencia_encode|slice:'2:-1'}}" style="width:100px;height:100px;" id="evidencia-{{observacion.id}}_f{{f.id}}">
+                  </a>
+                  {% endif %}  
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+                    
           {% endif %}
         </td>
         <td>{{ observacion.accion_plan }}</td>        
         <td>      
           {% if observacion.evidencia_correctiva_encode != "undefined"  %}
             <a href="#" class="pop" id="pop{{observacion.id}}_evidencia_correctiva">
-              <img src="data:image/png;base64,{{observacion.evidencia_correctiva_encode|slice:'2:-1'}}" style="width:100px;height:100px;" id="evidencia_correctiva-{{observacion.id}}">              
+              <img src="data:image/png;base64,{{observacion.evidencia_correctiva_encode|slice:'2:-1'}}" style="width:100px;height:100px;" id="evidencia_correctiva-{{observacion.id}}_f0">              
             </a>
           {% else %}  
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="actualizar_correctiva('{{observacion.id}}')">Tomar Foto</button>
@@ -544,8 +556,8 @@ function myFunction() {
       var id_categoria = $('#categoria_camara')[0].value;
       var id_lugar = $('#lugar_camara')[0].value;
       
-      fdcamera.append('imagen_evidencia', evidencia_src);
-      fdcamera.append('imagen_correctiva', correctiva_src);      
+      fdcamera.append('imagen_evidencia', JSON.stringify(evidencia_src));
+      fdcamera.append('imagen_correctiva', JSON.stringify(correctiva_src));
       fdcamera.append('descripcion',id_mod_des);
       fdcamera.append('plan_accion',id_plan_accion);      
       fdcamera.append('categoria',id_categoria);
@@ -585,7 +597,7 @@ function myFunction() {
 			$('#imagemodal').modal('show');  
       var image_path = $(this).find('img').attr('src');
       var id_obs = $(this).find('img').attr('id');
-      //console.log(id_obs);
+      console.log(id_obs);
       const canvas = document.getElementById('canvas1');
       const saveButton = document.getElementById('save1');
       const loadInput = document.getElementById('load');
@@ -666,7 +678,7 @@ function myFunction() {
 <!--Script para Dibujar-->
 <script>
   var token = '{{csrf_token}}';
-  var evidencia_src = "undefined", correctiva_src = "undefined";
+  var evidencia_src = [], correctiva_src = [];  
   var evidencia_flag = true, correctiva_flag = true, actualizar_correctiva_flag = true;
   var rect, offsetLeft, offsetTop, img;
   var dragging = false;
@@ -825,28 +837,38 @@ function myFunction() {
       //console.log(tipo_evidencia);
       if(tipo_evidencia == "evidencia" && evidencia_flag == true){
         evidencia_flag = false;
-        evidencia_src = data;
+        evidencia_src.push(data);
         close_snapshot();
         $('#myModalCamera').modal('toggle');
-        document.getElementById('evidencia_camara').innerHTML = '<img src="'+evidencia_src+'" style="width:100px;height:100px;"><br><br>';
+        var imagenes_evidencia = ""        
+        evidencia_src.forEach(function(e) {
+          imagenes_evidencia = imagenes_evidencia + '<img src="'+e+'" style="width:100px;height:100px;">';          
+        });
+        document.getElementById('evidencia_camara').innerHTML = imagenes_evidencia
       }
       //Si es una observacion tomada con cámara
       else if(tipo_evidencia == "evidencia_correctiva" && correctiva_flag == true){
         correctiva_flag = false;
-        correctiva_src = data;
+        correctiva_src.push(data);
         close_snapshot();
         $('#myModalCamera').modal('toggle');
-        document.getElementById('correctiva_camara').innerHTML = '<img src="'+correctiva_src+'" style="width:100px;height:100px;"><br><br>';
+        var imagenes_correctiva = ""        
+        correctiva_src.forEach(function(e) {
+          imagenes_correctiva = imagenes_correctiva + '<img src="'+e+'" style="width:100px;height:100px;">';          
+        });
+        document.getElementById('correctiva_camara').innerHTML = imagenes_correctiva
       }
       //Actualizar evidencia correctiva
       else if(tipo_evidencia == "actualizar_correctiva" && actualizar_correctiva_flag == true){
         actualizar_correctiva_flag = false;
         var fdcamera_update = new FormData();        
         fdcamera_update.append('data', data); 
+        var observacion_id = id_obs.substring(id_obs.lastIndexOf("-") + 1,  id_obs.lastIndexOf("_f"));
+        var foto_id = id_obs.substring(id_obs.lastIndexOf("_f") + 2,  id_obs.length);
         // AJAX request
         $.ajax({
           headers: { "X-CSRFToken": token },
-          url: '/excel/db/update_image_editor/'+ id_obs,
+          url: '/excel/db/update_image_editor/'+ observacion_id,
           type: 'POST',
           data: fdcamera_update,
           contentType: false,
@@ -860,8 +882,9 @@ function myFunction() {
       if(tipo_evidencia == "undefined"){        
         
         var observacion_tipo = id_obs.substring(0, id_obs.lastIndexOf("-"));
-        var observacion_id = id_obs.substring(id_obs.lastIndexOf("-") + 1,  id_obs.length);
-
+        var observacion_id = id_obs.substring(id_obs.lastIndexOf("-") + 1,  id_obs.lastIndexOf("_f"));
+        var foto_id = id_obs.substring(id_obs.lastIndexOf("_f") + 2,  id_obs.length);
+        
         var fd = new FormData();
         fd.append('imagen', data);
         fd.append('observacion_tipo', observacion_tipo);
@@ -871,7 +894,7 @@ function myFunction() {
         // AJAX request
         $.ajax({
           headers: { "X-CSRFToken": token },
-          url: '/excel/db/image_editor/'+observacion_id,          
+          url: '/excel/db/image_editor/'+observacion_id+'/' + foto_id,          
           type: 'POST',
           data: fd,
           contentType: false,
@@ -885,7 +908,7 @@ function myFunction() {
               alert('file not uploaded');
             }
           }
-        });    
+        });
       }
     }
 

@@ -27,8 +27,8 @@ urlpatterns = [
     path('db/<int:id>/obs_disaprove/<int:id2>/<int:id3>',views.obs_disaprove),
 
     path('db/obs_camera/<int:id>',views.obs_camera),
-    path('db/image_editor/<int:id>', views.image_editor), 
-    path('db/update_image_editor/<int:id>', views.update_image_editor), 
+    path('db/image_editor/<int:id>/<int:id2>', views.image_editor), 
+    path('db/update_image_editor/<int:id>/<int:id2>', views.update_image_editor), 
 
     path('db/take_photo_vehicle/<int:id>', views.take_photo_vehicle),
     path('db/download_photos_v/<str:id>', views.download_photos_v),
