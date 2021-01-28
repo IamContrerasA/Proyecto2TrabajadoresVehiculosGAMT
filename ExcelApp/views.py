@@ -429,6 +429,16 @@ def obs(request, id, id2):
     
     return render(request,'e_db_obs.html',{'fila_programacion_general': fila_programacion_general, 'observaciones': observaciones, 'fotos': fotos,'existe': True, 'id_file': id, 'id_registro': id2, 'categorias': categorias, 'lugares': lugares}) 
 
+def obs_destroy(request, id, id2, id3):  
+    if not request.user.is_authenticated or request.user.role.id >= 3:
+        return redirect("/")
+    Observaciones.objects.filter(id = id3).delete()  
+    obs = Observaciones.objects.filter(programacion_general_id = id2)
+    if not obs: 
+        fila_programacion_general = ProgramacionGeneral.objects.filter(id=id2)        
+        fila_programacion_general.update(estado_id = 1)    
+    return redirect("/excel/db/"+str(id)+"/obs/"+str(id2))
+
 def obs_camera(request, id): 
     if not request.user.is_authenticated or request.user.role.id >= 4:
         return redirect("/")

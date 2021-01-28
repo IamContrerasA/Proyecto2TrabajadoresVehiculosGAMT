@@ -103,68 +103,10 @@
         </td>
         <td>{{ observacion.estado.name }}</td>
 
-        <!--Modal para editar una observacion-->      
-        <td>          
-          <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#uploadModal{{observacion.id}}">Editar</button>            
-          <!-- Modal -->
-          <div id="uploadModal{{observacion.id}}" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-
-              <!-- Modal content-->
-              <div class="modal-content">
-                <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal">&times;</button>
-                  <h4 class="modal-title">CERRAR</h4>
-                </div>
-                <div class="modal-body">
-                  <!-- Form -->
-                  <form method = "post" action='' enctype="multipart/form-data">
-                    {% csrf_token %} 
-                    
-                    Categoría :    
-                    <select class="form-control" name="categoria" id="categoria_{{observacion.id}}">
-                      {% for categoria in categorias %}
-                        {% if observacion.categoria.id == categoria.id %}
-                          <option selected="selected" value="{{ categoria.id }}"> {{ categoria.name }} </option>
-                        {% else %}
-                          <option value="{{ categoria.id }}"> {{ categoria.name }} </option>
-                        {% endif %}
-                      {% endfor %}
-                    </select><br> 
-                    Lugar :    
-                    <select class="form-control" name="lugar" id="lugar_{{observacion.id}}">
-                      {% for lugar in lugares %}
-                        {% if observacion.lugar.id == lugar.id %}
-                          <option selected="selected" value="{{ lugar.id }}"> {{ lugar.name }} </option>
-                        {% else %}
-                          <option value="{{ lugar.id }}"> {{ lugar.name }} </option>
-                        {% endif %}
-                      {% endfor %}
-                    </select><br>          
-                    Evidencia Fotográfica :<input type='file' name='evidencia' id='id_evidencia_{{observacion.id}}' required class='form-control' value="{{observacion.evidencia}}" ><br>                    
-                    {% if observacion.evidencia != "undefined"  %}
-                      Foto actual  
-                      <a href="#" class="pop">
-                        <img src="data:image/png;base64,{{observacion.evidencia_encode|slice:'2:-1'}}" style="width:100px;height:100px;"><br><br>
-                      </a>
-                    {% endif %}
-                    Descripción: <input type="text"  class="form-control" name="descripcion" id="id_descripcion_{{observacion.id}}" required value="{{observacion.descripcion}}" /><br>
-                    Plan de Acción: <input type="text"  class="form-control" name="plan_accion" id="id_plan_accion_{{observacion.id}}" value="{{observacion.accion_plan}}" /><br>
-                    Evidencia Correctiva :<input type='file' name='levantamiento' id='id_levantamiento_{{observacion.id}}' class='form-control' value=""><br>
-                    {% if observacion.evidencia_correctiva != "undefined"  %}
-                      Foto actual  
-                      <a href="#" class="pop">
-                        <img src="data:image/png;base64,{{observacion.evidencia_correctiva_encode|slice:'2:-1'}}" style="width:100px;height:100px;"><br><br>
-                      </a>
-                    {% endif %}
-                    <input type='button' class='btn btn-info' value='Editar Observacion' id='btn_upload_{{observacion.id}}' name='btn_upload_{{observacion.id}}-{{observacion.programacion_general_id.id}}'>
-                  </form> 
-                  <!-- Preview-->
-                  <div id='preview'></div>
-                </div>          
-              </div>
-            </div>
-          </div>
+        <!--Modal para borrar una observacion-->      
+        <td>
+          <a href="/excel/db/obs_destroy/{{id_file}}/{{observacion.programacion_general_id.id}}/{{observacion.id}}" class="btn btn-danger btn-sm" onclick="return confirm('ESTAS SEGURO QUE DESEA BORRAR LA OBSERVACION?')">BORRAR</a>           
+          
         </td>
         <td>
           <a href="/excel/db/{{id_file}}/obs_aprove/{{observacion.programacion_general_id.id}}/{{observacion.id}}" class="btn btn-success btn-sm" >Aprobar</a>        

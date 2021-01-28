@@ -26,6 +26,7 @@ urlpatterns = [
     path('db/<int:id>/obs_aprove/<int:id2>/<int:id3>',views.obs_aprove),
     path('db/<int:id>/obs_disaprove/<int:id2>/<int:id3>',views.obs_disaprove),
 
+    path('db/obs_destroy/<int:id>/<int:id2>/<int:id3>', views.obs_destroy),
     path('db/obs_camera/<int:id>',views.obs_camera),
     path('db/image_editor/<int:id>/<int:id2>', views.image_editor), 
     path('db/update_image_editor/<int:id>/<int:id2>', views.update_image_editor), 
