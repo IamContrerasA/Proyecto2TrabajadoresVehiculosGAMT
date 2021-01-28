@@ -158,7 +158,7 @@
 	</thead>
 	<tbody>
     {% for fila in tabla %}
-    {% if fila.estado.name == "DESAPROBADO" %}
+    {% if fila.estado.name == "DESAPROBADO" or not fila.cantidad_desinfectado %}
 		  <tr class="table-danger">
     {% else %}
       <tr >
@@ -867,7 +867,11 @@
 	</thead>
 	<tbody>
     {% for fila in tabla %}   
-
+    {% if not fila.cantidad_desinfectado %}
+		  <tr class="table-danger">
+    {% else %}
+      <tr >
+    {% endif %}
 			<td>{{ fila.ea }}</td>
       <td>{{ fila.tipo_vehiculo.name }}</td>
       <td>
