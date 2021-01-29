@@ -98,10 +98,8 @@ def process_excel(excel, id):
     for i in range (0, sheet.nrows):
         if(sheet.cell_value(i, 0).upper() == 'EA'):
             row_start = i
-            break      
-    # print(str(sheet.cell_value(20, 8)))
-    # print(str(sheet.cell_value(26, 8)))
-    # print(str(sheet.cell_value(41, 8)))
+            break     
+    
     for i in range(row_start + 1, sheet.nrows):     
         db_register = []
         for j in range(sheet.ncols): 
@@ -425,7 +423,6 @@ def obs(request, id, id2):
     contador = 0
     for obs in observaciones:
         fotos.append(FotosObservaciones.objects.filter(observacion_id = obs.id))
-    print(fotos)
     
     return render(request,'e_db_obs.html',{'fila_programacion_general': fila_programacion_general, 'observaciones': observaciones, 'fotos': fotos,'existe': True, 'id_file': id, 'id_registro': id2, 'categorias': categorias, 'lugares': lugares}) 
 
@@ -628,18 +625,31 @@ def image_editor(request, id, id2):
         return JsonResponse({"resultado": "ok"})        
 
 #actualizar evidencia correctiva con la camara
-def update_image_editor(request, id, id2):
+def update_image_editor(request, id):
     if not request.user.is_authenticated or request.user.role.id >= 4:
         return redirect("/")    
     if request.method == 'POST': 
         imagen = request.POST['data']
+        imagen = "b'" + imagen[22:] + "'"
+
         observacion_registro = Observaciones.objects.get(id = id)
 
-        imagen = "b'" + imagen[22:] + "'"
-        
-        observacion_registro.evidencia_correctiva_encode = imagen
-        observacion_registro.save()
-        
+        if observacion_registro.evidencia_correctiva_encode == "undefined":        
+            observacion_registro.evidencia_correctiva_encode = imagen
+            observacion_registro.save()
+            return JsonResponse({"resultado": "ok"})
+
+        fo = FotosObservaciones.objects.filter(observacion_id = observacion_registro.id, evidencia_correctiva_encode="undefined")
+        if fo:            
+            fo[0].evidencia_correctiva_encode = imagen
+            fo[0].save()
+        else:
+            FotosObservaciones(
+                observacion_id = observacion_registro.id,                         
+                evidencia_encode = "undefined",
+                evidencia_correctiva_encode = imagen
+            ).save()            
+                
         return JsonResponse({"resultado": "ok"})
 
 def take_photo_vehicle(request, id):
@@ -811,8 +821,7 @@ def __obs_modales(request, id, id2, tipo_archivo, categoria, pertenece_a):
     uploaded_file_corrected = request.POST['file_lev']    
 
     #Solo para el archivo fatiga, declaracion jurada e iperc, independiente de la observacion
-    if pertenece_a == "conductor":  
-        print(uploaded_file)            
+    if pertenece_a == "conductor":      
         if uploaded_file != "undefined":
             uploaded_file = "b'" + uploaded_file[22:] + "'"
             imagen_watermark = __water_mark_function(request, fecha, uploaded_file)

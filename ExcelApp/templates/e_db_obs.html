@@ -80,7 +80,7 @@
             {% for foto in fotos %}
               {% if foto %}
                 {% for f in foto %}
-                  {% if f.observacion_id == observacion.id %}
+                  {% if f.evidencia_encode != "undefined" and f.observacion_id == observacion.id %}
                   <a href="#" class="pop" id="pop{{observacion.id}}_evidencia">
                     <img src="data:image/png;base64,{{f.evidencia_encode|slice:'2:-1'}}" style="width:100px;height:100px;" id="evidencia-{{observacion.id}}_f{{f.id}}">
                   </a>
@@ -97,9 +97,19 @@
             <a href="#" class="pop" id="pop{{observacion.id}}_evidencia_correctiva">
               <img src="data:image/png;base64,{{observacion.evidencia_correctiva_encode|slice:'2:-1'}}" style="width:100px;height:100px;" id="evidencia_correctiva-{{observacion.id}}_f0">              
             </a>
-          {% else %}  
-            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="actualizar_correctiva('{{observacion.id}}')">Tomar Foto</button>
           {% endif %}
+          {% for foto in fotos %}
+              {% if foto %}
+                {% for f in foto %}
+                  {% if f.evidencia_correctiva_encode != "undefined" and f.observacion_id == observacion.id %}
+                  <a href="#" class="pop" id="pop{{observacion.id}}_evidencia_correctiva">
+                    <img src="data:image/png;base64,{{f.evidencia_correctiva_encode|slice:'2:-1'}}" style="width:100px;height:100px;" id="evidencia_correctiva-{{observacion.id}}_f{{f.id}}">
+                  </a>
+                  {% endif %}  
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+          <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalCamera" onClick="actualizar_correctiva('{{observacion.id}}')">Tomar Foto</button>          
         </td>
         <td>{{ observacion.estado.name }}</td>
 
@@ -174,9 +184,10 @@
 
 <!-- Form oculto para subir nueva observacion-->
 <div class="btn-toolbar mb-2 mb-md-0">
+  <!-- Añadir antiguo oculto, si se desea hacer con archivos, falta corregir toda la funcionalidad
   <div class="btn-group mr-2">
     <a onclick="myFunction()" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Añadir Observación</a>
-  </div>
+  </div> -->
   <!-- Añadir observación con cámara -->
   <div class="btn-group mr-2">
     <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#uploadModalCamara">Observación Cámara</button>
@@ -805,12 +816,10 @@ function myFunction() {
         actualizar_correctiva_flag = false;
         var fdcamera_update = new FormData();        
         fdcamera_update.append('data', data); 
-        var observacion_id = id_obs.substring(id_obs.lastIndexOf("-") + 1,  id_obs.lastIndexOf("_f"));
-        var foto_id = id_obs.substring(id_obs.lastIndexOf("_f") + 2,  id_obs.length);
         // AJAX request
         $.ajax({
           headers: { "X-CSRFToken": token },
-          url: '/excel/db/update_image_editor/'+ observacion_id,
+          url: '/excel/db/update_image_editor/'+ id_obs,
           type: 'POST',
           data: fdcamera_update,
           contentType: false,
