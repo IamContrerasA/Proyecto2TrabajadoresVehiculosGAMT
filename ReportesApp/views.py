@@ -249,7 +249,7 @@ def generate_excel(request):
     start_date = request.session.get('start_date')
     end_date = request.session.get('end_date')
     observaciones = Observaciones.objects.filter(date__range =[start_date, end_date])  
-
+            
     #tamaño de celda que coincida con 0.5 de la imagen
     cell_width = 45.0
     cell_height = 180.0
@@ -257,14 +257,18 @@ def generate_excel(request):
     worksheet.set_column(1, 12, cell_width/2)
     worksheet.set_column(8, 8, cell_width)
     worksheet.set_column(12, 12, cell_width)
-    worksheet.set_default_row(cell_height)    
+    worksheet.set_default_row(cell_height)
+    worksheet.set_row(0, 40)
     x_scale = 0.5
     y_scale = 0.5
     
     #info cabecera
     format = workbook.add_format()
-    format.set_font_size(20)
-    format.set_bold(True)    
+    format.set_font_size(18)
+    format.set_bold(True)   
+    format.set_text_wrap() 
+    format.set_fg_color('#9b7c69')
+    format.set_font_color('white')
     worksheet.write('A1', "ITEM", format)
     worksheet.write('B1', "FECHA", format)
     worksheet.write('C1', "LUGAR", format)
@@ -280,32 +284,61 @@ def generate_excel(request):
     worksheet.write('M1', "EVIDENCIA CORRECTIVA", format)
     i = 1
     undefined = "PENDIENTE"
+    #alinear centro
+    format2 = workbook.add_format()
+    format2.set_valign('center')
+    format2.set_valign('vcenter')       
+    format2.set_text_wrap() 
     for obs in observaciones:      
-      worksheet.write('A'+ str(i +1), i)
-      worksheet.write('B'+ str(i +1), obs.date)
-      worksheet.write('C'+ str(i +1), obs.lugar.name)
-      worksheet.write('D'+ str(i +1), obs.programacion_general_id.contratista.name)
-      worksheet.write('E'+ str(i +1), obs.programacion_general_id.conductor_placa.placa1 + '|' + obs.programacion_general_id.conductor_placa.placa2)
-      worksheet.write('F'+ str(i +1), obs.programacion_general_id.transporte.name)
-      worksheet.write('G'+ str(i +1), obs.categoria.name)
-      worksheet.write('H'+ str(i +1), obs.descripcion)
+      worksheet.write('A'+ str(i +1), i, format2)
+      worksheet.write('B'+ str(i +1), obs.date, format2)
+      worksheet.write('C'+ str(i +1), obs.lugar.name, format2)
+      worksheet.write('D'+ str(i +1), obs.programacion_general_id.contratista.name, format2)
+      worksheet.write('E'+ str(i +1), obs.programacion_general_id.conductor_placa.placa1 + '|' + obs.programacion_general_id.conductor_placa.placa2, format2)
+      worksheet.write('F'+ str(i +1), obs.programacion_general_id.transporte.name, format2)
+      worksheet.write('G'+ str(i +1), obs.categoria.name, format2)
+      worksheet.write('H'+ str(i +1), obs.descripcion, format2)
       if obs.evidencia_encode != "undefined":
         data = obs.evidencia_encode[2:-1]
         imgdata = base64.b64decode(data)
         image = BytesIO(imgdata)
         worksheet.insert_image('I'+ str(i +1), 'myimage.png', {'image_data': image, 'x_scale': x_scale, 'y_scale': y_scale})
+        #insertar mas fotoes evidencia si tiene
+        fo = (FotosObservaciones.objects.filter(observacion_id = obs.id))
+        if fo:          
+          worksheet.set_row(i, cell_height * (len(fo) + 1))
+          aux_contador = 1
+          for f in fo:
+            if f.evidencia_encode and f.evidencia_encode != "undefined":
+              data = f.evidencia_encode[2:-1]
+              imgdata = base64.b64decode(data)
+              image = BytesIO(imgdata)
+              worksheet.insert_image('I'+ str(i +1), 'foto_evidencia.png', {'image_data': image, 'x_scale': x_scale, 'y_scale': y_scale, 'y_offset': (cell_height * aux_contador) + (60 * aux_contador) })
+              print(cell_height * aux_contador)
+              aux_contador = aux_contador +1 
       else:
-        worksheet.write('I'+ str(i +1), undefined)  
-      worksheet.write('J'+ str(i +1), obs.accion_plan)
-      worksheet.write('K'+ str(i +1), "CONTRATISTA")
-      worksheet.write('L'+ str(i +1), obs.date)
+        worksheet.write('I'+ str(i +1), undefined, format2)
+      worksheet.write('J'+ str(i +1), obs.accion_plan, format2)
+      worksheet.write('K'+ str(i +1), "CONTRATISTA", format2)
+      worksheet.write('L'+ str(i +1), obs.date, format2)
       if obs.evidencia_correctiva_encode != "undefined":
         data = obs.evidencia_correctiva_encode[2:-1]
         imgdata = base64.b64decode(data)
         image = BytesIO(imgdata)
         worksheet.insert_image('M'+ str(i +1), 'myimage.png', {'image_data': image, 'x_scale': x_scale, 'y_scale': y_scale})    
+        #insertar mas fotoes evidencia ocrrectiva si tiene
+        fo = (FotosObservaciones.objects.filter(observacion_id = obs.id))
+        if fo:
+          aux_contador = 1
+          for f in fo:
+            if f.evidencia_correctiva_encode and f.evidencia_correctiva_encode != "undefined":
+              data = f.evidencia_correctiva_encode[2:-1]
+              imgdata = base64.b64decode(data)
+              image = BytesIO(imgdata)
+              worksheet.insert_image('M'+ str(i +1), 'foto_correctiva.png', {'image_data': image, 'x_scale': x_scale, 'y_scale': y_scale, 'y_offset':  (cell_height * aux_contador) + (60 * aux_contador) })
+              aux_contador = aux_contador +1 
       else:
-        worksheet.write('M'+ str(i +1), undefined)      
+        worksheet.write('M'+ str(i +1), undefined, format2)    
       i = i +1
     workbook.close()
 
