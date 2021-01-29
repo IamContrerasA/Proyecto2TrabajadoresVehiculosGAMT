@@ -157,12 +157,24 @@
 							if (resultados != "vacio"){
 								resultados.forEach(element => {
 									if(element.evidencia_encode != "undefined" && element.evidencia_encode != null){									
-										link_evidencia_encode = "<a href='#' class='pop'><img src='data:image/png;base64,"+ element.evidencia_encode.slice(2, -1) +"' style='width:100px;height:100px;' id='myImg'> </a>";									
+										link_evidencia_encode = "<a href='#' class='pop'><img src='data:image/png;base64,"+ element.evidencia_encode.slice(2, -1) +"' style='width:100px;height:100px;' id='myImg'> </a>";
+										if(element.fotos){
+											element.fotos.forEach(e => {
+												if(e.evidencia_encode != "undefined")
+													link_evidencia_encode = link_evidencia_encode + "<a href='#' class='pop'><img src='data:image/png;base64,"+ e.evidencia_encode.slice(2, -1) +"' style='width:100px;height:100px;' id='myImg'> </a>";
+											});
+										}
 									}else{
 										link_evidencia_encode = "PENDIENTE";
 									}
 									if(element.evidencia_correctiva_encode != "undefined" && element.evidencia_correctiva_encode != null){
-										link_evidencia_correctiva_encode = "<a href='#' class='pop'><img src='data:image/png;base64,"+ element.evidencia_correctiva_encode.slice(2, -1) +"' style='width:100px;height:100px;' id='myImg'> </a>";
+										link_evidencia_correctiva_encode = "<a href='#' class='pop'><img src='data:image/png;base64,"+ element.evidencia_correctiva_encode.slice(2, -1) +"' style='width:100px;height:100px;' id='myImg'> </a>";										
+										if(element.fotos){
+											element.fotos.forEach(e => {
+												if(e.evidencia_correctiva_encode != "undefined")
+												link_evidencia_correctiva_encode = link_evidencia_correctiva_encode + "<a href='#' class='pop'><img src='data:image/png;base64,"+ e.evidencia_correctiva_encode.slice(2, -1) +"' style='width:100px;height:100px;' id='myImg'> </a>";
+											});
+										}
 									}else{
 										link_evidencia_correctiva_encode = "PENDIENTE";
 									}				

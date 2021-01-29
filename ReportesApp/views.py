@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
-from ExcelApp.models import Observaciones, Lugar, Contratista, Categoria
+from ExcelApp.models import Observaciones, Lugar, Contratista, Categoria, FotosObservaciones
 from django.conf import settings
 from django.template.loader import get_template
 from xhtml2pdf import pisa
+from django.core import serializers
 
 def index(request):
   if not request.user.is_authenticated or request.user.role.id >= 4:
@@ -186,6 +187,18 @@ def create(request):
 
     if not observaciones:
       return JsonResponse({"resultado": "vacio"})
+
+    fo = []
+    
+    for obs in observaciones:
+      fo = FotosObservaciones.objects.filter(observacion_id = obs['id'])
+      if fo:
+        aux = []        
+        for f in fo:
+          my_dict = {"id":f.id, "id_obs": f.observacion_id, "evidencia_encode": f.evidencia_encode, "evidencia_correctiva_encode": f.evidencia_correctiva_encode}
+          aux.append(my_dict)
+        obs.update({"fotos": aux})
+      
     json = list(observaciones)    
     return JsonResponse({"resultado": json})
 
