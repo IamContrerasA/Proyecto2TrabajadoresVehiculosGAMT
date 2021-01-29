@@ -209,9 +209,13 @@ def generate_pdf(request):
   end_date = request.session.get('end_date')
 
   observaciones = Observaciones.objects.filter(date__range = [start_date, end_date])
+  fotos = []
+  contador = 0
+  for obs in observaciones:
+      fotos.append(FotosObservaciones.objects.filter(observacion_id = obs.id))
 
   template_path = 'r_pdf.html'
-  context = {'observaciones': observaciones, 'STATIC_ROOT': settings.STATIC_ROOT, 'start_date': start_date, 'end_date': end_date}
+  context = {'observaciones': observaciones,'fotos': fotos, 'STATIC_ROOT': settings.STATIC_ROOT, 'start_date': start_date, 'end_date': end_date}
   # context = {'myvar': 'this is your template context'}
   # Create a Django response object, and specify content_type as pdf
   response = HttpResponse(content_type='application/pdf')

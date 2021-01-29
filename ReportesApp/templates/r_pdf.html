@@ -98,7 +98,18 @@ h1 {
       <td>{{ observacion.descripcion }}</td>
       <td>        
         {% if observacion.evidencia_encode != "undefined"  %}        
-          <img src="data:image/png;base64,{{observacion.evidencia_encode|slice:'2:-1'}}" height='200px'>          
+          <img src="data:image/png;base64,{{observacion.evidencia_encode|slice:'2:-1'}}" height='200px'><br> 
+          {% for foto in fotos %}
+              {% if foto %}
+                {% for f in foto %}
+                  {% if f.evidencia_encode != "undefined" and f.observacion_id == observacion.id %}
+                  <a href="#" class="pop" id="pop{{observacion.id}}_evidencia">
+                    <img src="data:image/png;base64,{{f.evidencia_encode|slice:'2:-1'}}" height='200px'><br>
+                  </a>
+                  {% endif %}  
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
         {% endif %}
       </td>
       <td>{{ observacion.accion_plan }}</td>
@@ -106,7 +117,18 @@ h1 {
       <td>{{ observacion.date }}</td>
       <td>      
         {% if observacion.evidencia_correctiva_encode != "undefined"  %}
-            <img src="data:image/png;base64,{{observacion.evidencia_correctiva_encode|slice:'2:-1'}}" height='200px'>        
+            <img src="data:image/png;base64,{{observacion.evidencia_correctiva_encode|slice:'2:-1'}}" height='200px'><br>
+            {% for foto in fotos %}
+            {% if foto %}
+              {% for f in foto %}
+                {% if f.evidencia_correctiva_encode != "undefined" and f.observacion_id == observacion.id %}
+                <a href="#" class="pop" id="pop{{observacion.id}}_evidencia_correctiva">
+                  <img src="data:image/png;base64,{{f.evidencia_correctiva_encode|slice:'2:-1'}}" height='200px'><br>
+                </a>
+                {% endif %}  
+              {% endfor %}
+            {% endif %}
+          {% endfor %}       
         {% endif %}
       </td>      
     </tr>
