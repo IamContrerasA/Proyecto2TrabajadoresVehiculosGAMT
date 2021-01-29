@@ -1165,10 +1165,11 @@
           success: function(response){
             if(response != 0){
               resultados = response.resultado
-              console.log(resultados);
-              location.reload()
-              // Show image preview
-              //$('#preview').append("<img src='"+response+"' width='100' height='100' style='display: inline-block;'>");
+              if(resultados == "falta evidencia o descripcion"){
+                alert('Falta Evidencia o Descripcion');
+                $("#myModal2").modal('hide');
+              }else
+                location.reload()
             }else{
               alert('file not uploaded');
             }
@@ -1215,10 +1216,11 @@
           success: function(response){
             if(response != 0){
               resultados = response.resultado
-              console.log(resultados);
-              location.reload()
-              // Show image preview
-              //$('#preview').append("<img src='"+response+"' width='100' height='100' style='display: inline-block;'>");
+              if(resultados == "falta evidencia o descripcion"){
+                alert('Falta Evidencia o Descripcion');
+                $("#myModal2").modal('hide');
+              }else
+                location.reload()
             }else{
               alert('file not uploaded');
             }
@@ -1265,10 +1267,11 @@
           success: function(response){
             if(response != 0){
               resultados = response.resultado
-              console.log(resultados);
-              location.reload()
-              // Show image preview
-              //$('#preview').append("<img src='"+response+"' width='100' height='100' style='display: inline-block;'>");
+              if(resultados == "falta evidencia o descripcion"){
+                alert('Falta Evidencia o Descripcion');
+                $("#myModal2").modal('hide');
+              }else
+                location.reload()
             }else{
               alert('file not uploaded');
             }
