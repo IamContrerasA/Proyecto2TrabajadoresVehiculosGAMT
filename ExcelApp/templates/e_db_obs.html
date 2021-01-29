@@ -56,6 +56,7 @@
         <th scope="col">Evidencia Correctiva</th>
         <th scope="col">Estado</th>
         <th scope="col">Editar</th>
+        <th scope="col">Borrar</th>
         <th scope="col">Acciones</th>
       </tr>
     </thead>
@@ -113,10 +114,58 @@
         </td>
         <td>{{ observacion.estado.name }}</td>
 
-        <!--Modal para borrar una observacion-->      
+        <!--Modal para editar una observacion-->      
         <td>
-          <a href="/excel/db/obs_destroy/{{id_file}}/{{observacion.programacion_general_id.id}}/{{observacion.id}}" class="btn btn-danger btn-sm" onclick="return confirm('ESTAS SEGURO QUE DESEA BORRAR LA OBSERVACION?')">BORRAR</a>           
-          
+          <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#uploadModal{{observacion.id}}">EDITAR</button> 
+          <!-- Modal -->	
+          <div id="uploadModal{{observacion.id}}" class="modal fade" role="dialog">	
+            <div class="modal-dialog">	
+
+              <!-- Modal content-->	
+              <div class="modal-content">	
+                <div class="modal-header">	
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>	
+                  <h4 class="modal-title">CERRAR</h4>	
+                </div>	
+                <div class="modal-body">	
+                  <!-- Form -->	
+                  <form method = "post" action='' enctype="multipart/form-data">	
+                    {% csrf_token %} 	
+
+                    Categoría :    	
+                    <select class="form-control" name="categoria" id="categoria_{{observacion.id}}">	
+                      {% for categoria in categorias %}	
+                        {% if observacion.categoria.id == categoria.id %}	
+                          <option selected="selected" value="{{ categoria.id }}"> {{ categoria.name }} </option>	
+                        {% else %}	
+                          <option value="{{ categoria.id }}"> {{ categoria.name }} </option>	
+                        {% endif %}	
+                      {% endfor %}	
+                    </select><br> 	
+                    Lugar :    	
+                    <select class="form-control" name="lugar" id="lugar_{{observacion.id}}">	
+                      {% for lugar in lugares %}	
+                        {% if observacion.lugar.id == lugar.id %}	
+                          <option selected="selected" value="{{ lugar.id }}"> {{ lugar.name }} </option>	
+                        {% else %}	
+                          <option value="{{ lugar.id }}"> {{ lugar.name }} </option>	
+                        {% endif %}	
+                      {% endfor %}	
+                    </select><br>                    
+                    Descripción: <input type="text"  class="form-control" name="descripcion" id="id_descripcion_{{observacion.id}}" required value="{{observacion.descripcion}}" /><br>	
+                    Plan de Acción: <input type="text"  class="form-control" name="plan_accion" id="id_plan_accion_{{observacion.id}}" value="{{observacion.accion_plan}}" /><br>	                    
+                    <input type='button' class='btn btn-info' value='Editar Observacion' id='btn_upload_{{observacion.id}}' name='btn_upload_{{observacion.id}}-{{observacion.programacion_general_id.id}}'>	
+                  </form> 	
+                  <!-- Preview-->	
+                  <div id='preview'></div>	
+                </div>          	
+              </div>	
+            </div>	
+          </div>
+        </td>
+
+        <td>
+          <a href="/excel/db/obs_destroy/{{id_file}}/{{observacion.programacion_general_id.id}}/{{observacion.id}}" class="btn btn-danger btn-sm" onclick="return confirm('ESTAS SEGURO QUE DESEA BORRAR LA OBSERVACION?')">BORRAR</a>          
         </td>
         <td>
           <a href="/excel/db/{{id_file}}/obs_aprove/{{observacion.programacion_general_id.id}}/{{observacion.id}}" class="btn btn-success btn-sm" >Aprobar</a>        
@@ -458,18 +507,14 @@ function myFunction() {
       var indice_obs = $this.substring($this.lastIndexOf("_") + 1, $this.lastIndexOf("-"));
       var indice_pg =  $this.substring($this.lastIndexOf("-") + 1,  $this.length);
 
-      var fd = new FormData();
-      var files = $('#id_evidencia_'+indice_obs)[0].files[0];
-      var id_levantamiento_ = $('#id_levantamiento_'+indice_obs)[0].files[0];
+      var fd = new FormData();            
       var id_mod_des = $('#id_descripcion_'+indice_obs)[0].value;
       var id_plan_accion = $('#id_plan_accion_'+indice_obs)[0].value;
       var id_categoria = $('#categoria_'+indice_obs)[0].value;
       var id_lugar = $('#lugar_'+indice_obs)[0].value;
             
-      fd.append('file',files);
       fd.append('descripcion',id_mod_des);
-      fd.append('plan_accion',id_plan_accion);
-      fd.append('file_id_levantamiento_',id_levantamiento_);
+      fd.append('plan_accion',id_plan_accion);      
       fd.append('categoria',id_categoria);
       fd.append('lugar',id_lugar);
       

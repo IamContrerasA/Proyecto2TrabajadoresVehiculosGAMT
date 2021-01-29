@@ -539,31 +539,13 @@ def obs_update(request, id, id2, id3):
 
     if request.method == 'POST':    
         data = request.POST        
-        name = "undefined"
-        name_corrected = "undefined"
-        uploaded_file = request.FILES['file'] if 'file' in request.FILES else False
-        uploaded_file_corrected = request.FILES['file_id_levantamiento_'] if 'file_id_levantamiento_' in request.FILES else False       
         categoria = Categoria.objects.get(id = data['categoria'])
         lugar = Lugar.objects.get(id = data['lugar'])
-
-        if uploaded_file :  
-            name = __encode64(uploaded_file)
-
-        if uploaded_file_corrected :
-            name_corrected = __encode64(uploaded_file_corrected)
         
         observacion_registro = Observaciones.objects.filter(id = id3)
 
-        if name == "undefined" and observacion_registro[0].evidencia_encode:
-            name = observacion_registro[0].evidencia_encode
-
-        if name_corrected == "undefined" and observacion_registro[0].evidencia_correctiva_encode:
-            name_corrected = observacion_registro[0].evidencia_correctiva_encode
-
         observacion_registro.update(
-            descripcion = data['descripcion'],  
-            evidencia_encode = name,
-            evidencia_correctiva_encode = name_corrected,
+            descripcion = data['descripcion'],
             accion_plan = data['plan_accion'],
             categoria = categoria,
             lugar = lugar
