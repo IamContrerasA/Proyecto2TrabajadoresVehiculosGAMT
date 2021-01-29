@@ -1147,10 +1147,10 @@
         var id_lugar = $('#id_lugar'+indice+'_'+indice_fila)[0].value;       
 
         fd.append('file',fatiga_src);
-        fd.append('file_obs',evidencia_src);
+        fd.append('file_obs',JSON.stringify(evidencia_src));
         fd.append('id_mod_des',id_mod_des);
         fd.append('id_plan_accion',id_plan_accion);
-        fd.append('file_lev',correctiva_src);
+        fd.append('file_lev',JSON.stringify(correctiva_src));
         fd.append('fecha',"{{file.created_at|date:'c'}}");
         fd.append('lugar',id_lugar);
         $("#myModal2").modal();
@@ -1197,10 +1197,10 @@
         var id_lugar = $('#id_lugar_dj'+indice+'_'+indice_fila)[0].value;       
 
         fd.append('file',declaracion_src);
-        fd.append('file_obs',evidencia_src);
+        fd.append('file_obs',JSON.stringify(evidencia_src));
         fd.append('id_mod_des',id_mod_des);
         fd.append('id_plan_accion',id_plan_accion);
-        fd.append('file_lev',correctiva_src); 
+        fd.append('file_lev',JSON.stringify(correctiva_src));
         fd.append('fecha',"{{file.created_at|date:'c'}}");
         fd.append('lugar',id_lugar);
         $("#myModal2").modal();
@@ -1247,10 +1247,10 @@
         var id_lugar = $('#id_lugar_i'+indice+'_'+indice_fila)[0].value;       
 
         fd.append('file',iperc_src);
-        fd.append('file_obs',evidencia_src);
+        fd.append('file_obs',JSON.stringify(evidencia_src));
         fd.append('id_mod_des',id_mod_des);
         fd.append('id_plan_accion',id_plan_accion);
-        fd.append('file_lev',correctiva_src); 
+        fd.append('file_lev',JSON.stringify(correctiva_src));
         fd.append('fecha',"{{file.created_at|date:'c'}}");
         fd.append('lugar',id_lugar);
         $("#myModal2").modal();
@@ -1296,10 +1296,10 @@
         var id_lugar = $('#id_lugar_cl'+indice+'_'+indice_fila)[0].value;
 
         fd.append('file',check_list_src);
-        fd.append('file_obs',evidencia_src);
+        fd.append('file_obs',JSON.stringify(evidencia_src));
         fd.append('id_mod_des',id_mod_des);
         fd.append('id_plan_accion',id_plan_accion);
-        fd.append('file_lev',correctiva_src); 
+        fd.append('file_lev',JSON.stringify(correctiva_src));
         fd.append('fecha',"{{file.created_at|date:'c'}}");
         fd.append('lugar',id_lugar);
         $("#myModal2").modal();
@@ -1315,7 +1315,11 @@
             if(response != 0){
               resultados = response.resultado
               console.log(resultados);
-              location.reload()
+              if(resultados == "falta evidencia o descripcion"){
+                alert('Falta Evidencia o Descripcion');
+                $("#myModal2").modal('hide');
+              }else
+                location.reload()
               // Show image preview
               //$('#preview').append("<img src='"+response+"' width='100' height='100' style='display: inline-block;'>");
             }else{
@@ -1400,7 +1404,7 @@
 <!--Script para Dibujar-->
 <script>
   var token = '{{csrf_token}}';
-  var evidencia_src = "undefined", correctiva_src = "undefined", check_list_src = "undefined", fatiga_src = "undefined", declaracion_src = "undefined", iperc_src = "undefined";
+  var evidencia_src = [], correctiva_src = [], check_list_src = "undefined", fatiga_src = "undefined", declaracion_src = "undefined", iperc_src = "undefined";
   var evidencia_flag = true, correctiva_flag = true, check_list_flag = true, fatiga_flag= true, declaracion_flag = true, iperc_flag=true;
   var rect, offsetLeft, offsetTop, img;
   var dragging = false;
@@ -1560,18 +1564,26 @@
       //console.log(tipo_evidencia);
       if(tipo_evidencia == "evidencia" && evidencia_flag == true){      
         evidencia_flag = false;
-        evidencia_src = data;
+        evidencia_src.push(data);
         close_snapshot();
         $('#myModalCamera').modal('toggle');
-        document.getElementById(id_fila).innerHTML = '<img src="'+evidencia_src+'" style="width:100px;height:100px;"><br><br>';
+        var imagenes_evidencia = ""        
+        evidencia_src.forEach(function(e) {
+          imagenes_evidencia = imagenes_evidencia + '<img src="'+e+'" style="width:100px;height:100px;">';          
+        });
+        document.getElementById(id_fila).innerHTML = imagenes_evidencia
       }
       //Si es una observacion tomada con cámara
       else if(tipo_evidencia == "evidencia_correctiva" && correctiva_flag == true){
         correctiva_flag = false;
-        correctiva_src = data;
+        correctiva_src.push(data);
         close_snapshot();
         $('#myModalCamera').modal('toggle');
-        document.getElementById(id_fila).innerHTML = '<img src="'+correctiva_src+'" style="width:100px;height:100px;"><br><br>';
+        var correctiva_evidencia = ""        
+        correctiva_src.forEach(function(e) {
+          correctiva_evidencia = correctiva_evidencia + '<img src="'+e+'" style="width:100px;height:100px;">';          
+        });
+        document.getElementById(id_fila).innerHTML = correctiva_evidencia;
       }
       //Agregar foto
       else if(tipo_evidencia == "check_list" && check_list_flag == true){
