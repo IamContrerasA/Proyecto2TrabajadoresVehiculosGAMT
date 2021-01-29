@@ -1,4 +1,4 @@
-var scroll_y, scroll_x;
+var scroll_y = 0, scroll_x = 0;
   window.addEventListener("scroll", function(event) {  
     if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
       scroll_y = 0; 
